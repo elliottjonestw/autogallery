@@ -15,9 +15,9 @@ A single-file, no-backend browser app for managing an autograph and memorabilia 
 7. [Table View](#table-view)
 8. [Add / Edit Item Modal](#add--edit-item-modal)
 9. [Item Detail Modal](#item-detail-modal)
-10. [Settings Modal (Currency)](#settings-modal-currency)
-11. [Light & Dark Mode](#light--dark-mode)
-12. [Import & Export](#import--export)
+10. [Settings Modal](#settings-modal)
+11. [Import & Export](#import--export)
+12. [Light & Dark Mode](#light--dark-mode)
 13. [Mobile Behavior](#mobile-behavior)
 14. [Data Storage](#data-storage)
 15. [Item Schema](#item-schema)
@@ -63,13 +63,10 @@ The header is sticky — it stays at the top of the viewport while you scroll. I
 
 | Control | Description |
 |---|---|
-| ⚙️ Settings | Opens the **Settings Modal** for currency configuration |
-| 📥 Import | Triggers a hidden `<input type="file">` to import a `.json` backup |
-| 📤 Export | Downloads the entire collection as a `.json` file |
-| ☀️ / 🌙 Theme toggle | Switches between light mode and dark mode |
+| ⚙️ Settings | Opens the **Settings Modal** for theme, import/export, and currency options |
 | **+ Add Item** | Opens the Add Item modal |
 
-All icon buttons (settings, import, export, theme) are 36×36px square buttons with rounded corners. On hover they brighten slightly.
+The Settings button is a 36×36px square icon button with rounded corners. On hover it brightens slightly.
 
 The **+ Add Item** button is styled in gold with black text to make it the primary call to action.
 
@@ -86,7 +83,7 @@ Directly below the header, the stats bar shows four live aggregate statistics ac
 | **Est. Value** | Sum of all "Est. Value" values |
 | **Total ROI** | Overall return on investment: `(total value − total paid) / total paid × 100`, displayed as a whole-number percentage |
 
-- All monetary values are converted to the **display currency** using the live exchange rate (see [Settings Modal](#settings-modal-currency)).
+- All monetary values are converted to the **display currency** using the live exchange rate (see [Settings Modal](#settings-modal)).
 - If no items have both a paid amount and an estimated value, ROI shows `—`.
 - Values use the display currency symbol and `toLocaleString()` formatting (e.g. commas for thousands).
 - Stats are separated by vertical dividers and use gold for the value text.
@@ -258,11 +255,24 @@ Fields with no value are omitted (not shown as blank rows).
 
 ---
 
-## Settings Modal (Currency)
+## Settings Modal
 
-Opened by clicking the **⚙️ gear icon** in the header. Contains all currency configuration.
+Opened by clicking the **⚙️ gear icon** in the header. The modal is organized into three sections: Appearance, Data, and Currency.
 
-### Two-Currency System
+### Appearance
+
+A row button that toggles between light and dark mode. The label updates to reflect the opposite of the current theme ("Switch to Dark Mode" / "Switch to Light Mode"), and the icon switches between a sun and moon accordingly. See [Light & Dark Mode](#light--dark-mode) for full details.
+
+### Data
+
+Two row buttons for backup and restore:
+
+- **Export Collection** — downloads the full collection as a `.json` file. See [Import & Export](#import--export).
+- **Import Collection** — opens a file picker to load a previously exported `.json` file, replacing the current collection. See [Import & Export](#import--export).
+
+### Currency
+
+#### Two-Currency System
 
 AutoGallery separates **where you record values** from **how you display them**:
 
@@ -318,7 +328,7 @@ Changing either currency in the settings modal:
 
 ## Light & Dark Mode
 
-A toggle button (☀️ sun in dark mode, 🌙 moon in light mode) appears in the header. Clicking it switches between the two themes.
+The theme toggle lives inside the **Settings Modal** under the Appearance section. It is a full-width row button that switches between light and dark mode. The button label reads "Switch to Dark Mode" when light mode is active, and "Switch to Light Mode" when dark mode is active. The icon changes between a sun (☀️) and moon (🌙) to match.
 
 **Default:** Light mode.
 
@@ -345,7 +355,7 @@ A toggle button (☀️ sun in dark mode, 🌙 moon in light mode) appears in th
 
 ### Export
 
-Click the **📤 export button** in the header. The browser downloads a file named `autogallery-backup.json`.
+Click **Export Collection** in the Settings Modal (⚙️ → Data). The browser downloads a `.json` file named with today's date (e.g. `autogallery-2024-11-15.json`).
 
 **File format:**
 
@@ -377,7 +387,7 @@ Click the **📤 export button** in the header. The browser downloads a file nam
 
 ### Import
 
-Click the **📥 import button** in the header. A file picker opens. Select a previously exported `.json` file.
+Click **Import Collection** in the Settings Modal (⚙️ → Data). A file picker opens. Select a previously exported `.json` file.
 
 **Import behavior:**
 
