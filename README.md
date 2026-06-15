@@ -1,0 +1,510 @@
+# AutoGallery
+
+A single-file, no-backend browser app for managing an autograph and memorabilia collection. All data is stored locally in the browser — nothing is ever sent to a server.
+
+---
+
+## Table of Contents
+
+1. [Overview](#overview)
+2. [Getting Started](#getting-started)
+3. [Header](#header)
+4. [Stats Bar](#stats-bar)
+5. [Search & Controls Bar](#search--controls-bar)
+6. [Grid View](#grid-view)
+7. [Table View](#table-view)
+8. [Add / Edit Item Modal](#add--edit-item-modal)
+9. [Item Detail Modal](#item-detail-modal)
+10. [Settings Modal (Currency)](#settings-modal-currency)
+11. [Light & Dark Mode](#light--dark-mode)
+12. [Import & Export](#import--export)
+13. [Mobile Behavior](#mobile-behavior)
+14. [Data Storage](#data-storage)
+15. [Item Schema](#item-schema)
+16. [Technical Notes](#technical-notes)
+
+---
+
+## Overview
+
+AutoGallery is a **single HTML file** (`index.html`). There is no server, no database, no external JavaScript libraries, and no external CSS files. Everything — markup, styles, and logic — lives inside one self-contained file.
+
+Key characteristics:
+
+- **Zero dependencies** — runs directly from the filesystem or any static file server (e.g. `python3 -m http.server 4200`).
+- **Persistent storage** — all collection data, preferences, and cached exchange rates are stored in the browser's `localStorage`.
+- **No account required** — open the file, start adding items.
+- **Designed for 8×10 autographed photos and similar memorabilia**, but works for any signed collectible.
+
+---
+
+## Getting Started
+
+Open `index.html` in any modern browser. If you need URL-based navigation or want to load images from disk, serve it locally:
+
+```bash
+python3 -m http.server 4200
+# then open http://localhost:4200
+```
+
+The app is blank on first launch. Click **+ Add Item** in the header to add your first piece.
+
+---
+
+## Header
+
+The header is sticky — it stays at the top of the viewport while you scroll. It contains:
+
+### Logo
+
+**Auto**Gallery — "Auto" is styled in gold, "Gallery" in the default text color.
+
+### Header Controls (right side, left to right)
+
+| Control | Description |
+|---|---|
+| ⚙️ Settings | Opens the **Settings Modal** for currency configuration |
+| 📥 Import | Triggers a hidden `<input type="file">` to import a `.json` backup |
+| 📤 Export | Downloads the entire collection as a `.json` file |
+| ☀️ / 🌙 Theme toggle | Switches between light mode and dark mode |
+| **+ Add Item** | Opens the Add Item modal |
+
+All icon buttons (settings, import, export, theme) are 36×36px square buttons with rounded corners. On hover they brighten slightly.
+
+The **+ Add Item** button is styled in gold with black text to make it the primary call to action.
+
+---
+
+## Stats Bar
+
+Directly below the header, the stats bar shows four live aggregate statistics across the **entire collection** (not just the filtered view):
+
+| Stat | Description |
+|---|---|
+| **Items** | Total number of items in the collection |
+| **Total Paid** | Sum of all "Paid" values |
+| **Est. Value** | Sum of all "Est. Value" values |
+| **Total ROI** | Overall return on investment: `(total value − total paid) / total paid × 100`, displayed as a whole-number percentage |
+
+- All monetary values are converted to the **display currency** using the live exchange rate (see [Settings Modal](#settings-modal-currency)).
+- If no items have both a paid amount and an estimated value, ROI shows `—`.
+- Values use the display currency symbol and `toLocaleString()` formatting (e.g. commas for thousands).
+- Stats are separated by vertical dividers and use gold for the value text.
+
+---
+
+## Search & Controls Bar
+
+Below the stats bar is a row of controls for filtering and viewing the collection.
+
+### Search
+
+A text input with a magnifying-glass icon. Filters items in real time (on every keystroke) across:
+
+- Signer name
+- Character name
+- Film/show title
+- Notes
+
+The search is **case-insensitive**. Clearing the input restores the full list.
+
+### Sort
+
+A dropdown to sort the visible items. Options:
+
+| Option | Sort order |
+|---|---|
+| Value: High → Low | Estimated value descending *(default)* |
+| Value: Low → High | Estimated value ascending |
+| Paid: High → Low | Amount paid descending |
+| Paid: Low → High | Amount paid ascending |
+| Newest First | Date added descending |
+| Oldest First | Date added ascending |
+| Name A → Z | Signer name alphabetically |
+| Name Z → A | Signer name reverse alphabetically |
+
+Items without a value are sorted to the end when sorting by value or paid.
+
+### Columns (desktop only)
+
+A dropdown to choose how many cards appear per row in grid view. Options: **3, 4, 5, 6, 7, 8**. Default is **5**. This setting is saved to `localStorage` (`ag_cols`) and restored on next visit.
+
+### View Toggle (desktop only)
+
+Two buttons side by side — a grid icon and a table/list icon — to switch between **Grid View** and **Table View**. The active mode is highlighted. The last-used view is saved to `localStorage` (`ag_view`). Both the columns selector and view toggle are **hidden on mobile**.
+
+---
+
+## Grid View
+
+The default view. Items are displayed as cards in a responsive grid. The number of columns is controlled by the **Columns** dropdown (3–8 per row on desktop; 2 columns fixed on mobile).
+
+### Card Layout
+
+Each card from top to bottom:
+
+1. **Image area** — 5:4 aspect ratio. If a photo was uploaded it fills this area with `object-fit: cover`. If no photo exists, a placeholder icon is shown. On hover, the image subtly scales up (1.03×).
+
+2. **ROI Overlay** — if both "Paid" and "Est. Value" are filled in, an ROI pill is shown **over the top-left corner of the image**, with a frosted-glass dark background. Green for positive ROI, red for negative. Example: `+47%` or `-12%`.
+
+3. **Card body** (below the image):
+   - **Signer name** — bold, 14px
+   - **Character name** — smaller, muted color, on its own line
+   - **Film/show title** — smaller, muted color, on its own line below character name
+   - A thin horizontal divider
+   - **Paid** label + value (or `—` if not set)
+   - **Est. Value** label + value; if a value URL is set, the value is a clickable gold link that opens the source in a new tab. The link click does **not** open the detail modal.
+   - **Cert** label + a gold clickable link to the authentication company's verification page (if a cert company is selected). Link text is the company name (e.g. "Beckett"). The link click does **not** open the detail modal.
+
+4. **Clicking the card** (anywhere except the links) opens the **Item Detail Modal**.
+
+Cards animate on hover: they lift up 3px and show a deeper shadow.
+
+---
+
+## Table View
+
+An alternative view available on desktop. Items are shown as rows in a sortable table with the following columns:
+
+| Column | Content |
+|---|---|
+| (thumbnail) | 52×40px cropped thumbnail of the photo, or a placeholder icon |
+| **Signer** | Bold signer name with character and film/show in smaller muted text below |
+| **Paid** | Amount paid in display currency |
+| **Est. Value** | Estimated value in display currency, colored green (positive) or red (negative) relative to paid. If a value URL is set, the value is a clickable link that opens in a new tab. |
+| **ROI** | Whole-number percentage, green or red pill |
+| **Cert** | Clickable gold link to the authentication company's verification page |
+| **Added** | Date the item was added, formatted as `MMM D, YYYY` |
+
+- Clicking any **row** opens the **Item Detail Modal** for that item.
+- Clicking the **Est. Value link** or **Cert link** opens the respective URL in a new tab without opening the detail modal (click propagation is stopped).
+- Rows have a hover background highlight.
+
+---
+
+## Add / Edit Item Modal
+
+Opened by clicking **+ Add Item** (new item) or **Edit** inside the detail modal (existing item). The modal slides in with a slight scale animation and a blurred backdrop.
+
+### Form Fields
+
+| Field | Type | Notes |
+|---|---|---|
+| **Signer** | Text input | Required. The autograph signer's real name. |
+| **Character** | Text input | Optional. Character name (e.g. "Darth Vader"). |
+| **Film / Show** | Text input | Optional. The title of the film or show. |
+| **Cert #** | Text input | Optional. The authentication certificate number. |
+| **Cert Company** | Dropdown | Options: *(none)*, Beckett, PSA, JSA, SWAU. Controls the verification URL. |
+| **Paid** | Number input | Optional. What you paid, in your **local currency**. |
+| **Est. Value** | Number input | Optional. Current estimated market value, in your **local currency**. |
+| **Value Source URL** | Text input | Optional. A URL linking to a source for the estimated value (e.g. eBay sold listing). |
+| **Notes** | Textarea | Optional. Free-form notes. Resizable vertically. |
+| **Photo** | File upload / drag-and-drop | Optional. See below. |
+
+All monetary inputs (**Paid**, **Est. Value**) are stored in the **local currency** (configured in Settings). They are converted to the display currency at render time using the live exchange rate.
+
+### Photo Upload
+
+The photo area is a dashed drop zone. You can:
+
+- **Click** to open the system file picker (accepts `image/*`)
+- **Drag and drop** an image file onto the zone
+
+After an image is selected it is compressed client-side using an HTML5 Canvas:
+
+- Maximum dimension: **900px** (width or height, whichever is larger)
+- Output format: **JPEG at 0.82 quality**
+- Stored as a **base64 data URL** in `localStorage`
+
+A preview of the selected image is shown in the drop zone. A **Remove** button appears to clear the photo.
+
+### Validation
+
+Only **Signer** is required. If left blank, the field is highlighted in red and saving is blocked.
+
+### Buttons
+
+- **Cancel** — closes the modal without saving
+- **Save** (Add Item modal) or **Save Changes** (edit modal) — validates and writes to `localStorage`, then re-renders the gallery
+
+---
+
+## Item Detail Modal
+
+Clicking any card (grid) or row (table) opens a read-only detail view for that item.
+
+### Contents
+
+- **Signer name** as the modal title
+- Photo (full width, if available) with `object-fit: cover`
+- All fields displayed as label/value pairs:
+  - Character
+  - Film / Show
+  - Paid (in display currency)
+  - Est. Value (in display currency, with link if URL is set)
+  - ROI pill (colored)
+  - Cert # with a clickable link to the cert company's verification page
+  - Date Added
+  - Notes
+
+Fields with no value are omitted (not shown as blank rows).
+
+### Buttons
+
+- **Edit** — opens the Edit modal pre-populated with all current field values
+- **Delete** — shows a browser `confirm()` dialog. If confirmed, removes the item from `localStorage` and re-renders. If cancelled, nothing happens.
+- **✕** (top-right) — closes the modal
+- Clicking the **backdrop** (outside the modal) also closes it
+
+---
+
+## Settings Modal (Currency)
+
+Opened by clicking the **⚙️ gear icon** in the header. Contains all currency configuration.
+
+### Two-Currency System
+
+AutoGallery separates **where you record values** from **how you display them**:
+
+| Currency | Purpose |
+|---|---|
+| **Local Currency** | The currency in which you enter **Paid** and **Est. Value** amounts. Stored with the data. |
+| **Display Currency** | The currency shown throughout the UI — stats bar, cards, table, detail modal. |
+
+If local and display currencies differ, a live exchange rate is fetched from the internet and used to convert all displayed monetary values.
+
+### Currency Options
+
+Both dropdowns offer the same list of currencies:
+
+`USD`, `GBP`, `EUR`, `TWD`, `JPY`, `CNY`, `AUD`, `CAD`, `HKD`, `SGD`, `KRW`
+
+Each is shown with its symbol in the UI: `$`, `£`, `€`, `NT$`, `¥`, `¥`, `A$`, `CA$`, `HK$`, `S$`, `₩`.
+
+### Exchange Rate
+
+When local ≠ display currency, the app fetches a live exchange rate from:
+
+```
+https://cdn.jsdelivr.net/npm/@fawazahmed0/currency-api@latest/v1/currencies/{base}.json
+```
+
+This is a free, public API that requires no authentication.
+
+**Caching:** The exchange rate is cached in `localStorage` (`ag_rate_cache`) for **1 hour**. This prevents excessive API calls on every page load. The cache stores: the `from` currency, the `to` currency, the `rate`, and a Unix timestamp. If the cache is older than 1 hour, or if either currency has changed since it was cached, a fresh fetch is triggered.
+
+**Rate Status Box:** The settings modal shows a small status box indicating the current exchange rate and its state:
+
+| State | Display |
+|---|---|
+| Same currency | No rate box shown (rate = 1) |
+| Loading | "Fetching rate…" with a spinner |
+| Loaded | "1 TWD = 0.0312 USD · updated just now" (example) |
+| Error | "Could not fetch rate" with a Retry button |
+
+A **Refresh** button allows manually re-fetching the rate at any time (bypasses the 1-hour cache).
+
+**Behavior when currencies match:** If local and display currencies are set to the same value, no exchange rate is fetched, and `exchangeRate` is set to `1` internally. All displayed values are identical to stored values.
+
+### Changing Currencies
+
+Changing either currency in the settings modal:
+1. Saves the selection to `localStorage` immediately
+2. Clears any cached exchange rate (to prevent stale rates when the currency pair changes)
+3. Triggers a fresh `fetchExchangeRate()` call
+4. Re-renders the gallery with the new rate once it arrives
+
+---
+
+## Light & Dark Mode
+
+A toggle button (☀️ sun in dark mode, 🌙 moon in light mode) appears in the header. Clicking it switches between the two themes.
+
+**Default:** Light mode.
+
+**How it works:** A `data-theme="light"` attribute is set on the `<html>` element for light mode. When dark mode is active, the attribute is removed. CSS custom properties (variables) defined in `:root` apply the dark theme, and a `[data-theme="light"]` block overrides them for light mode.
+
+**Persistence:** The chosen theme is saved as `ag_theme` in `localStorage` and restored on next visit.
+
+### Color Palette
+
+| Variable | Dark mode | Light mode |
+|---|---|---|
+| `--bg` | `#0c0c10` | `#f0f0f5` |
+| `--surface` | `#16161e` | `#ffffff` |
+| `--card` | `#1d1d27` | `#ffffff` |
+| `--gold` | `#c9a435` | `#a07810` |
+| `--text` | `#e6e6f0` | `#18182a` |
+| `--sub` | `#9090a8` | `#70708a` |
+| `--green` | `#4caf84` | `#1e7a52` |
+| `--red` | `#e05555` | `#c03030` |
+
+---
+
+## Import & Export
+
+### Export
+
+Click the **📤 export button** in the header. The browser downloads a file named `autogallery-backup.json`.
+
+**File format:**
+
+```json
+{
+  "currency": "TWD",
+  "items": [
+    {
+      "id": "abc123",
+      "added": "2024-11-15T08:30:00.000Z",
+      "name": "Harrison Ford",
+      "character": "Han Solo",
+      "film": "Star Wars",
+      "certNum": "A1234567",
+      "certCompany": "beckett",
+      "paid": 15000,
+      "value": 22000,
+      "valueUrl": "https://www.ebay.com/...",
+      "notes": "Signed at Fan Expo 2023",
+      "img": "data:image/jpeg;base64,/9j/..."
+    }
+  ]
+}
+```
+
+- `currency` is the **local currency** at time of export.
+- All monetary values in `items` are in that local currency.
+- `img` is the full base64-encoded JPEG string, or `null` if no photo.
+
+### Import
+
+Click the **📥 import button** in the header. A file picker opens. Select a previously exported `.json` file.
+
+**Import behavior:**
+
+- The imported `currency` field is set as the new **local currency**.
+- All items are loaded into `localStorage`, **replacing** the current collection entirely.
+- The gallery re-renders immediately with the imported data.
+- If the file is malformed or cannot be parsed, a browser `alert()` is shown.
+
+> ⚠️ Import **overwrites** your current data. Export a backup before importing if you want to preserve your existing collection.
+
+---
+
+## Mobile Behavior
+
+The app is designed to work on small screens. On viewports **640px wide or narrower**:
+
+- **Grid/Table toggle is hidden** — table view is not available on mobile.
+- **Columns selector is hidden** — the column count is not adjustable on mobile.
+- **Grid is forced** — even if `ag_view` is set to `"table"` in localStorage, the app renders grid view. This is enforced both in CSS (with `!important` overrides hiding `.table-wrap` and showing `.gallery`) and in JavaScript (a `isMobile` check in the render function).
+- **Grid is 2 columns** — a CSS media query sets `--cols: 2` on mobile, overriding any saved column preference.
+- **Cards go full width** — the text (signer name, character, film) spans the full card width rather than being cramped next to a fixed-width image column.
+- **Horizontal scroll is prevented** — all layout uses `box-sizing: border-box` and the gallery padding is reduced to `12px` on mobile to prevent content from overflowing the viewport.
+
+---
+
+## Data Storage
+
+All data is stored in the browser's `localStorage`. The following keys are used:
+
+| Key | Type | Contents |
+|---|---|---|
+| `autogallery_v2` | JSON string | Array of all item objects |
+| `ag_currency` | String | Local currency code (e.g. `"TWD"`) |
+| `ag_display_currency` | String | Display currency code (e.g. `"USD"`) |
+| `ag_rate_cache` | JSON string | Cached exchange rate: `{from, to, rate, ts}` |
+| `ag_cols` | String | Saved columns per row (e.g. `"5"`) |
+| `ag_view` | String | Saved view mode: `"grid"` or `"table"` |
+| `ag_theme` | String | Saved theme: `"light"` or `"dark"` |
+
+**Storage limits:** `localStorage` is typically limited to **5–10 MB** per origin. Because item photos are stored as base64-encoded JPEGs (compressed to max 900px at 0.82 quality), each photo takes roughly 100–400 KB. A collection of 20–50 items with photos is well within typical limits, but very large collections with many high-detail photos could approach the limit. If storage is full, the browser will throw an error and the item will not be saved.
+
+---
+
+## Item Schema
+
+Each item is a JavaScript object with the following fields:
+
+| Field | Type | Description |
+|---|---|---|
+| `id` | string | Unique identifier generated with `Date.now() + Math.random()` at creation time |
+| `added` | string | ISO 8601 timestamp of when the item was first saved (e.g. `"2024-11-15T08:30:00.000Z"`) |
+| `name` | string | Signer's real name (required) |
+| `character` | string | Character name (optional, may be empty string) |
+| `film` | string | Film or show title (optional, may be empty string) |
+| `certNum` | string | Certificate number (optional, may be empty string) |
+| `certCompany` | string | One of: `"beckett"`, `"psa"`, `"jsa"`, `"swau"`, or `""` (none) |
+| `paid` | number \| null | Amount paid, in the local currency |
+| `value` | number \| null | Estimated current value, in the local currency |
+| `valueUrl` | string | URL to a value source (optional, may be empty string) |
+| `notes` | string | Free-form notes (optional, may be empty string) |
+| `img` | string \| null | Base64 JPEG data URL, or `null` if no photo |
+
+---
+
+## Technical Notes
+
+### No External Dependencies
+
+The app uses only:
+- Native browser APIs (`localStorage`, `fetch`, `FileReader`, `HTMLCanvasElement`)
+- Vanilla JavaScript (ES2017+, using `async/await`)
+- Inline CSS with custom properties
+
+### Certification URL Derivation
+
+Cert company codes map to verification URLs as follows:
+
+| Code | Company | Verification URL |
+|---|---|---|
+| `beckett` | Beckett | `https://www.beckett-authentication.com/verify-certificate` |
+| `psa` | PSA | `https://www.psacard.com/cert` |
+| `jsa` | JSA | `https://www.spenceloa.com/verify-authenticity` |
+| `swau` | SWAU | `https://auth.swau.com/pages/verify-hologram` |
+
+The URL is derived at render time from `item.certCompany`. No URL is stored in the item data — only the company code.
+
+### ROI Calculation
+
+```
+ROI = Math.round((value - paid) / paid * 100)
+```
+
+Result is a whole number (no decimal places). Displayed as `+47%` or `-12%`. If either `paid` or `value` is missing, ROI is not shown.
+
+### Currency Conversion
+
+All monetary values are stored in the local currency. At render time, every value is multiplied by `exchangeRate` (a module-level variable):
+
+```javascript
+const converted = Math.round(Number(n) * exchangeRate);
+```
+
+The result is formatted with `toLocaleString()` for thousands separators and prefixed with the display currency symbol.
+
+### Image Compression Pipeline
+
+```
+User picks file
+  → FileReader reads as Data URL
+  → Image loaded into <img> element
+  → Canvas resized to max 900px on longest side
+  → Canvas.toDataURL('image/jpeg', 0.82) produces compressed base64
+  → Stored in item.img
+```
+
+### Modal Behavior
+
+Modals use a two-class system:
+- `.overlay` — the full-screen backdrop (always in DOM, `opacity: 0`, `pointer-events: none`)
+- `.overlay.open` — adds `opacity: 1` and `pointer-events: all`, animates the inner `.modal` from a slightly translated/scaled state to its natural position
+
+Closing can happen via: the ✕ button, a Cancel button, a backdrop click (on the overlay itself, not the modal), or Delete confirmation.
+
+### Sorting Implementation
+
+Sort is applied after search filtering. Items without a value (`null`) are sorted to the bottom when sorting by value or paid. Sort state is not persisted — it resets to "Value: High → Low" on page load.
+
+### Click Propagation
+
+Links inside cards and table rows (Est. Value link, Cert link) call `event.stopPropagation()` so that clicking them does not bubble up to the card/row click handler that would otherwise open the detail modal.
