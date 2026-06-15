@@ -87,6 +87,21 @@
     }
     .btn-icon:hover { color: var(--text); background: var(--border); }
 
+    .currency-select {
+      background: var(--card);
+      border: 1px solid var(--border);
+      color: var(--text);
+      padding: 0 10px;
+      height: 36px;
+      border-radius: 8px;
+      font-size: 12px;
+      font-weight: 600;
+      outline: none;
+      cursor: pointer;
+      transition: border-color .15s;
+    }
+    .currency-select:focus { border-color: var(--gold-dim); }
+
     .btn-add {
       background: var(--gold);
       color: #000;
@@ -707,6 +722,19 @@
 <header>
   <div class="logo">Auto<span>Gallery</span></div>
   <div class="header-right">
+    <select class="currency-select" id="currencySelect" onchange="setCurrency(this.value)" title="Currency">
+      <option value="USD">USD $</option>
+      <option value="GBP">GBP £</option>
+      <option value="EUR">EUR €</option>
+      <option value="TWD" selected>TWD NT$</option>
+      <option value="JPY">JPY ¥</option>
+      <option value="CNY">CNY ¥</option>
+      <option value="AUD">AUD A$</option>
+      <option value="CAD">CAD CA$</option>
+      <option value="HKD">HKD HK$</option>
+      <option value="SGD">SGD S$</option>
+      <option value="KRW">KRW ₩</option>
+    </select>
     <button class="btn-icon" title="Export collection" onclick="exportData()">
       <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
     </button>
@@ -842,20 +870,20 @@
           <input class="finput" id="fCertNum" placeholder="e.g. BD13964">
         </div>
         <div class="fg">
-          <label class="flabel">Cert URL</label>
-          <input class="finput" id="fCertUrl" placeholder="https://…" type="url">
+          <label class="flabel">Cert Company</label>
+          <select class="finput" id="fCertCompany">
+            <option value="">— None —</option>
+            <option value="beckett">Beckett</option>
+            <option value="psa">PSA</option>
+            <option value="jsa">JSA</option>
+            <option value="swau">SWAU</option>
+          </select>
         </div>
       </div>
 
-      <div class="frow">
-        <div class="fg">
-          <label class="flabel">Currency</label>
-          <input class="finput" id="fCurrency" placeholder="NT$" value="NT$">
-        </div>
-        <div class="fg">
-          <label class="flabel">Amount Paid</label>
-          <input class="finput" id="fPaid" type="number" min="0" placeholder="5025">
-        </div>
+      <div class="fg">
+        <label class="flabel">Amount Paid</label>
+        <input class="finput" id="fPaid" type="number" min="0" placeholder="5025">
       </div>
 
       <div class="frow">
@@ -905,6 +933,37 @@
   let pendingImg = null;   // base64 string or null
   let activeDetailId = null;
 
+  /* ── Currency ── */
+  const CURRENCY_SYMBOLS = {
+    USD: '$', GBP: '£', EUR: '€', TWD: 'NT$',
+    JPY: '¥', CNY: '¥', AUD: 'A$', CAD: 'CA$',
+    HKD: 'HK$', SGD: 'S$', KRW: '₩',
+  };
+
+  function getCurrencySymbol() {
+    return CURRENCY_SYMBOLS[localStorage.getItem('ag_currency') || 'TWD'] || 'NT$';
+  }
+
+  function setCurrency(code) {
+    localStorage.setItem('ag_currency', code);
+    const sel = document.getElementById('currencySelect');
+    if (sel) sel.value = code;
+    render();
+  }
+
+  /* ── Cert company URL map ── */
+  const CERT_URLS = {
+    beckett : 'https://www.beckett-authentication.com/verify-certificate',
+    psa     : 'https://www.psacard.com/cert',
+    jsa     : 'https://www.spenceloa.com/verify-authenticity',
+    swau    : 'https://auth.swau.com/pages/verify-hologram',
+  };
+  const CERT_LABELS = { beckett: 'Beckett', psa: 'PSA', jsa: 'JSA', swau: 'SWAU' };
+
+  function getCertUrl(item) {
+    return CERT_URLS[item.certCompany] || null;
+  }
+
   /* ── Storage ── */
   function load() {
     try { items = JSON.parse(localStorage.getItem(KEY) || '[]'); }
@@ -942,9 +1001,9 @@
   }
 
   /* ── Formatting ── */
-  function fmt(currency, n) {
+  function fmt(n) {
     if (!n && n !== 0) return '—';
-    return (currency || '') + Number(n).toLocaleString();
+    return getCurrencySymbol() + Number(n).toLocaleString();
   }
 
   function roi(paid, value) {
@@ -959,14 +1018,13 @@
 
   /* ── Stats ── */
   function updateStats() {
-    const cur = items.length ? (items[0].currency || '') : '';
     const totalPaid  = items.reduce((s, i) => s + (Number(i.paid)  || 0), 0);
     const totalValue = items.reduce((s, i) => s + (Number(i.value) || 0), 0);
     const r = totalPaid > 0 ? (totalValue - totalPaid) / totalPaid * 100 : null;
 
     document.getElementById('sCount').textContent = items.length;
-    document.getElementById('sPaid').textContent  = items.length ? fmt(cur, totalPaid) : '—';
-    document.getElementById('sValue').textContent = items.length ? fmt(cur, totalValue) : '—';
+    document.getElementById('sPaid').textContent  = items.length ? fmt(totalPaid) : '—';
+    document.getElementById('sValue').textContent = items.length ? fmt(totalValue) : '—';
 
     const el = document.getElementById('sROI');
     if (r !== null) {
@@ -1031,7 +1089,6 @@
     g.innerHTML = res.map(item => {
       const r    = roi(item.paid, item.value);
       const rStr = roiStr(r);
-      const cur  = item.currency || '';
 
       const roiBadge = rStr
         ? `<span class="roi-pill ${r >= 0 ? 'roi-pos' : 'roi-neg'} roi-overlay">${rStr}</span>`
@@ -1046,19 +1103,20 @@
 
       let rows = '';
       if (item.certNum) {
-        const v = item.certUrl
-          ? `<a class="card-link" href="${escHtml(item.certUrl)}" target="_blank" rel="noopener" onclick="event.stopPropagation()">${escHtml(item.certNum)}</a>`
+        const cUrl = getCertUrl(item);
+        const v = cUrl
+          ? `<a class="card-link" href="${escHtml(cUrl)}" target="_blank" rel="noopener" onclick="event.stopPropagation()">${escHtml(item.certNum)}</a>`
           : escHtml(item.certNum);
         rows += cardRow('Cert #', v);
       }
       if (item.paid) {
-        let paidStr = escHtml(fmt(cur, item.paid));
+        let paidStr = escHtml(fmt(item.paid));
         if (item.shipping) paidStr += ` <span style="font-size:11px;color:var(--sub)">(${escHtml(item.shipping)})</span>`;
         rows += cardRow('Paid', paidStr);
       }
       if (item.value) {
         const cls = r !== null ? (r >= 0 ? 'text-green' : 'text-red') : '';
-        let vStr = escHtml(fmt(cur, item.value));
+        let vStr = escHtml(fmt(item.value));
         if (item.valueUrl) vStr = `<a class="card-link ${cls}" href="${escHtml(item.valueUrl)}" target="_blank" rel="noopener" onclick="event.stopPropagation()" style="color:inherit">${vStr}</a>`;
         rows += cardRow('Est. Value', `<span class="${cls}">${vStr}</span>`);
       }
@@ -1104,9 +1162,8 @@
     document.getElementById('fName').value      = item.name      || '';
     document.getElementById('fCharacter').value = item.character || '';
     document.getElementById('fFilm').value      = item.film      || '';
-    document.getElementById('fCertNum').value   = item.certNum   || '';
-    document.getElementById('fCertUrl').value   = item.certUrl   || '';
-    document.getElementById('fCurrency').value  = item.currency  || 'NT$';
+    document.getElementById('fCertNum').value       = item.certNum     || '';
+    document.getElementById('fCertCompany').value  = item.certCompany || '';
     document.getElementById('fPaid').value      = item.paid      || '';
     document.getElementById('fValue').value     = item.value     || '';
     document.getElementById('fValueUrl').value  = item.valueUrl  || '';
@@ -1116,8 +1173,8 @@
   }
 
   function resetForm() {
-    ['fName','fCharacter','fFilm','fCertNum','fCertUrl','fCurrency','fPaid','fValue','fValueUrl','fNotes']
-      .forEach(id => { document.getElementById(id).value = id === 'fCurrency' ? 'NT$' : ''; });
+    ['fName','fCharacter','fFilm','fCertNum','fCertCompany','fPaid','fValue','fValueUrl','fNotes']
+      .forEach(id => { document.getElementById(id).value = ''; });
     document.getElementById('fName').classList.remove('err');
     clearImg();
   }
@@ -1135,9 +1192,8 @@
       name,
       character : document.getElementById('fCharacter').value.trim(),
       film      : document.getElementById('fFilm').value.trim(),
-      certNum   : document.getElementById('fCertNum').value.trim(),
-      certUrl   : document.getElementById('fCertUrl').value.trim(),
-      currency  : document.getElementById('fCurrency').value.trim() || 'NT$',
+      certNum     : document.getElementById('fCertNum').value.trim(),
+      certCompany : document.getElementById('fCertCompany').value,
       paid      : document.getElementById('fPaid').value || null,
       value     : document.getElementById('fValue').value || null,
       valueUrl  : document.getElementById('fValueUrl').value.trim(),
@@ -1193,7 +1249,6 @@
     if (!item) return;
     activeDetailId = id;
 
-    const cur  = item.currency || '';
     const r    = roi(item.paid, item.value);
     const rStr = roiStr(r);
 
@@ -1210,20 +1265,22 @@
 
     html += '<div class="detail-rows">';
     if (item.certNum) {
-      const v = item.certUrl
-        ? `<a class="card-link" href="${escHtml(item.certUrl)}" target="_blank" rel="noopener">${escHtml(item.certNum)}</a>`
+      const cUrl = getCertUrl(item);
+      const v = cUrl
+        ? `<a class="card-link" href="${escHtml(cUrl)}" target="_blank" rel="noopener">${escHtml(item.certNum)}</a>`
         : escHtml(item.certNum);
-      html += detailRow('Certification #', v);
+      const lbl = item.certCompany ? `${CERT_LABELS[item.certCompany]} Cert #` : 'Certification #';
+      html += detailRow(lbl, v);
     }
     if (item.paid) {
-      let s = escHtml(fmt(cur, item.paid));
+      let s = escHtml(fmt(item.paid));
       if (item.shipping) s += ` <span style="font-size:12px;color:var(--sub)">(${escHtml(item.shipping)})</span>`;
       html += detailRow('Paid', s);
     }
     if (item.value) {
       const cls = r !== null ? (r >= 0 ? 'text-green' : 'text-red') : '';
-      let v = `<span class="${cls}">${escHtml(fmt(cur, item.value))}</span>`;
-      if (item.valueUrl) v = `<a class="card-link ${cls}" href="${escHtml(item.valueUrl)}" target="_blank" rel="noopener" style="color:inherit">${escHtml(fmt(cur, item.value))}</a>`;
+      let v = `<span class="${cls}">${escHtml(fmt(item.value))}</span>`;
+      if (item.valueUrl) v = `<a class="card-link ${cls}" href="${escHtml(item.valueUrl)}" target="_blank" rel="noopener" style="color:inherit">${escHtml(fmt(item.value))}</a>`;
       html += detailRow('Estimated Value', v);
     }
     html += '</div>';
@@ -1284,7 +1341,11 @@
   /* ── Export / Import ── */
   function exportData() {
     if (!items.length) { toast('Nothing to export'); return; }
-    const blob = new Blob([JSON.stringify(items, null, 2)], { type: 'application/json' });
+    const payload = {
+      currency: localStorage.getItem('ag_currency') || 'TWD',
+      items,
+    };
+    const blob = new Blob([JSON.stringify(payload, null, 2)], { type: 'application/json' });
     const a    = document.createElement('a');
     a.href     = URL.createObjectURL(blob);
     a.download = `autogallery-${new Date().toISOString().slice(0,10)}.json`;
@@ -1299,11 +1360,15 @@
     const reader = new FileReader();
     reader.onload = ev => {
       try {
-        const data = JSON.parse(ev.target.result);
+        const parsed = JSON.parse(ev.target.result);
+        // Support both new format {currency, items} and legacy plain array
+        const data     = Array.isArray(parsed) ? parsed : parsed.items;
+        const currency = Array.isArray(parsed) ? null   : parsed.currency;
         if (!Array.isArray(data)) throw new Error();
         if (!confirm(`Import ${data.length} items? This will replace your current collection.`)) return;
         items = data;
         persist();
+        if (currency) setCurrency(currency);
         render();
         toast(`Imported ${data.length} items`);
       } catch {
@@ -1343,20 +1408,20 @@
       return;
     }
     tbody.innerHTML = res.map(item => {
-      const cur  = item.currency || '';
-      const r    = roi(item.paid, item.value);
+        const r    = roi(item.paid, item.value);
       const rStr = roiStr(r);
       const thumb = item.img
         ? `<img class="tbl-thumb" src="${item.img}" alt="">`
         : `<div class="tbl-no-thumb"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg></div>`;
       const cls = r !== null ? (r >= 0 ? 'text-green' : 'text-red') : '';
+      const cUrl = getCertUrl(item);
       const certCell = item.certNum
-        ? (item.certUrl ? `<a class="card-link" href="${escHtml(item.certUrl)}" target="_blank" rel="noopener" onclick="event.stopPropagation()">${escHtml(item.certNum)}</a>` : escHtml(item.certNum))
+        ? (cUrl ? `<a class="card-link" href="${escHtml(cUrl)}" target="_blank" rel="noopener" onclick="event.stopPropagation()">${escHtml(item.certNum)}</a>` : escHtml(item.certNum))
         : '—';
       const valueCell = item.value
         ? (item.valueUrl
-            ? `<span class="${cls}"><a class="card-link" href="${escHtml(item.valueUrl)}" target="_blank" rel="noopener" onclick="event.stopPropagation()" style="color:inherit">${escHtml(fmt(cur, item.value))}</a></span>`
-            : `<span class="${cls}">${escHtml(fmt(cur, item.value))}</span>`)
+            ? `<span class="${cls}"><a class="card-link" href="${escHtml(item.valueUrl)}" target="_blank" rel="noopener" onclick="event.stopPropagation()" style="color:inherit">${escHtml(fmt(item.value))}</a></span>`
+            : `<span class="${cls}">${escHtml(fmt(item.value))}</span>`)
         : '—';
       const roiCell = rStr
         ? `<span class="roi-pill ${r >= 0 ? 'roi-pos' : 'roi-neg'}">${rStr}</span>`
@@ -1367,7 +1432,7 @@
         <td>${escHtml(item.character) || '—'}</td>
         <td>${escHtml(item.film) || '—'}</td>
         <td>${certCell}</td>
-        <td>${item.paid ? escHtml(fmt(cur, item.paid)) : '—'}</td>
+        <td>${item.paid ? escHtml(fmt(item.paid)) : '—'}</td>
         <td>${valueCell}</td>
         <td>${roiCell}</td>
       </tr>`;
@@ -1394,6 +1459,7 @@
   const savedView = localStorage.getItem('ag_view') || 'grid';
   setView(savedView);
   applyTheme(localStorage.getItem('ag_theme') || 'light');
+  setCurrency(localStorage.getItem('ag_currency') || 'TWD');
   render();
 </script>
 </body>
