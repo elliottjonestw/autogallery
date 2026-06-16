@@ -100,7 +100,7 @@ Below the stats bar is a row of controls for filtering and viewing the collectio
 
 A text input with a magnifying-glass icon. Filters items in real time (on every keystroke) across:
 
-- Signer name
+- Signer name(s) — all signers are searched for multi-signer items
 - Character name
 - Film/show title
 - Notes
@@ -147,7 +147,7 @@ Each card from top to bottom:
 2. **ROI Overlay** — if both "Paid" and "Est. Value" are filled in, an ROI pill is shown **over the top-left corner of the image**, with a frosted-glass dark background. Green for positive ROI, red for negative. Example: `+47%` or `-12%`.
 
 3. **Card body** (below the image):
-   - **Signer name** — bold, 14px
+   - **Signer name** — bold, 14px. For items with multiple signers, this shows **"Multiple Signers"** instead of individual names.
    - **Character name** — smaller, muted color, on its own line
    - **Film/show title** — smaller, muted color, on its own line below character name
    - A thin horizontal divider
@@ -168,7 +168,7 @@ An alternative view available on desktop. Items are shown as rows in a sortable 
 | Column | Content |
 |---|---|
 | (thumbnail) | 52×40px cropped thumbnail of the photo, or a placeholder icon |
-| **Signer** | Bold signer name with character and film/show in smaller muted text below |
+| **Signer** | Bold signer name (or **"Multiple Signers"** for multi-signer items) with character and film/show in smaller muted text below |
 | **Paid** | Amount paid in display currency |
 | **Est. Value** | Estimated value in display currency, colored green (positive) or red (negative) relative to paid. If a value URL is set, the value is a clickable link that opens in a new tab. |
 | **ROI** | Whole-number percentage, green or red pill |
@@ -189,8 +189,9 @@ Opened by clicking **+ Add Item** (new item) or **Edit** inside the detail modal
 
 | Field | Type | Notes |
 |---|---|---|
-| **Signer** | Text input | Required. The autograph signer's real name. |
-| **Character** | Text input | Optional. Character name (e.g. "Darth Vader"). |
+| **Signer 1** | Text input | Required. The first (or only) autograph signer's real name. |
+| **+ button** | Button | Adds a Signer 2 field. Each additional signer row has a − button to remove it. There is no upper limit on the number of signers. |
+| **Character** | Text input | Optional. Character name (e.g. "Darth Vader"). Applies to the item, not per signer. |
 | **Film / Show** | Text input | Optional. The title of the film or show. |
 | **Cert #** | Text input | Optional. The authentication certificate number. |
 | **Cert Company** | Dropdown | Options: *(none)*, Beckett, PSA, JSA, SWAU. Controls the verification URL. |
@@ -201,6 +202,19 @@ Opened by clicking **+ Add Item** (new item) or **Edit** inside the detail modal
 | **Photo** | File upload / drag-and-drop | Optional. See below. |
 
 All monetary inputs (**Paid**, **Est. Value**) are stored in the **local currency** (configured in Settings). They are converted to the display currency at render time using the live exchange rate.
+
+### Multiple Signers
+
+The form always shows a **Signer 1** field. Click the **+** button to the right of any signer field to add the next signer. Additional signer rows (Signer 2, Signer 3, …) each have a **−** button to remove them. There is no limit to the number of signers.
+
+**How multi-signer items are displayed:**
+
+- **Grid and table views** — show **"Multiple Signers"** in place of a name when an item has two or more signers.
+- **Detail modal** — the title shows **"Multiple Signers"**, and each signer appears as its own **Signer 1 / Signer 2 / …** row in the detail table.
+- **Search** — searches across all signer names simultaneously.
+- **Sorting by name** — sorts by the first signer's name.
+
+Single-signer items (Signer 1 only) behave identically to the original behavior — the signer's name is shown normally everywhere.
 
 ### Photo Upload
 
@@ -219,7 +233,7 @@ A preview of the selected image is shown in the drop zone. A **Remove** button a
 
 ### Validation
 
-Only **Signer** is required. If left blank, the field is highlighted in red and saving is blocked.
+Only **Signer 1** is required. If left blank, the field is highlighted in red and saving is blocked. Empty additional signer fields are ignored.
 
 ### Buttons
 
@@ -234,15 +248,16 @@ Clicking any card (grid) or row (table) opens a read-only detail view for that i
 
 ### Contents
 
-- **Signer name** as the modal title
+- **Signer name** (or **"Multiple Signers"**) as the modal title
 - Photo (full width, if available) with `object-fit: cover`
-- All fields displayed as label/value pairs:
+- ROI pill (colored), shown above the detail table
+- All fields displayed as label/value rows in a table:
+  - **Signer** — for single-signer items; **Signer 1 / Signer 2 / …** rows for multi-signer items
   - Character
   - Film / Show
+  - Cert # with a clickable link to the cert company's verification page
   - Paid (in display currency)
   - Est. Value (in display currency, with link if URL is set)
-  - ROI pill (colored)
-  - Cert # with a clickable link to the cert company's verification page
   - Date Added
   - Notes
 
@@ -498,6 +513,7 @@ Click **Export Collection** in the Settings Modal (⚙️ → Data). The browser
       "id": "abc123",
       "added": "2024-11-15T08:30:00.000Z",
       "name": "Harrison Ford",
+      "signers": ["Harrison Ford"],
       "character": "Han Solo",
       "film": "Star Wars",
       "certNum": "A1234567",
@@ -570,7 +586,8 @@ Each item is a JavaScript object with the following fields:
 |---|---|---|
 | `id` | string | Unique identifier generated with `Date.now() + Math.random()` at creation time |
 | `added` | string | ISO 8601 timestamp of when the item was first saved (e.g. `"2024-11-15T08:30:00.000Z"`) |
-| `name` | string | Signer's real name (required) |
+| `name` | string | First (or only) signer's name. Always set — used as the sort key. |
+| `signers` | string[] | Array of all signer names. Always present; single-signer items have `["Name"]`. Multi-signer items have two or more entries. |
 | `character` | string | Character name (optional, may be empty string) |
 | `film` | string | Film or show title (optional, may be empty string) |
 | `certNum` | string | Certificate number (optional, may be empty string) |

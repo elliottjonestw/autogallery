@@ -623,6 +623,25 @@
 
     .frow { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
 
+    /* ── Multi-signer ── */
+    .signer-row { display: flex; gap: 6px; align-items: flex-end; }
+    .signer-row .finput { flex: 1; }
+    .signer-btn {
+      flex-shrink: 0;
+      width: 36px; height: 36px;
+      border-radius: 8px;
+      border: 1px solid var(--border);
+      background: var(--surface);
+      color: var(--sub);
+      font-size: 18px;
+      cursor: pointer;
+      display: flex; align-items: center; justify-content: center;
+      transition: background .15s, color .15s;
+      font-family: var(--font);
+      line-height: 1;
+    }
+    .signer-btn:hover { background: var(--border); color: var(--text); }
+
     /* ── Image upload ── */
     .img-drop {
       border: 2px dashed var(--border-light);
@@ -937,11 +956,8 @@
         </div>
       </div>
 
-      <div class="frow">
-        <div class="fg">
-          <label class="flabel">Signer <span style="color:var(--red)">*</span></label>
-          <input class="finput" id="fName" placeholder="e.g. James Earl Jones">
-        </div>
+      <div id="multiSignerSection">
+        <div class="fg" id="signersList"></div>
         <div class="fg">
           <label class="flabel">Character</label>
           <input class="finput" id="fCharacter" placeholder="e.g. Darth Vader">
@@ -1386,7 +1402,7 @@
 
     let res = q
       ? items.filter(i =>
-          (i.name      || '').toLowerCase().includes(q) ||
+          (i.signers ? i.signers.join(' ') : (i.name || '')).toLowerCase().includes(q) ||
           (i.character || '').toLowerCase().includes(q) ||
           (i.film      || '').toLowerCase().includes(q) ||
           (i.certNum   || '').toLowerCase().includes(q))
@@ -1468,7 +1484,7 @@
         <div class="card" onclick="openDetail('${item.id}')">
           ${imgHtml}
           <div class="card-body">
-            <div class="card-name">${escHtml(item.name)}</div>
+            <div class="card-name">${item.signers && item.signers.length > 1 ? 'Multiple Signers' : escHtml(item.signers ? item.signers[0] : item.name)}</div>
             ${item.character ? `<div class="card-character">${escHtml(item.character)}</div>` : ''}
             ${item.film ? `<div class="card-character">${escHtml(item.film)}</div>` : ''}
             ${rows ? `<hr class="card-divider">${rows}` : ''}
@@ -1502,7 +1518,7 @@
     pendingImg = item.img || null;
     document.getElementById('editId').value    = id;
     document.getElementById('formTitle').textContent = 'Edit Item';
-    document.getElementById('fName').value      = item.name      || '';
+    renderSignersList(item.signers && item.signers.length ? item.signers : [item.name || '']);
     document.getElementById('fCharacter').value = item.character || '';
     document.getElementById('fFilm').value      = item.film      || '';
     document.getElementById('fCertNum').value       = item.certNum     || '';
@@ -1516,23 +1532,60 @@
   }
 
   function resetForm() {
-    ['fName','fCharacter','fFilm','fCertNum','fCertCompany','fPaid','fValue','fValueUrl','fNotes']
+    ['fCharacter','fFilm','fCertNum','fCertCompany','fPaid','fValue','fValueUrl','fNotes']
       .forEach(id => { document.getElementById(id).value = ''; });
-    document.getElementById('fName').classList.remove('err');
+    renderSignersList(['']);
     clearImg();
   }
 
   function closeForm() { close('formOverlay'); }
 
+  function getSignerValues() {
+    return [...document.querySelectorAll('.signer-input')].map(el => el.value.trim());
+  }
+
+  function renderSignersList(values) {
+    const list = document.getElementById('signersList');
+    list.innerHTML = values.map((val, i) => `
+      <div class="fg signer-entry" style="margin-bottom:${i < values.length - 1 ? '8px' : '0'}">
+        <label class="flabel">Signer ${i + 1}${i === 0 ? ' <span style="color:var(--red)">*</span>' : ''}</label>
+        <div class="signer-row">
+          <input class="finput signer-input" id="fSigner${i}" value="${escHtml(val)}" placeholder="e.g. Harrison Ford">
+          ${i > 0 ? `<button type="button" class="signer-btn" onclick="removeSignerRow(${i})">−</button>` : ''}
+          ${i === values.length - 1 ? `<button type="button" class="signer-btn" onclick="addSignerRow()">+</button>` : ''}
+        </div>
+      </div>
+    `).join('');
+  }
+
+  function addSignerRow() {
+    const vals = getSignerValues();
+    vals.push('');
+    renderSignersList(vals);
+    const inputs = document.querySelectorAll('.signer-input');
+    if (inputs.length) inputs[inputs.length - 1].focus();
+  }
+
+  function removeSignerRow(i) {
+    const vals = getSignerValues();
+    vals.splice(i, 1);
+    if (!vals.length) vals.push('');
+    renderSignersList(vals);
+  }
+
   function saveItem() {
-    const nameEl = document.getElementById('fName');
-    const name   = nameEl.value.trim();
-    if (!name) { nameEl.classList.add('err'); nameEl.focus(); return; }
-    nameEl.classList.remove('err');
+    const vals = getSignerValues().filter(v => v);
+    if (!vals.length) {
+      const el = document.querySelector('.signer-input');
+      if (el) { el.classList.add('err'); el.focus(); }
+      return;
+    }
+    document.querySelectorAll('.signer-input').forEach(el => el.classList.remove('err'));
 
     const id = document.getElementById('editId').value;
     const data = {
-      name,
+      name    : vals[0],
+      signers : vals,
       character : document.getElementById('fCharacter').value.trim(),
       film      : document.getElementById('fFilm').value.trim(),
       certNum     : document.getElementById('fCertNum').value.trim(),
@@ -1595,18 +1648,24 @@
     const r    = roi(item.paid, item.value);
     const rStr = roiStr(r);
 
-    document.getElementById('dTitle').textContent = item.name;
+    const displayTitle = item.signers && item.signers.length > 1 ? 'Multiple Signers' : (item.signers ? item.signers[0] : item.name);
+    document.getElementById('dTitle').textContent = displayTitle;
 
     let html = '';
-    if (item.img) html += `<img class="detail-img" src="${item.img}" alt="${escHtml(item.name)}">`;
-    if (item.character) html += `<div class="detail-sub">${escHtml(item.character)}</div>`;
-    if (item.film) html += `<div class="detail-sub">${escHtml(item.film)}</div>`;
+    if (item.img) html += `<img class="detail-img" src="${item.img}" alt="${escHtml(displayTitle)}">`;
     if (rStr) {
       const cls = r >= 0 ? 'roi-pos' : 'roi-neg';
       html += `<span class="roi-pill ${cls}" style="margin-bottom:4px;display:inline-flex">${rStr} ROI</span>`;
     }
 
     html += '<div class="detail-rows">';
+    if (item.signers && item.signers.length > 1) {
+      item.signers.forEach((s, i) => { html += detailRow(`Signer ${i + 1}`, escHtml(s)); });
+    } else {
+      html += detailRow('Signer', escHtml(item.signers ? item.signers[0] : item.name));
+    }
+    if (item.character) html += detailRow('Character', escHtml(item.character));
+    if (item.film)      html += detailRow('Film / Show', escHtml(item.film));
     if (item.certNum) {
       const cUrl = getCertUrl(item);
       const v = cUrl
@@ -1772,7 +1831,7 @@
         : '—';
       return `<tr onclick="openDetail('${item.id}')">
         <td>${thumb}</td>
-        <td><div class="tbl-name">${escHtml(item.name)}</div></td>
+        <td><div class="tbl-name">${item.signers && item.signers.length > 1 ? 'Multiple Signers' : escHtml(item.signers ? item.signers[0] : item.name)}</div></td>
         <td>${escHtml(item.character) || '—'}</td>
         <td>${escHtml(item.film) || '—'}</td>
         <td>${certCell}</td>
