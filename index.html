@@ -117,6 +117,34 @@
       font-weight: 500;
     }
 
+    /* ── Photo viewer ── */
+    .photo-viewer {
+      position: fixed; inset: 0;
+      background: rgba(0,0,0,.92);
+      z-index: 600;
+      display: flex; align-items: center; justify-content: center;
+      opacity: 0; pointer-events: none;
+      transition: opacity .2s;
+    }
+    .photo-viewer.open { opacity: 1; pointer-events: all; }
+    #pvClose {
+      position: absolute; top: 16px; right: 16px;
+      width: 40px; height: 40px; border-radius: 50%;
+      background: rgba(255,255,255,.15); border: none;
+      color: #fff; font-size: 20px; cursor: pointer;
+      display: flex; align-items: center; justify-content: center;
+      z-index: 1; transition: background .15s;
+    }
+    #pvClose:hover { background: rgba(255,255,255,.3); }
+    #pvImg {
+      max-width: 90vw; max-height: 90vh;
+      object-fit: contain; border-radius: 4px;
+      user-select: none; cursor: grab;
+      will-change: transform;
+    }
+    #pvImg.grabbing { cursor: grabbing; }
+    .detail-img { cursor: zoom-in; }
+
     .view-banner {
       background: var(--gold);
       color: #000;
@@ -1049,6 +1077,15 @@
         </button>
       </div>
 
+      <div class="fg">
+        <label class="flabel">Info Links</label>
+        <select class="finput" id="settingsInfoLink" onchange="setInfoLink(this.value)">
+          <option value="wiki">Wikipedia</option>
+          <option value="imdb">IMDb</option>
+        </select>
+        <div class="setting-hint" style="margin-top:4px">Signer names and film/show titles link to this site</div>
+      </div>
+
       <div class="fg" id="settingsDataSection">
         <label class="flabel">Data</label>
         <button class="settings-row-btn" onclick="exportData()">
@@ -1133,6 +1170,12 @@
 
 <!-- ── Toast ── -->
 <div class="toast" id="toast"></div>
+
+<!-- ── Photo viewer ── -->
+<div class="photo-viewer" id="photoViewer">
+  <button id="pvClose" onclick="closePhotoViewer()">✕</button>
+  <img id="pvImg" draggable="false">
+</div>
 
 <script>
   const KEY = 'autogallery_v2';
@@ -1299,8 +1342,9 @@
   }
 
   function openSettings() {
-    document.getElementById('settingsLocal').value   = getLocalCurrency();
-    document.getElementById('settingsDisplay').value = getDisplayCurrency();
+    document.getElementById('settingsLocal').value     = getLocalCurrency();
+    document.getElementById('settingsDisplay').value   = getDisplayCurrency();
+    document.getElementById('settingsInfoLink').value  = getInfoLinkMode();
     document.getElementById('settingsDataSection').style.display  = viewMode ? 'none' : '';
     document.getElementById('settingsLocalSection').style.display = viewMode ? 'none' : '';
     document.getElementById('settingsViewSection').style.display  = viewMode ? '' : 'none';
@@ -1656,7 +1700,7 @@
     document.getElementById('dTitle').textContent = displayTitle;
 
     let html = '';
-    if (item.img) html += `<img class="detail-img" src="${item.img}" alt="${escHtml(displayTitle)}">`;
+    if (item.img) html += `<img class="detail-img" src="${item.img}" alt="${escHtml(displayTitle)}" onclick="openPhotoViewer(this.src)">`;
     if (rStr) {
       const cls = r >= 0 ? 'roi-pos' : 'roi-neg';
       html += `<span class="roi-pill ${cls}" style="margin-bottom:4px;display:inline-flex">${rStr} ROI</span>`;
@@ -1664,12 +1708,13 @@
 
     html += '<div class="detail-rows">';
     if (item.signers && item.signers.length > 1) {
-      item.signers.forEach((s, i) => { html += detailRow(`Signer ${i + 1}`, escHtml(s)); });
+      item.signers.forEach((s, i) => { html += detailRow(`Signer ${i + 1}`, `<a class="card-link" href="${escHtml(signerUrl(s))}" target="_blank" rel="noopener">${escHtml(s)}</a>`); });
     } else {
-      html += detailRow('Signer', escHtml(item.signers ? item.signers[0] : item.name));
+      const signerName = item.signers ? item.signers[0] : item.name;
+      html += detailRow('Signer', `<a class="card-link" href="${escHtml(signerUrl(signerName))}" target="_blank" rel="noopener">${escHtml(signerName)}</a>`);
     }
     if (item.character) html += detailRow('Character', escHtml(item.character));
-    if (item.film)      html += detailRow('Film / Show', escHtml(item.film));
+    if (item.film)      html += detailRow('Film / Show', `<a class="card-link" href="${escHtml(filmUrl(item.film))}" target="_blank" rel="noopener">${escHtml(item.film)}</a>`);
     if (item.certNum) {
       const cUrl = getCertUrl(item);
       const v = cUrl
@@ -1835,9 +1880,9 @@
         : '—';
       return `<tr onclick="openDetail('${item.id}')">
         <td>${thumb}</td>
-        <td><div class="tbl-name">${item.signers && item.signers.length > 1 ? 'Multiple Signers' : escHtml(item.signers ? item.signers[0] : item.name)}</div></td>
+        <td><div class="tbl-name">${(() => { const sn = item.signers ? item.signers[0] : item.name; return item.signers && item.signers.length > 1 ? 'Multiple Signers' : `<a class="card-link" href="${escHtml(signerUrl(sn))}" target="_blank" rel="noopener" onclick="event.stopPropagation()">${escHtml(sn)}</a>`; })()}</div></td>
         <td>${escHtml(item.character) || '—'}</td>
-        <td>${escHtml(item.film) || '—'}</td>
+        <td>${item.film ? `<a class="card-link" href="${escHtml(filmUrl(item.film))}" target="_blank" rel="noopener" onclick="event.stopPropagation()">${escHtml(item.film)}</a>` : '—'}</td>
         <td>${certCell}</td>
         <td>${item.paid ? escHtml(fmt(item.paid)) : '—'}</td>
         <td>${valueCell}</td>
@@ -1944,6 +1989,49 @@
   }
 
   /* ── Init ── */
+  /* ── Photo viewer ── */
+  let pvScale = 1, pvX = 0, pvY = 0, pvDragging = false, pvDragStart = {x:0,y:0};
+
+  function openPhotoViewer(src) {
+    pvScale = 1; pvX = 0; pvY = 0;
+    const img = document.getElementById('pvImg');
+    img.src = src;
+    applyPvTransform();
+    document.getElementById('photoViewer').classList.add('open');
+    document.addEventListener('keydown', pvEsc);
+  }
+
+  function closePhotoViewer() {
+    document.getElementById('photoViewer').classList.remove('open');
+    document.removeEventListener('keydown', pvEsc);
+  }
+
+  function pvEsc(e) { if (e.key === 'Escape') closePhotoViewer(); }
+
+  function applyPvTransform() {
+    document.getElementById('pvImg').style.transform = `translate(${pvX}px,${pvY}px) scale(${pvScale})`;
+  }
+
+  /* ── Info links ── */
+  function getInfoLinkMode() { return localStorage.getItem('ag_info_link') || 'wiki'; }
+
+  function signerUrl(name) {
+    return getInfoLinkMode() === 'imdb'
+      ? `https://www.imdb.com/find/?q=${encodeURIComponent(name)}&s=nm`
+      : `https://en.wikipedia.org/wiki/${encodeURIComponent(name.replace(/ /g,'_'))}`;
+  }
+
+  function filmUrl(title) {
+    return getInfoLinkMode() === 'imdb'
+      ? `https://www.imdb.com/find/?q=${encodeURIComponent(title)}&s=tt`
+      : `https://en.wikipedia.org/wiki/${encodeURIComponent(title.replace(/ /g,'_'))}`;
+  }
+
+  function setInfoLink(mode) {
+    localStorage.setItem('ag_info_link', mode);
+    render();
+  }
+
   load();
   const savedCols = localStorage.getItem('ag_cols') || '5';
   setCols(savedCols);
@@ -1953,6 +2041,41 @@
   fetchExchangeRate(); // renders after rate is ready (uses cache if fresh)
   checkShareURL();
   window.addEventListener('hashchange', checkShareURL);
+
+  /* photo viewer interactions (attached once after DOM ready) */
+  const pv    = document.getElementById('photoViewer');
+  const pvImg = document.getElementById('pvImg');
+
+  pv.addEventListener('click', e => { if (e.target === pv) closePhotoViewer(); });
+
+  pv.addEventListener('wheel', e => {
+    e.preventDefault();
+    const factor   = e.deltaY < 0 ? 1.15 : 0.87;
+    const prevScale = pvScale;
+    pvScale = Math.max(0.5, Math.min(10, pvScale * factor));
+    const cx = e.clientX - window.innerWidth  / 2;
+    const cy = e.clientY - window.innerHeight / 2;
+    pvX = cx - (cx - pvX) * (pvScale / prevScale);
+    pvY = cy - (cy - pvY) * (pvScale / prevScale);
+    applyPvTransform();
+  }, { passive: false });
+
+  pvImg.addEventListener('mousedown', e => {
+    pvDragging = true;
+    pvDragStart = { x: e.clientX - pvX, y: e.clientY - pvY };
+    pvImg.classList.add('grabbing');
+    e.preventDefault(); e.stopPropagation();
+  });
+  window.addEventListener('mousemove', e => {
+    if (!pvDragging) return;
+    pvX = e.clientX - pvDragStart.x;
+    pvY = e.clientY - pvDragStart.y;
+    applyPvTransform();
+  });
+  window.addEventListener('mouseup', () => {
+    pvDragging = false;
+    pvImg.classList.remove('grabbing');
+  });
 </script>
 </body>
 </html>
