@@ -567,6 +567,61 @@
     .text-green { color: var(--green); }
     .text-red   { color: var(--red); }
 
+    html[data-privacy="on"] .priv-val {
+      filter: blur(7px);
+      user-select: none;
+      border-radius: 4px;
+    }
+
+    .flabel-row {
+      display: flex;
+      align-items: center;
+      gap: 5px;
+      margin-bottom: 5px;
+    }
+    .flabel-row .flabel { margin-bottom: 0; }
+    .ctrl-row {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .ctrl-row > .finput,
+    .ctrl-row > .settings-row-btn,
+    .ctrl-row > .rate-box { flex: 1; min-width: 0; }
+    .tip-btn {
+      flex-shrink: 0;
+      width: 15px;
+      height: 15px;
+      border-radius: 50%;
+      border: 1.5px solid var(--border-light);
+      background: none;
+      color: var(--sub);
+      font-size: 9px;
+      font-weight: 700;
+      font-style: italic;
+      font-family: Georgia, serif;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      line-height: 1;
+      padding: 0;
+      transition: color .15s, border-color .15s;
+    }
+    .tip-btn:hover { color: var(--text); border-color: var(--text); }
+    .tip-box {
+      display: none;
+      font-size: 11px;
+      color: var(--sub);
+      line-height: 1.5;
+      margin-bottom: 7px;
+      padding: 6px 8px;
+      background: var(--surface);
+      border-radius: 6px;
+      border-left: 2px solid var(--border-light);
+    }
+    .tip-container.tip-open .tip-box { display: block; }
+
     a.card-link {
       color: var(--gold);
       text-decoration: none;
@@ -880,7 +935,7 @@
     .toast.show { transform: translateX(-50%) translateY(0); }
 
     /* ── Import/Export hidden input ── */
-    #importFile { display: none; }
+    #importFile, #mergeFile { display: none; }
 
     /* ── Responsive ── */
     @media (max-width: 640px) {
@@ -909,10 +964,14 @@
 <header>
   <div class="logo">Auto<span>Gallery</span></div>
   <div class="header-right">
+    <button class="btn-icon" id="privacyRevealBtn" title="Reveal values" style="display:none" onclick="setPrivacyMode('off')">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
+    </button>
     <button class="btn-icon" id="settingsBtn" title="Settings" onclick="openSettings()">
       <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 00.33 1.82l.06.06a2 2 0 010 2.83 2 2 0 01-2.83 0l-.06-.06a1.65 1.65 0 00-1.82-.33 1.65 1.65 0 00-1 1.51V21a2 2 0 01-2 2 2 2 0 01-2-2v-.09A1.65 1.65 0 009 19.4a1.65 1.65 0 00-1.82.33l-.06.06a2 2 0 01-2.83 0 2 2 0 010-2.83l.06-.06A1.65 1.65 0 004.68 15a1.65 1.65 0 00-1.51-1H3a2 2 0 01-2-2 2 2 0 012-2h.09A1.65 1.65 0 004.6 9a1.65 1.65 0 00-.33-1.82l-.06-.06a2 2 0 010-2.83 2 2 0 012.83 0l.06.06A1.65 1.65 0 009 4.68a1.65 1.65 0 001-1.51V3a2 2 0 012-2 2 2 0 012 2v.09a1.65 1.65 0 001 1.51 1.65 1.65 0 001.82-.33l.06-.06a2 2 0 012.83 0 2 2 0 010 2.83l-.06.06A1.65 1.65 0 0019.4 9a1.65 1.65 0 001.51 1H21a2 2 0 012 2 2 2 0 01-2 2h-.09a1.65 1.65 0 00-1.51 1z"/></svg>
     </button>
     <input type="file" id="importFile" accept=".json" onchange="importData(event)">
+    <input type="file" id="mergeFile"  accept=".json" onchange="mergeImport(event)">
     <button class="btn-add" id="btnAdd" onclick="openAdd()">
       <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
       Add Item
@@ -936,11 +995,11 @@
     <div class="stat-lbl">Items</div>
   </div>
   <div class="stat">
-    <div class="stat-val" id="sPaid">—</div>
+    <div class="stat-val priv-val" id="sPaid">—</div>
     <div class="stat-lbl">Total Paid</div>
   </div>
   <div class="stat">
-    <div class="stat-val" id="sValue">—</div>
+    <div class="stat-val priv-val" id="sValue">—</div>
     <div class="stat-lbl">Est. Value</div>
   </div>
   <div class="stat">
@@ -1115,128 +1174,194 @@
 
       <!-- Display tab -->
       <div class="settings-panel active" id="stab-display">
-        <div class="fg">
+        <div class="fg tip-container">
           <label class="flabel">Appearance</label>
-          <button class="settings-row-btn" id="themeToggle" onclick="toggleTheme()">
-            <span class="settings-row-icon">
-              <svg id="iconSun" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:none"><circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/></svg>
-              <svg id="iconMoon" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12.79A9 9 0 1111.21 3 7 7 0 0021 12.79z"/></svg>
-            </span>
-            <span id="themeLabel">Switch to Dark Mode</span>
-          </button>
+          <div class="ctrl-row">
+            <button class="settings-row-btn" id="themeToggle" onclick="toggleTheme()">
+              <span class="settings-row-icon">
+                <svg id="iconSun" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:none"><circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/></svg>
+                <svg id="iconMoon" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12.79A9 9 0 1111.21 3 7 7 0 0021 12.79z"/></svg>
+              </span>
+              <span id="themeLabel">Switch to Dark Mode</span>
+            </button>
+            <button class="tip-btn" onclick="toggleTip(this)">i</button>
+          </div>
+          <div class="tip-box">Switches between light and dark color schemes. Your choice is saved automatically.</div>
         </div>
-        <div class="fg">
+        <div class="fg tip-container">
           <label class="flabel">Photo Format</label>
-          <select class="finput" id="settingsPhotoFormat" onchange="setPhotoFormat(this.value)">
-            <option value="8x10L">8×10 Landscape</option>
-            <option value="8x10P">8×10 Portrait</option>
-            <option value="5x7L">5×7 Landscape</option>
-            <option value="5x7P">5×7 Portrait</option>
-            <option value="4x6L">4×6 Landscape</option>
-            <option value="4x6P">4×6 Portrait</option>
-            <option value="3x5">Index Card (3×5)</option>
-            <option value="trading">Trading Card (2.5×3.5)</option>
-            <option value="square">Square (1×1)</option>
-          </select>
-          <div class="setting-hint" style="margin-top:4px">Sets the image aspect ratio for grid cards and table thumbnails</div>
+          <div class="ctrl-row">
+            <select class="finput" id="settingsPhotoFormat" onchange="setPhotoFormat(this.value)">
+              <option value="8x10L">8×10 Landscape</option>
+              <option value="8x10P">8×10 Portrait</option>
+              <option value="5x7L">5×7 Landscape</option>
+              <option value="5x7P">5×7 Portrait</option>
+              <option value="4x6L">4×6 Landscape</option>
+              <option value="4x6P">4×6 Portrait</option>
+              <option value="3x5">Index Card (3×5)</option>
+              <option value="trading">Trading Card (2.5×3.5)</option>
+              <option value="square">Square (1×1)</option>
+            </select>
+            <button class="tip-btn" onclick="toggleTip(this)">i</button>
+          </div>
+          <div class="tip-box">Sets the aspect ratio of image cards to match your memorabilia — e.g. 8×10 photos, index cards, or trading cards.</div>
         </div>
-        <div class="fg">
+        <div class="fg tip-container">
           <label class="flabel">Image Fit</label>
-          <select class="finput" id="settingsImgFit" onchange="setImgFit(this.value)">
-            <option value="cover">Crop to fill</option>
-            <option value="contain">Fit with black bars</option>
-            <option value="blurbg">Fit with blurred background</option>
-          </select>
-          <div class="setting-hint" style="margin-top:4px">How photos are shown when the image doesn't match the selected format</div>
+          <div class="ctrl-row">
+            <select class="finput" id="settingsImgFit" onchange="setImgFit(this.value)">
+              <option value="cover">Crop to fill</option>
+              <option value="contain">Fit with black bars</option>
+              <option value="blurbg">Fit with blurred background</option>
+            </select>
+            <button class="tip-btn" onclick="toggleTip(this)">i</button>
+          </div>
+          <div class="tip-box">Controls how photos are shown when the uploaded image doesn't match the selected format.</div>
         </div>
-        <div class="fg">
+        <div class="fg tip-container">
           <label class="flabel">Info Links</label>
-          <select class="finput" id="settingsInfoLink" onchange="setInfoLink(this.value)">
-            <option value="wiki">Wikipedia</option>
-            <option value="imdb">IMDb</option>
-          </select>
-          <div class="setting-hint" style="margin-top:4px">Signer names and film/show titles link to this site</div>
+          <div class="ctrl-row">
+            <select class="finput" id="settingsInfoLink" onchange="setInfoLink(this.value)">
+              <option value="wiki">Wikipedia</option>
+              <option value="imdb">IMDb</option>
+            </select>
+            <button class="tip-btn" onclick="toggleTip(this)">i</button>
+          </div>
+          <div class="tip-box">Choose which site signer names and film/show titles link to in table view and item detail.</div>
+        </div>
+        <div class="fg tip-container">
+          <label class="flabel">Privacy Mode</label>
+          <div class="ctrl-row">
+            <select class="finput" id="settingsPrivacy" onchange="setPrivacyMode(this.value)">
+              <option value="off">Off</option>
+              <option value="on">On — blur monetary values</option>
+            </select>
+            <button class="tip-btn" onclick="toggleTip(this)">i</button>
+          </div>
+          <div class="tip-box">Hides monetary values (paid amounts and estimates) from view. Reveal them using the eye button in the header.</div>
         </div>
       </div>
 
       <!-- Data tab -->
       <div class="settings-panel" id="stab-data">
         <div class="fg" id="settingsDataSection">
-          <label class="flabel">Backup &amp; Share</label>
-          <button class="settings-row-btn" onclick="exportData()">
-            <span class="settings-row-icon">
-              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
-            </span>
-            Export Collection
-          </button>
-          <button class="settings-row-btn" style="margin-top:6px" onclick="document.getElementById('importFile').click()">
-            <span class="settings-row-icon">
-              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="7 16 12 21 17 16"/><line x1="12" y1="21" x2="12" y2="9"/></svg>
-            </span>
-            Import Collection
-          </button>
-          <button class="settings-row-btn" id="sharePhotosBtn" style="margin-top:6px" onclick="shareCollectionWithPhotos()">
-            <span class="settings-row-icon">
-              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><line x1="8.59" y1="13.51" x2="15.42" y2="17.49"/><line x1="15.41" y1="6.51" x2="8.59" y2="10.49"/></svg>
-            </span>
-            Copy Share Link
-          </button>
-          <div class="setting-hint" style="margin-top:4px">Uploads your collection to dpaste.com and copies a short shareable URL. ⚠️ Your collection data will be publicly accessible to anyone with the link.</div>
+          <div class="tip-container">
+            <div class="ctrl-row">
+              <button class="settings-row-btn" onclick="exportData()">
+                <span class="settings-row-icon">
+                  <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
+                </span>
+                Export Collection
+              </button>
+              <button class="tip-btn" onclick="toggleTip(this)">i</button>
+            </div>
+            <div class="tip-box">Saves a complete backup of your collection as a JSON file.</div>
+          </div>
+          <div class="tip-container" style="margin-top:6px">
+            <div class="ctrl-row">
+              <button class="settings-row-btn" onclick="document.getElementById('importFile').click()">
+                <span class="settings-row-icon">
+                  <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="7 16 12 21 17 16"/><line x1="12" y1="21" x2="12" y2="9"/></svg>
+                </span>
+                Import Collection
+              </button>
+              <button class="tip-btn" onclick="toggleTip(this)">i</button>
+            </div>
+            <div class="tip-box">⚠️ Loads a JSON file and replaces your entire current collection. Export a backup first if you want to keep it.</div>
+          </div>
+          <div class="tip-container" style="margin-top:6px">
+            <div class="ctrl-row">
+              <button class="settings-row-btn" onclick="document.getElementById('mergeFile').click()">
+                <span class="settings-row-icon">
+                  <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M8 17l4 4 4-4"/><path d="M12 12v9"/><path d="M20.88 18.09A5 5 0 0018 9h-1.26A8 8 0 103 16.29"/></svg>
+                </span>
+                Merge Import
+              </button>
+              <button class="tip-btn" onclick="toggleTip(this)">i</button>
+            </div>
+            <div class="tip-box">Adds items from a JSON file to your existing collection without removing anything.</div>
+          </div>
+          <div class="tip-container" style="margin-top:6px">
+            <div class="ctrl-row">
+              <button class="settings-row-btn" id="sharePhotosBtn" onclick="shareCollectionWithPhotos()">
+                <span class="settings-row-icon">
+                  <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><line x1="8.59" y1="13.51" x2="15.42" y2="17.49"/><line x1="15.41" y1="6.51" x2="8.59" y2="10.49"/></svg>
+                </span>
+                Copy Share Link
+              </button>
+              <button class="tip-btn" onclick="toggleTip(this)">i</button>
+            </div>
+            <div class="tip-box">⚠️ Uploads your collection publicly to dpaste.com and copies a shareable URL to the clipboard.</div>
+          </div>
         </div>
         <div class="fg" id="settingsViewSection" style="display:none">
-          <label class="flabel">This Collection</label>
-          <button class="settings-row-btn" onclick="saveSharedAsOwn()">
-            <span class="settings-row-icon">
-              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 21H5a2 2 0 01-2-2V5a2 2 0 012-2h11l5 5v11a2 2 0 01-2 2z"/><polyline points="17 21 17 13 7 13 7 21"/><polyline points="7 3 7 8 15 8"/></svg>
-            </span>
-            Save as My Collection
-          </button>
-          <div class="setting-hint" style="margin-top:4px">Overwrites your own collection with the one you are currently viewing.</div>
+          <div class="tip-container">
+            <div class="ctrl-row">
+              <button class="settings-row-btn" onclick="saveSharedAsOwn()">
+                <span class="settings-row-icon">
+                  <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 21H5a2 2 0 01-2-2V5a2 2 0 012-2h11l5 5v11a2 2 0 01-2 2z"/><polyline points="17 21 17 13 7 13 7 21"/><polyline points="7 3 7 8 15 8"/></svg>
+                </span>
+                Save as My Collection
+              </button>
+              <button class="tip-btn" onclick="toggleTip(this)">i</button>
+            </div>
+            <div class="tip-box">Saves the collection you're currently viewing as your own, replacing your existing data.</div>
+          </div>
         </div>
       </div>
 
       <!-- Currency tab -->
       <div class="settings-panel" id="stab-currency">
-        <div class="fg" id="settingsLocalSection">
+        <div class="fg tip-container" id="settingsLocalSection">
           <label class="flabel">Local Currency</label>
-          <div class="setting-hint">The currency your data is recorded in</div>
-          <select class="finput" id="settingsLocal" onchange="setLocalCurrency(this.value)">
-            <option value="USD">USD — $</option>
-            <option value="GBP">GBP — £</option>
-            <option value="EUR">EUR — €</option>
-            <option value="TWD">TWD — NT$</option>
-            <option value="JPY">JPY — ¥</option>
-            <option value="CNY">CNY — ¥</option>
-            <option value="AUD">AUD — A$</option>
-            <option value="CAD">CAD — CA$</option>
-            <option value="HKD">HKD — HK$</option>
-            <option value="SGD">SGD — S$</option>
-            <option value="KRW">KRW — ₩</option>
-          </select>
-        </div>
-        <div class="fg">
-          <label class="flabel">Display Currency</label>
-          <div class="setting-hint">The currency prices are shown in (converted automatically)</div>
-          <select class="finput" id="settingsDisplay" onchange="setDisplayCurrency(this.value)">
-            <option value="USD">USD — $</option>
-            <option value="GBP">GBP — £</option>
-            <option value="EUR">EUR — €</option>
-            <option value="TWD">TWD — NT$</option>
-            <option value="JPY">JPY — ¥</option>
-            <option value="CNY">CNY — ¥</option>
-            <option value="AUD">AUD — A$</option>
-            <option value="CAD">CAD — CA$</option>
-            <option value="HKD">HKD — HK$</option>
-            <option value="SGD">SGD — S$</option>
-            <option value="KRW">KRW — ₩</option>
-          </select>
-        </div>
-        <div class="fg">
-          <label class="flabel">Exchange Rate</label>
-          <div class="rate-box">
-            <div class="rate-text" id="rateInfo">—</div>
-            <button class="btn-refresh" id="rateRefreshBtn" onclick="refreshRate()">↻ Refresh</button>
+          <div class="ctrl-row">
+            <select class="finput" id="settingsLocal" onchange="setLocalCurrency(this.value)">
+              <option value="USD">USD — $</option>
+              <option value="GBP">GBP — £</option>
+              <option value="EUR">EUR — €</option>
+              <option value="TWD">TWD — NT$</option>
+              <option value="JPY">JPY — ¥</option>
+              <option value="CNY">CNY — ¥</option>
+              <option value="AUD">AUD — A$</option>
+              <option value="CAD">CAD — CA$</option>
+              <option value="HKD">HKD — HK$</option>
+              <option value="SGD">SGD — S$</option>
+              <option value="KRW">KRW — ₩</option>
+            </select>
+            <button class="tip-btn" onclick="toggleTip(this)">i</button>
           </div>
+          <div class="tip-box">The currency used when recording Paid and Est. Value amounts on your items.</div>
+        </div>
+        <div class="fg tip-container">
+          <label class="flabel">Display Currency</label>
+          <div class="ctrl-row">
+            <select class="finput" id="settingsDisplay" onchange="setDisplayCurrency(this.value)">
+              <option value="USD">USD — $</option>
+              <option value="GBP">GBP — £</option>
+              <option value="EUR">EUR — €</option>
+              <option value="TWD">TWD — NT$</option>
+              <option value="JPY">JPY — ¥</option>
+              <option value="CNY">CNY — ¥</option>
+              <option value="AUD">AUD — A$</option>
+              <option value="CAD">CAD — CA$</option>
+              <option value="HKD">HKD — HK$</option>
+              <option value="SGD">SGD — S$</option>
+              <option value="KRW">KRW — ₩</option>
+            </select>
+            <button class="tip-btn" onclick="toggleTip(this)">i</button>
+          </div>
+          <div class="tip-box">The currency shown in the gallery UI. If different from your local currency, values are converted automatically.</div>
+        </div>
+        <div class="fg tip-container">
+          <label class="flabel">Exchange Rate</label>
+          <div class="ctrl-row">
+            <div class="rate-box">
+              <div class="rate-text" id="rateInfo">—</div>
+              <button class="btn-refresh" id="rateRefreshBtn" onclick="refreshRate()">↻ Refresh</button>
+            </div>
+            <button class="tip-btn" onclick="toggleTip(this)">i</button>
+          </div>
+          <div class="tip-box">Shows the current conversion rate between your local and display currencies. Rates are cached for 1 hour.</div>
         </div>
       </div>
 
@@ -1417,6 +1542,13 @@
     fetchExchangeRate();
   }
 
+  function toggleTip(btn) {
+    const container = btn.closest('.tip-container');
+    const wasOpen = container.classList.contains('tip-open');
+    document.querySelectorAll('.tip-container.tip-open').forEach(el => el.classList.remove('tip-open'));
+    if (!wasOpen) container.classList.add('tip-open');
+  }
+
   function switchSettingsTab(name) {
     document.querySelectorAll('.settings-tab').forEach(el =>
       el.classList.toggle('active', el.dataset.tab === name)
@@ -1432,6 +1564,7 @@
     document.getElementById('settingsPhotoFormat').value = getPhotoFormat();
     document.getElementById('settingsImgFit').value      = getImgFit();
     document.getElementById('settingsInfoLink').value    = getInfoLinkMode();
+    document.getElementById('settingsPrivacy').value     = getPrivacyMode();
     document.getElementById('settingsDataSection').style.display  = viewMode ? 'none' : '';
     document.getElementById('settingsLocalSection').style.display = viewMode ? 'none' : '';
     document.getElementById('settingsViewSection').style.display  = viewMode ? '' : 'none';
@@ -1603,13 +1736,13 @@
       if (item.paid) {
         let paidStr = escHtml(fmt(item.paid));
         if (item.shipping) paidStr += ` <span style="font-size:11px;color:var(--sub)">(${escHtml(item.shipping)})</span>`;
-        rows += cardRow('Paid', paidStr);
+        rows += cardRow('Paid', `<span class="priv-val">${paidStr}</span>`);
       }
       if (item.value) {
         const cls = r !== null ? (r >= 0 ? 'text-green' : 'text-red') : '';
         let vStr = escHtml(fmt(item.value));
         if (item.valueUrl) vStr = `<a class="card-link ${cls}" href="${escHtml(item.valueUrl)}" target="_blank" rel="noopener" onclick="event.stopPropagation()" style="color:inherit">${vStr}</a>`;
-        rows += cardRow('Est. Value', `<span class="${cls}">${vStr}</span>`);
+        rows += cardRow('Est. Value', `<span class="priv-val"><span class="${cls}">${vStr}</span></span>`);
       }
       if (rStr) rows += cardRow('ROI', `<span class="${r >= 0 ? 'text-green' : 'text-red'}">${rStr}</span>`);
 
@@ -1807,13 +1940,13 @@
     if (item.paid) {
       let s = escHtml(fmt(item.paid));
       if (item.shipping) s += ` <span style="font-size:12px;color:var(--sub)">(${escHtml(item.shipping)})</span>`;
-      html += detailRow('Paid', s);
+      html += detailRow('Paid', `<span class="priv-val">${s}</span>`);
     }
     if (item.value) {
       const cls = r !== null ? (r >= 0 ? 'text-green' : 'text-red') : '';
       let v = `<span class="${cls}">${escHtml(fmt(item.value))}</span>`;
       if (item.valueUrl) v = `<a class="card-link ${cls}" href="${escHtml(item.valueUrl)}" target="_blank" rel="noopener" style="color:inherit">${escHtml(fmt(item.value))}</a>`;
-      html += detailRow('Estimated Value', v);
+      html += detailRow('Estimated Value', `<span class="priv-val">${v}</span>`);
     }
     if (rStr) {
       const cls = r >= 0 ? 'text-green' : 'text-red';
@@ -1916,6 +2049,27 @@
     e.target.value = '';
   }
 
+  function mergeImport(e) {
+    const file = e.target.files[0];
+    if (!file) return;
+    const reader = new FileReader();
+    reader.onload = ev => {
+      try {
+        const parsed   = JSON.parse(ev.target.result);
+        const incoming = Array.isArray(parsed) ? parsed : parsed.items;
+        if (!Array.isArray(incoming) || !incoming.length) { toast('⚠️ No items found'); return; }
+        items = [...items, ...incoming];
+        persist();
+        render();
+        toast(`Added ${incoming.length} item${incoming.length !== 1 ? 's' : ''}`);
+      } catch {
+        toast('⚠️ Invalid file format');
+      }
+      e.target.value = '';
+    };
+    reader.readAsText(file);
+  }
+
   /* ── Columns per row ── */
   function setCols(n) {
     document.documentElement.style.setProperty('--cols', n);
@@ -1957,8 +2111,8 @@
         : '—';
       const valueCell = item.value
         ? (item.valueUrl
-            ? `<span class="${cls}"><a class="card-link" href="${escHtml(item.valueUrl)}" target="_blank" rel="noopener" onclick="event.stopPropagation()" style="color:inherit">${escHtml(fmt(item.value))}</a></span>`
-            : `<span class="${cls}">${escHtml(fmt(item.value))}</span>`)
+            ? `<span class="priv-val ${cls}"><a class="card-link" href="${escHtml(item.valueUrl)}" target="_blank" rel="noopener" onclick="event.stopPropagation()" style="color:inherit">${escHtml(fmt(item.value))}</a></span>`
+            : `<span class="priv-val ${cls}">${escHtml(fmt(item.value))}</span>`)
         : '—';
       const roiCell = rStr
         ? `<span class="roi-pill ${r >= 0 ? 'roi-pos' : 'roi-neg'}">${rStr}</span>`
@@ -1969,7 +2123,7 @@
         <td>${escHtml(item.character) || '—'}</td>
         <td>${item.film ? `<a class="card-link" href="${escHtml(filmUrl(item.film))}" target="_blank" rel="noopener" onclick="event.stopPropagation()">${escHtml(item.film)}</a>` : '—'}</td>
         <td>${certCell}</td>
-        <td>${item.paid ? escHtml(fmt(item.paid)) : '—'}</td>
+        <td>${item.paid ? `<span class="priv-val">${escHtml(fmt(item.paid))}</span>` : '—'}</td>
         <td>${valueCell}</td>
         <td>${roiCell}</td>
       </tr>`;
@@ -2119,6 +2273,18 @@
     applyPhotoFormat(key);
   }
 
+  function getPrivacyMode() { return localStorage.getItem('ag_privacy') || 'off'; }
+  function applyPrivacyMode(val) {
+    document.documentElement.dataset.privacy = val;
+    document.documentElement.removeAttribute('data-privacy-revealed');
+    const btn = document.getElementById('privacyRevealBtn');
+    if (btn) btn.style.display = val === 'on' ? '' : 'none';
+  }
+  function setPrivacyMode(val) {
+    localStorage.setItem('ag_privacy', val);
+    applyPrivacyMode(val);
+  }
+
   function getImgFit() { return localStorage.getItem('ag_img_fit') || 'cover'; }
   function applyImgFit(key) {
     const el = document.documentElement;
@@ -2158,6 +2324,8 @@
   applyTheme(localStorage.getItem('ag_theme') || 'light');
   applyPhotoFormat(getPhotoFormat());
   applyImgFit(getImgFit());
+  applyPrivacyMode(getPrivacyMode());
+
   fetchExchangeRate(); // renders after rate is ready (uses cache if fresh)
   checkShareURL();
   window.addEventListener('hashchange', checkShareURL);

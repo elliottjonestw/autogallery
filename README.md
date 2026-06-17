@@ -65,6 +65,7 @@ The header is sticky — it stays at the top of the viewport while you scroll. I
 
 | Control | Description |
 |---|---|
+| 👁 Eye (privacy) | Visible only when Privacy Mode is enabled. Clicking it turns Privacy Mode off and hides the button. |
 | ⚙️ Settings | Opens the **Settings Modal** for theme, import/export, and currency options |
 | **+ Add Item** | Opens the Add Item modal |
 
@@ -89,6 +90,7 @@ Directly below the header, the stats bar shows four live aggregate statistics ac
 - If no items have both a paid amount and an estimated value, ROI shows `—`.
 - Values use the display currency symbol and `toLocaleString()` formatting (e.g. commas for thousands).
 - Stats are separated by vertical dividers and use gold for the value text.
+- When **Privacy Mode** is on, the Total Paid and Est. Value stats are blurred. The Return (ROI) stat is always visible.
 
 ---
 
@@ -279,11 +281,15 @@ Opened by clicking the **⚙️ gear icon** in the header. Settings are organize
 
 | Tab | Contents |
 |---|---|
-| **Display** | Appearance, Photo Format, Image Fit, Info Links |
+| **Display** | Appearance, Photo Format, Image Fit, Info Links, Privacy Mode |
 | **Data** | Backup & Share (normal mode) or Save as My Collection (view mode) |
 | **Currency** | Local Currency, Display Currency, Exchange Rate (Local Currency hidden in view mode) |
 
 The modal always opens on the **Display** tab.
+
+### Tooltip Buttons
+
+Every setting has a small italic **i** circle button at the right end of its control row (dropdown or action button). Clicking or tapping it toggles an explanation panel directly below. Only one tip is open at a time — opening a new one closes the previous one.
 
 ---
 
@@ -326,6 +332,19 @@ A dropdown that controls how photos are displayed when the uploaded image doesn'
 - The blurred background option has no effect on cards without a photo.
 - Table thumbnails use `contain` (no blur) in the blurred background mode, since the thumbnail size is too small for the effect to be useful.
 
+#### Privacy Mode
+
+A dropdown to enable or disable privacy mode:
+
+| Option | Behavior |
+|---|---|
+| **Off** *(default)* | All monetary values displayed normally |
+| **On — blur monetary values** | Paid amounts and estimated values are blurred wherever they appear (stats bar, grid cards, table, detail modal) |
+
+When privacy mode is on, an **eye button** appears in the header (to the left of the gear icon). Clicking it turns privacy mode off and hides the button. ROI/Return % is never blurred regardless of this setting.
+
+- Saved to `localStorage` (`ag_privacy`). Takes effect instantly via a CSS `data-privacy` attribute on `<html>`.
+
 #### Info Links
 
 A dropdown to choose which site signer names and film/show titles link to in the table view and detail modal:
@@ -342,13 +361,14 @@ A dropdown to choose which site signer names and film/show titles link to in the
 
 ### Data Tab
 
-Three row buttons for backup, restore, and sharing:
+Four row buttons, each with its own `(i)` tooltip on the right:
 
 - **Export Collection** — downloads the full collection as a `.json` file. See [Import & Export](#import--export).
-- **Import Collection** — opens a file picker to load a previously exported `.json` file, replacing the current collection. See [Import & Export](#import--export).
+- **Import Collection** — opens a file picker to load a previously exported `.json` file, **replacing** the current collection. See [Import & Export](#import--export).
+- **Merge Import** — opens a file picker to load a `.json` file and **add** its items to the existing collection without replacing anything. Useful for combining collections. See [Import & Export](#import--export).
 - **Copy Share Link** — uploads the collection to dpaste.com and copies a short shareable URL to the clipboard. See [Sharing a Collection](#sharing-a-collection).
 
-> ⚠️ In [View Mode](#view-mode) the Data tab shows **Save as My Collection** instead of the backup and share buttons.
+> ⚠️ In [View Mode](#view-mode) the Data tab shows a single **Save as My Collection** button instead of the backup and share buttons.
 
 ---
 
@@ -599,9 +619,22 @@ Click **Import Collection** in the Settings Modal (⚙️ → Data). A file pick
 - The imported `currency` field is set as the new **local currency**.
 - All items are loaded into `localStorage`, **replacing** the current collection entirely.
 - The gallery re-renders immediately with the imported data.
-- If the file is malformed or cannot be parsed, a browser `alert()` is shown.
+- If the file is malformed or cannot be parsed, a toast error is shown.
 
 > ⚠️ Import **overwrites** your current data. Export a backup before importing if you want to preserve your existing collection.
+
+### Merge Import
+
+Click **Merge Import** in the Settings Modal (⚙️ → Data). A file picker opens. Select a `.json` file in the same format as an exported collection.
+
+**Merge Import behavior:**
+
+- Items from the file are **appended** to the current collection — nothing is replaced or deleted.
+- The imported `currency` field is ignored; your existing local currency is kept.
+- A toast confirms how many items were added (e.g. "Added 12 items").
+- If the file is malformed or contains no items, a toast error is shown.
+
+Merge Import is useful for combining collections exported from different devices or sessions.
 
 ---
 
@@ -631,6 +664,10 @@ All data is stored in the browser's `localStorage`. The following keys are used:
 | `ag_cols` | String | Saved columns per row (e.g. `"5"`) |
 | `ag_view` | String | Saved view mode: `"grid"` or `"table"` |
 | `ag_theme` | String | Saved theme: `"light"` or `"dark"` |
+| `ag_photo_format` | String | Saved photo format key (e.g. `"8x10L"`) |
+| `ag_img_fit` | String | Saved image fit mode: `"cover"`, `"contain"`, or `"blurbg"` |
+| `ag_info_link` | String | Saved info link target: `"wiki"` or `"imdb"` |
+| `ag_privacy` | String | Saved privacy mode: `"off"` or `"on"` |
 
 **Storage limits:** `localStorage` is typically limited to **5–10 MB** per origin. Because item photos are stored as base64-encoded JPEGs (compressed to max 900px at 0.82 quality), each photo takes roughly 100–400 KB. A collection of 20–50 items with photos is well within typical limits, but very large collections with many high-detail photos could approach the limit. If storage is full, the browser will throw an error and the item will not be saved.
 
