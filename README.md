@@ -16,15 +16,16 @@ A single-file, no-backend browser app for managing an autograph and memorabilia 
 8. [Add / Edit Item Modal](#add--edit-item-modal)
 9. [Item Detail Modal](#item-detail-modal)
 10. [Fullscreen Photo Viewer](#fullscreen-photo-viewer)
-11. [Settings Modal](#settings-modal)
-12. [Import & Export](#import--export)
-13. [Sharing a Collection](#sharing-a-collection)
-14. [View Mode](#view-mode)
-15. [Light & Dark Mode](#light--dark-mode)
-16. [Mobile Behavior](#mobile-behavior)
-17. [Data Storage](#data-storage)
-18. [Item Schema](#item-schema)
-19. [Technical Notes](#technical-notes)
+11. [Presentation Mode](#presentation-mode)
+12. [Settings Modal](#settings-modal)
+13. [Import & Export](#import--export)
+14. [Sharing a Collection](#sharing-a-collection)
+15. [View Mode](#view-mode)
+16. [Light & Dark Mode](#light--dark-mode)
+17. [Mobile Behavior](#mobile-behavior)
+18. [Data Storage](#data-storage)
+19. [Item Schema](#item-schema)
+20. [Technical Notes](#technical-notes)
 
 ---
 
@@ -67,6 +68,7 @@ The header is sticky — it stays at the top of the viewport while you scroll. I
 | Control | Description |
 |---|---|
 | 👁 Eye (privacy) | Visible only when Privacy Mode is enabled. Clicking it turns Privacy Mode off and hides the button. |
+| ▶ Play | Opens **Presentation Mode** — a full-screen photo slideshow for displaying the collection on a TV or monitor |
 | ⚙️ Settings | Opens the **Settings Modal** for theme, import/export, and currency options |
 | **+ Add Item** | Opens the Add Item modal |
 
@@ -366,6 +368,41 @@ If the item has multiple photos, **‹** and **›** buttons appear on the left 
 - **Scroll wheel** — zoom in/out, centered on the cursor position
 - **Click and drag** — pan when zoomed in
 - Navigating to a different photo resets zoom and position to 1× centered
+
+---
+
+## Presentation Mode
+
+Clicking the **▶ play button** in the header launches a full-screen photo slideshow — designed to display the collection on a TV or monitor.
+
+### What it shows
+
+Only items that have at least one photo are included. The **first (cover) photo** of each item is shown — additional photos for an item are skipped. Items are shown in the same order as the current gallery view (respecting any active sort or filters).
+
+### Layout
+
+Each slide fills the entire screen against a black background (`object-fit: contain` — no cropping). A caption overlay at the bottom shows:
+
+- **Signer name** — large, bold white text. Shows "Multiple Signers" for items with more than one signer.
+- **Character · Film/Show** — smaller, dimmed text below the name (omitted if neither field is set).
+
+A thin **gold progress bar** runs along the very bottom edge of the screen and animates from left to right over the 5-second display duration, then resets for the next slide.
+
+### Timing & transitions
+
+- Each slide is displayed for **5 seconds**.
+- Slides transition with a **crossfade** — the current image fades out over 0.6 seconds before the next fades in.
+- After the last item, the slideshow loops back to the first.
+
+### Exiting
+
+| Action | Result |
+|---|---|
+| Click anywhere | Closes presentation |
+| `Escape` | Closes presentation |
+| `Space` | Closes presentation |
+
+If no items in the collection have photos, a toast message appears instead of entering presentation mode.
 
 ---
 
