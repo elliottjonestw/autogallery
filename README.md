@@ -15,15 +15,16 @@ A single-file, no-backend browser app for managing an autograph and memorabilia 
 7. [Table View](#table-view)
 8. [Add / Edit Item Modal](#add--edit-item-modal)
 9. [Item Detail Modal](#item-detail-modal)
-10. [Settings Modal](#settings-modal)
-11. [Import & Export](#import--export)
-12. [Sharing a Collection](#sharing-a-collection)
-13. [View Mode](#view-mode)
-14. [Light & Dark Mode](#light--dark-mode)
-15. [Mobile Behavior](#mobile-behavior)
-16. [Data Storage](#data-storage)
-17. [Item Schema](#item-schema)
-18. [Technical Notes](#technical-notes)
+10. [Fullscreen Photo Viewer](#fullscreen-photo-viewer)
+11. [Settings Modal](#settings-modal)
+12. [Import & Export](#import--export)
+13. [Sharing a Collection](#sharing-a-collection)
+14. [View Mode](#view-mode)
+15. [Light & Dark Mode](#light--dark-mode)
+16. [Mobile Behavior](#mobile-behavior)
+17. [Data Storage](#data-storage)
+18. [Item Schema](#item-schema)
+19. [Technical Notes](#technical-notes)
 
 ---
 
@@ -184,7 +185,7 @@ The default view. Items are displayed as cards in a responsive grid. The number 
 
 Each card from top to bottom:
 
-1. **Image area** — 5:4 aspect ratio. If a photo was uploaded it fills this area with `object-fit: cover`. If no photo exists, a placeholder icon is shown. On hover, the image subtly scales up (1.03×).
+1. **Image area** — 5:4 aspect ratio. The first (cover) photo fills this area with `object-fit: cover`. If no photos exist, a placeholder icon is shown. On hover, the image subtly scales up (1.03×). If the item has more than one photo, a small badge in the bottom-right corner shows the total count (e.g. `3`).
 
 2. **Card body** (below the image):
    - **Signer name** — bold, 14px. Plain text (not a link) in the grid view. For items with multiple signers, this shows **"Multiple Signers"** instead of individual names.
@@ -262,18 +263,18 @@ Single-signer items (Signer 1 only) behave identically to the original behavior 
 
 ### Photo Upload
 
-The photo area is a dashed drop zone. You can:
+Items support **multiple photos**. The **Photos** section of the form shows a row of thumbnails for all uploaded photos, followed by an **Add photo** tile.
 
-- **Click** to open the system file picker (accepts `image/*`)
-- **Drag and drop** an image file onto the zone
+- **Click "Add photo"** to open the system file picker (accepts `image/*`; you can select multiple files at once)
+- Each selected file is compressed client-side and added to the thumbnail row
 
-After an image is selected it is compressed client-side using an HTML5 Canvas:
+Each thumbnail has an **✕** button to remove that individual photo. The first photo in the row is the **cover image** shown on the card and in the table view. There is no limit on the number of photos per item beyond localStorage capacity.
+
+**Compression per image:**
 
 - Maximum dimension: **900px** (width or height, whichever is larger)
 - Output format: **JPEG at 0.82 quality**
-- Stored as a **base64 data URL** in `localStorage`
-
-A preview of the selected image is shown in the drop zone. A **Remove** button appears to clear the photo.
+- Stored as a **base64 data URL** in `localStorage` inside the `imgs` array
 
 ### Validation
 
@@ -293,7 +294,8 @@ Clicking any card (grid) or row (table) opens a read-only detail view for that i
 ### Contents
 
 - **Signer name** (or **"Multiple Signers"**) as the modal title
-- Photo (full width, if available). **Click the photo to open it fullscreen** — see [Fullscreen Photo Viewer](#fullscreen-photo-viewer).
+- **Main photo** (full width, if available). **Click the photo to open it fullscreen** — see [Fullscreen Photo Viewer](#fullscreen-photo-viewer).
+- **Photo thumbnail strip** — if the item has more than one photo, a row of 52×52 thumbnail chips appears directly below the main photo. Clicking a thumbnail swaps it into the main photo position. The active thumbnail is highlighted with a gold border.
 - All fields displayed as label/value rows in a table:
   - **Signer** — clickable link (Wikipedia or IMDb). For multi-signer items, individual **Signer 1 / Signer 2 / …** rows, each a link.
   - Character — plain text
@@ -314,6 +316,30 @@ Fields with no value are omitted (not shown as blank rows).
 - **Delete** — shows a browser `confirm()` dialog. If confirmed, removes the item from `localStorage` and re-renders. If cancelled, nothing happens.
 - **✕** (top-right) — closes the modal
 - Clicking the **backdrop** (outside the modal) also closes it
+
+---
+
+## Fullscreen Photo Viewer
+
+Clicking the main photo in the detail modal opens a fullscreen overlay showing the image at maximum size against a dark background.
+
+### Navigation
+
+If the item has multiple photos, **‹** and **›** buttons appear on the left and right edges. A **"2 / 4"** counter at the bottom center shows the current position. The thumbnail strip in the detail modal stays in sync as you navigate.
+
+**Keyboard shortcuts:**
+
+| Key | Action |
+|---|---|
+| `←` | Previous photo |
+| `→` | Next photo |
+| `Escape` | Close viewer |
+
+### Pan & Zoom
+
+- **Scroll wheel** — zoom in/out, centered on the cursor position
+- **Click and drag** — pan when zoomed in
+- Navigating to a different photo resets zoom and position to 1× centered
 
 ---
 
@@ -657,7 +683,7 @@ Click **Export Collection** in the Settings Modal (⚙️ → Data). The browser
       "value": 22000,
       "valueUrl": "https://www.ebay.com/...",
       "notes": "Signed at Fan Expo 2023",
-      "img": "data:image/jpeg;base64,/9j/..."
+      "imgs": ["data:image/jpeg;base64,/9j/...", "data:image/jpeg;base64,/9j/..."]
     }
   ]
 }
@@ -666,7 +692,7 @@ Click **Export Collection** in the Settings Modal (⚙️ → Data). The browser
 - `currency` is the **local currency** at time of export.
 - All monetary values in `items` are in that local currency.
 - `settings` contains all user preferences at time of export (only keys that were explicitly set are included).
-- `img` is the full base64-encoded JPEG string, or `null` if no photo.
+- `imgs` is an array of base64-encoded JPEG strings. An empty array `[]` means no photos. The first element is the cover image shown on cards and in the table view.
 
 ### Import
 
@@ -754,7 +780,7 @@ Each item is a JavaScript object with the following fields:
 | `valueUrl` | string | URL to a value source (optional, may be empty string) |
 | `notes` | string | Free-form notes (optional, may be empty string) |
 | `tags` | string[] | Array of tag strings (optional, defaults to `[]`) |
-| `img` | string \| null | Base64 JPEG data URL, or `null` if no photo |
+| `imgs` | string[] | Array of base64 JPEG data URLs. Empty array means no photos. First element is the cover image. |
 
 ---
 
@@ -800,14 +826,18 @@ The result is formatted with `toLocaleString()` for thousands separators and pre
 
 ### Image Compression Pipeline
 
+Each uploaded file goes through the same pipeline before being appended to the item's `imgs` array:
+
 ```
-User picks file
-  → FileReader reads as Data URL
+User picks file(s)
+  → FileReader reads each as Data URL
   → Image loaded into <img> element
   → Canvas resized to max 900px on longest side
   → Canvas.toDataURL('image/jpeg', 0.82) produces compressed base64
-  → Stored in item.img
+  → Appended to item.imgs[]
 ```
+
+Multiple files selected in one picker dialog are processed in parallel and appended in the order they finish compressing. Old data exported with a single `img` field is automatically migrated to `imgs: [img]` on load.
 
 ### Modal Behavior
 
