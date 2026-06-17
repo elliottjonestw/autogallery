@@ -1497,16 +1497,12 @@
       const r    = roi(item.paid, item.value);
       const rStr = roiStr(r);
 
-      const roiBadge = rStr
-        ? `<span class="roi-pill ${r >= 0 ? 'roi-pos' : 'roi-neg'} roi-overlay">${rStr}</span>`
-        : '';
-
       const imgHtml = item.img
-        ? `<div class="card-img-wrap"><img src="${item.img}" alt="${escHtml(item.name)}" loading="lazy">${roiBadge}</div>`
+        ? `<div class="card-img-wrap"><img src="${item.img}" alt="${escHtml(item.name)}" loading="lazy"></div>`
         : `<div class="card-img-wrap"><div class="card-no-img">
             <svg width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.2" stroke-linecap="round"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg>
             <span style="font-size:11px">No photo</span>
-           </div>${roiBadge}</div>`;
+           </div></div>`;
 
       let rows = '';
       if (item.certNum) {
@@ -1527,6 +1523,7 @@
         if (item.valueUrl) vStr = `<a class="card-link ${cls}" href="${escHtml(item.valueUrl)}" target="_blank" rel="noopener" onclick="event.stopPropagation()" style="color:inherit">${vStr}</a>`;
         rows += cardRow('Est. Value', `<span class="${cls}">${vStr}</span>`);
       }
+      if (rStr) rows += cardRow('ROI', `<span class="${r >= 0 ? 'text-green' : 'text-red'}">${rStr}</span>`);
 
       return `
         <div class="card" onclick="openDetail('${item.id}')">
@@ -1701,10 +1698,6 @@
 
     let html = '';
     if (item.img) html += `<img class="detail-img" src="${item.img}" alt="${escHtml(displayTitle)}" onclick="openPhotoViewer(this.src)">`;
-    if (rStr) {
-      const cls = r >= 0 ? 'roi-pos' : 'roi-neg';
-      html += `<span class="roi-pill ${cls}" style="margin-bottom:4px;display:inline-flex">${rStr} ROI</span>`;
-    }
 
     html += '<div class="detail-rows">';
     if (item.signers && item.signers.length > 1) {
@@ -1733,6 +1726,10 @@
       let v = `<span class="${cls}">${escHtml(fmt(item.value))}</span>`;
       if (item.valueUrl) v = `<a class="card-link ${cls}" href="${escHtml(item.valueUrl)}" target="_blank" rel="noopener" style="color:inherit">${escHtml(fmt(item.value))}</a>`;
       html += detailRow('Estimated Value', v);
+    }
+    if (rStr) {
+      const cls = r >= 0 ? 'text-green' : 'text-red';
+      html += detailRow('ROI', `<span class="${cls}">${rStr}</span>`);
     }
     html += '</div>';
 

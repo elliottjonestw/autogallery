@@ -144,18 +144,17 @@ Each card from top to bottom:
 
 1. **Image area** — 5:4 aspect ratio. If a photo was uploaded it fills this area with `object-fit: cover`. If no photo exists, a placeholder icon is shown. On hover, the image subtly scales up (1.03×).
 
-2. **ROI Overlay** — if both "Paid" and "Est. Value" are filled in, an ROI pill is shown **over the top-left corner of the image**, with a frosted-glass dark background. Green for positive ROI, red for negative. Example: `+47%` or `-12%`.
-
-3. **Card body** (below the image):
-   - **Signer name** — bold, 14px. For items with multiple signers, this shows **"Multiple Signers"** instead of individual names.
-   - **Character name** — smaller, muted color, on its own line
-   - **Film/show title** — smaller, muted color, on its own line below character name
+2. **Card body** (below the image):
+   - **Signer name** — bold, 14px. Plain text (not a link) in the grid view. For items with multiple signers, this shows **"Multiple Signers"** instead of individual names.
+   - **Character name** — smaller, muted color, on its own line. Plain text.
+   - **Film/show title** — smaller, muted color, on its own line below character name. Plain text.
    - A thin horizontal divider
+   - **Cert** label + a gold clickable link to the authentication company's verification page (if a cert company is selected). Clicking the link **also copies the cert number to the clipboard** and shows a toast. The link click does **not** open the detail modal.
    - **Paid** label + value (or `—` if not set)
    - **Est. Value** label + value; if a value URL is set, the value is a clickable gold link that opens the source in a new tab. The link click does **not** open the detail modal.
-   - **Cert** label + a gold clickable link to the authentication company's verification page (if a cert company is selected). Link text is the company name (e.g. "Beckett"). The link click does **not** open the detail modal.
+   - **ROI** label + percentage value, green or red. Only shown when both Paid and Est. Value are set.
 
-4. **Clicking the card** (anywhere except the links) opens the **Item Detail Modal**.
+3. **Clicking the card** (anywhere except the links) opens the **Item Detail Modal**.
 
 Cards animate on hover: they lift up 3px and show a deeper shadow.
 
@@ -168,15 +167,17 @@ An alternative view available on desktop. Items are shown as rows in a sortable 
 | Column | Content |
 |---|---|
 | (thumbnail) | 52×40px cropped thumbnail of the photo, or a placeholder icon |
-| **Signer** | Bold signer name (or **"Multiple Signers"** for multi-signer items) with character and film/show in smaller muted text below |
+| **Signer** | Signer name as a clickable link (Wikipedia or IMDb per the Info Links setting), or **"Multiple Signers"** for multi-signer items |
+| **Character** | Character name, plain text |
+| **Film / Show** | Film or show title as a clickable link (Wikipedia or IMDb per the Info Links setting) |
 | **Paid** | Amount paid in display currency |
 | **Est. Value** | Estimated value in display currency, colored green (positive) or red (negative) relative to paid. If a value URL is set, the value is a clickable link that opens in a new tab. |
 | **ROI** | Whole-number percentage, green or red pill |
-| **Cert** | Clickable gold link to the authentication company's verification page |
+| **Cert** | Clickable gold link to the authentication company's verification page. Clicking also copies the cert number to the clipboard. |
 | **Added** | Date the item was added, formatted as `MMM D, YYYY` |
 
 - Clicking any **row** opens the **Item Detail Modal** for that item.
-- Clicking the **Est. Value link** or **Cert link** opens the respective URL in a new tab without opening the detail modal (click propagation is stopped).
+- Clicking the **Est. Value link**, **Cert link**, **Signer link**, or **Film link** opens the URL in a new tab without opening the detail modal (click propagation is stopped).
 - Rows have a hover background highlight.
 
 ---
@@ -249,17 +250,17 @@ Clicking any card (grid) or row (table) opens a read-only detail view for that i
 ### Contents
 
 - **Signer name** (or **"Multiple Signers"**) as the modal title
-- Photo (full width, if available) with `object-fit: cover`
-- ROI pill (colored), shown above the detail table
+- Photo (full width, if available). **Click the photo to open it fullscreen** — see [Fullscreen Photo Viewer](#fullscreen-photo-viewer).
 - All fields displayed as label/value rows in a table:
-  - **Signer** — for single-signer items; **Signer 1 / Signer 2 / …** rows for multi-signer items
-  - Character
-  - Film / Show
-  - Cert # with a clickable link to the cert company's verification page
+  - **Signer** — clickable link (Wikipedia or IMDb). For multi-signer items, individual **Signer 1 / Signer 2 / …** rows, each a link.
+  - Character — plain text
+  - Film / Show — clickable link (Wikipedia or IMDb)
+  - Cert # — clickable link to the cert company's verification page. Clicking **also copies the cert number to the clipboard** and shows a toast confirmation.
   - Paid (in display currency)
   - Est. Value (in display currency, with link if URL is set)
-  - Date Added
+  - ROI — percentage, colored green or red. Only shown when both Paid and Est. Value are set.
   - Notes
+  - Date Added
 
 Fields with no value are omitted (not shown as blank rows).
 
@@ -276,13 +277,26 @@ Fields with no value are omitted (not shown as blank rows).
 
 Opened by clicking the **⚙️ gear icon** in the header. The modal is organized into sections that vary depending on whether you are in normal mode or [View Mode](#view-mode).
 
-**Normal mode sections:** Appearance, Data, Local Currency, Display Currency, Exchange Rate
+**Normal mode sections:** Appearance, Info Links, Data, Local Currency, Display Currency, Exchange Rate
 
-**View mode sections:** Appearance, This Collection, Display Currency, Exchange Rate
+**View mode sections:** Appearance, Info Links, This Collection, Display Currency, Exchange Rate
 
 ### Appearance
 
 A row button that toggles between light and dark mode. The label updates to reflect the opposite of the current theme ("Switch to Dark Mode" / "Switch to Light Mode"), and the icon switches between a sun and moon accordingly. See [Light & Dark Mode](#light--dark-mode) for full details.
+
+### Info Links
+
+A dropdown to choose which site signer names and film/show titles link to in the table view and detail modal:
+
+| Option | Signer links to | Film / Show links to |
+|---|---|---|
+| **Wikipedia** *(default)* | `en.wikipedia.org/wiki/[Name]` | `en.wikipedia.org/wiki/[Title]` |
+| **IMDb** | IMDb name search (`&s=nm`) | IMDb title search (`&s=tt`) |
+
+- The setting is saved to `localStorage` (`ag_info_link`) and takes effect immediately (gallery re-renders on change).
+- Available in both normal mode and view mode.
+- Links appear in **table view** (Signer column, Film / Show column) and **detail modal** (Signer row, Film / Show row). Grid card text is plain — no links.
 
 ### Data
 
