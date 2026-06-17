@@ -110,6 +110,33 @@ A text input with a magnifying-glass icon. Filters items in real time (on every 
 
 The search is **case-insensitive**. Clearing the input restores the full list.
 
+### Filter
+
+A **Filter** button (funnel icon) opens the Filter modal for structured, multi-select filtering. When one or more filters are active, the button turns gold and shows a count badge indicating how many filters are applied.
+
+#### Filter Modal
+
+The modal shows up to four sections, each populated from values that actually exist in the current collection (empty sections are hidden):
+
+| Section | Description |
+|---|---|
+| **Tags** | All tags used across the collection |
+| **Cert Company** | Authentication companies used (Beckett, PSA, JSA, SWAU) |
+| **Film / Show** | All film and show titles in the collection |
+| **Signer** | All signer names in the collection |
+
+Each option is a toggleable chip. Click a chip to select it (turns gold); click again to deselect. **Multiple chips can be selected simultaneously.**
+
+**Filter logic:**
+- Within a category — **OR**: an item matches if it has *any* of the selected values (e.g. tag "sci-fi" OR tag "horror")
+- Across categories — **AND**: an item must satisfy *all* active categories (e.g. tag "sci-fi" AND cert company "Beckett")
+
+**Buttons:**
+- **Clear All** — removes all active filters and re-renders the full list
+- **Done** — closes the modal (filters remain active)
+
+Filters and search work together — both are applied simultaneously.
+
 ### Sort
 
 A dropdown to sort the visible items. Options:
@@ -652,6 +679,7 @@ The app is designed to work on small screens. On viewports **640px wide or narro
 - **Grid is 2 columns** — a CSS media query sets `--cols: 2` on mobile, overriding any saved column preference.
 - **Cards go full width** — the text (signer name, character, film) spans the full card width rather than being cramped next to a fixed-width image column.
 - **Horizontal scroll is prevented** — all layout uses `box-sizing: border-box` and the gallery padding is reduced to `12px` on mobile to prevent content from overflowing the viewport.
+- **Sort and Filter share a row** — the Sort dropdown and Filter button appear side by side on a second row below the search bar, each taking half the available width.
 
 ---
 

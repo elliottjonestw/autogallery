@@ -411,6 +411,78 @@
     .view-btn.active { background: var(--border); color: var(--text); }
     .view-btn:hover:not(.active) { color: var(--text); }
 
+    /* ── Filter button ── */
+    .btn-filter {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      padding: 0 14px;
+      height: 38px;
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      background: var(--surface);
+      color: var(--sub);
+      font-family: var(--font);
+      font-size: 13px;
+      font-weight: 600;
+      cursor: pointer;
+      white-space: nowrap;
+      transition: border-color .15s, color .15s, background .15s;
+    }
+    .btn-filter:hover { border-color: var(--border-light); color: var(--text); }
+    .btn-filter.active { border-color: var(--gold); color: var(--gold); background: var(--surface); }
+    .filter-badge {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      min-width: 17px;
+      height: 17px;
+      padding: 0 4px;
+      background: var(--gold);
+      color: #111;
+      border-radius: 99px;
+      font-size: 10px;
+      font-weight: 700;
+    }
+
+    /* ── Filter modal ── */
+    .modal-filter {
+      height: min(560px, 90vh);
+      display: flex;
+      flex-direction: column;
+      overflow-y: hidden;
+    }
+    .modal-filter .modal-body {
+      flex: 1;
+      min-height: 0;
+      overflow-y: auto;
+    }
+    .filter-section { margin-bottom: 22px; }
+    .filter-section:last-child { margin-bottom: 0; }
+    .filter-section-label {
+      font-size: 10px;
+      font-weight: 700;
+      letter-spacing: .06em;
+      text-transform: uppercase;
+      color: var(--sub);
+      margin-bottom: 9px;
+    }
+    .filter-chips { display: flex; flex-wrap: wrap; gap: 6px; }
+    .filter-chip {
+      padding: 5px 13px;
+      border: 1px solid var(--border-light);
+      border-radius: 99px;
+      background: none;
+      color: var(--text);
+      font-family: var(--font);
+      font-size: 12px;
+      font-weight: 500;
+      cursor: pointer;
+      transition: border-color .15s, background .15s, color .15s;
+    }
+    .filter-chip:hover { border-color: var(--gold); color: var(--gold); }
+    .filter-chip.active { background: var(--gold); border-color: var(--gold); color: #111; font-weight: 700; }
+
     /* ── Table view ── */
     .table-wrap {
       padding: 0 24px 32px;
@@ -1026,6 +1098,9 @@
       .controls { padding: 10px 12px; }
       .cols-select { display: none; }
       .view-toggle { display: none; }
+      .search-wrap { flex-basis: 100%; }
+      .sort-select { flex: 1; }
+      .btn-filter { flex: 1; justify-content: center; }
       header { padding: 0 16px; }
       .stats-bar { padding: 0 16px; }
       .frow { grid-template-columns: 1fr; }
@@ -1090,6 +1165,11 @@
     <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
     <input class="search-input" id="searchInput" placeholder="Search name, character, film…" oninput="render()">
   </div>
+  <button class="btn-filter" id="filterBtn" onclick="openFilterModal()">
+    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="22 3 2 3 10 12.46 10 19 14 21 14 12.46 22 3"/></svg>
+    Filter
+    <span class="filter-badge" id="filterBadge" style="display:none">0</span>
+  </button>
   <select class="sort-select" id="sortSelect" onchange="render()">
     <option value="date-desc">Newest first</option>
     <option value="date-asc">Oldest first</option>
@@ -1453,6 +1533,21 @@
   </div>
 </div>
 
+<!-- ── Filter Modal ── -->
+<div class="overlay" id="filterOverlay" onclick="overlayClick(event,'filterOverlay')">
+  <div class="modal modal-filter" style="max-width:460px">
+    <div class="modal-head">
+      <span class="modal-title">Filter</span>
+      <button class="btn-x" onclick="closeFilterModal()">✕</button>
+    </div>
+    <div class="modal-body" id="filterBody"></div>
+    <div class="modal-foot">
+      <button class="btn-secondary" onclick="clearAllFilters()">Clear All</button>
+      <button class="btn-primary" onclick="closeFilterModal()">Done</button>
+    </div>
+  </div>
+</div>
+
 <!-- ── Share warning ── -->
 <div class="overlay" id="shareWarnOverlay" onclick="if(event.target===this)closeShareWarn()">
   <div class="modal" style="max-width:420px">
@@ -1769,6 +1864,73 @@
     }
   }
 
+  /* ── Filter modal ── */
+  let activeFilters = { tags: new Set(), certCompany: new Set(), film: new Set(), signer: new Set() };
+
+  function openFilterModal() {
+    buildFilterModal();
+    open('filterOverlay');
+  }
+  function closeFilterModal() { close('filterOverlay'); }
+
+  function buildFilterModal() {
+    const allTags = new Set(), allCerts = new Set(), allFilms = new Set(), allSigners = new Set();
+    items.forEach(i => {
+      (i.tags || []).forEach(t => allTags.add(t));
+      if (i.certCompany) allCerts.add(i.certCompany);
+      if (i.film) allFilms.add(i.film);
+      (i.signers || [i.name]).filter(Boolean).forEach(s => allSigners.add(s));
+    });
+
+    const sections = [];
+    if (allTags.size)    sections.push({ key: 'tags',        label: 'Tags',        values: [...allTags].sort() });
+    if (allCerts.size)   sections.push({ key: 'certCompany', label: 'Cert Company', values: [...allCerts].sort(), display: CERT_LABELS });
+    if (allFilms.size)   sections.push({ key: 'film',        label: 'Film / Show',  values: [...allFilms].sort() });
+    if (allSigners.size) sections.push({ key: 'signer',      label: 'Signer',       values: [...allSigners].sort() });
+
+    const body = document.getElementById('filterBody');
+    if (!sections.length) {
+      body.innerHTML = '<p style="color:var(--sub);text-align:center;padding:30px 20px">No items to filter.</p>';
+      return;
+    }
+    body.innerHTML = sections.map(s => `
+      <div class="filter-section">
+        <div class="filter-section-label">${s.label}</div>
+        <div class="filter-chips">
+          ${s.values.map(v => {
+            const label = s.display ? (s.display[v] || v) : v;
+            const active = activeFilters[s.key].has(v) ? ' active' : '';
+            return `<button class="filter-chip${active}" data-key="${s.key}" data-val="${escHtml(v)}" onclick="toggleFilterChip(this)">${escHtml(label)}</button>`;
+          }).join('')}
+        </div>
+      </div>`).join('');
+    body.style.padding = '20px';
+  }
+
+  function toggleFilterChip(btn) {
+    const key = btn.dataset.key, val = btn.dataset.val;
+    if (activeFilters[key].has(val)) activeFilters[key].delete(val);
+    else activeFilters[key].add(val);
+    btn.classList.toggle('active');
+    updateFilterBtn();
+    render();
+  }
+
+  function clearAllFilters() {
+    activeFilters = { tags: new Set(), certCompany: new Set(), film: new Set(), signer: new Set() };
+    updateFilterBtn();
+    buildFilterModal();
+    render();
+  }
+
+  function updateFilterBtn() {
+    const count = activeFilters.tags.size + activeFilters.certCompany.size + activeFilters.film.size + activeFilters.signer.size;
+    const badge = document.getElementById('filterBadge');
+    badge.textContent = count;
+    badge.style.display = count ? '' : 'none';
+    document.getElementById('filterBtn').classList.toggle('active', count > 0);
+  }
+
   /* ── Filter + sort ── */
   function filtered() {
     const q   = document.getElementById('searchInput').value.toLowerCase().trim();
@@ -1782,6 +1944,17 @@
           (i.certNum   || '').toLowerCase().includes(q) ||
           (i.tags || []).some(t => t.toLowerCase().includes(q)))
       : [...items];
+
+    const af = activeFilters;
+    if (af.tags.size || af.certCompany.size || af.film.size || af.signer.size) {
+      res = res.filter(i => {
+        if (af.tags.size        && !(i.tags || []).some(t => af.tags.has(t)))                         return false;
+        if (af.certCompany.size && !af.certCompany.has(i.certCompany || ''))                           return false;
+        if (af.film.size        && !af.film.has(i.film || ''))                                         return false;
+        if (af.signer.size      && !(i.signers || [i.name]).filter(Boolean).some(s => af.signer.has(s))) return false;
+        return true;
+      });
+    }
 
     res.sort((a, b) => {
       switch (srt) {
@@ -2154,6 +2327,7 @@
       close('formOverlay');
       close('detailOverlay');
       close('shareWarnOverlay');
+      close('filterOverlay');
       close('settingsOverlay');
     }
   });
