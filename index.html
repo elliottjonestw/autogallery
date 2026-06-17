@@ -225,6 +225,24 @@
     .settings-panel { display: none; }
     .settings-panel.active { display: block; }
 
+    .modal-settings {
+      height: min(500px, 90vh);
+      display: flex;
+      flex-direction: column;
+      overflow-y: hidden;
+    }
+    .modal-settings .modal-body {
+      flex: 1;
+      min-height: 0;
+      overflow-y: auto;
+    }
+    .modal-settings .settings-tabs {
+      position: sticky;
+      top: 0;
+      background: var(--card);
+      z-index: 1;
+    }
+
     .rate-box {
       background: var(--surface);
       border: 1px solid var(--border);
@@ -1159,7 +1177,7 @@
 
 <!-- ── Settings Modal ── -->
 <div class="overlay" id="settingsOverlay" onclick="overlayClick(event,'settingsOverlay')">
-  <div class="modal" style="max-width:400px">
+  <div class="modal modal-settings" style="max-width:400px">
     <div class="modal-head">
       <span class="modal-title">Settings</span>
       <button class="btn-x" onclick="closeSettings()">✕</button>
