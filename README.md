@@ -436,8 +436,9 @@ AutoGallery can generate a short URL that lets anyone view your collection in th
 
 1. Open the **Settings Modal** (⚙️ in the header)
 2. Under **Data**, click **Copy Share Link**
-3. The button label changes to "Uploading…" while the collection is sent to dpaste.com
-4. Once uploaded, a short URL is copied to your clipboard automatically — e.g.:
+3. A warning dialog appears explaining that your collection will be uploaded publicly. Read it carefully — if your gallery contains financial details or personal information you wouldn't want others to see, click **Cancel** and use **Export Collection** to share the file privately instead.
+4. Click **Share publicly** to proceed. The button label changes to "Uploading…" while the collection is sent to dpaste.com.
+5. Once uploaded, a short URL is copied to your clipboard automatically — e.g.:
    ```
    http://localhost:4200/index.html#blob=G9GW3KB53
    ```

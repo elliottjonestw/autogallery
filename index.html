@@ -1283,7 +1283,7 @@
           </div>
           <div class="tip-container" style="margin-top:6px">
             <div class="ctrl-row">
-              <button class="settings-row-btn" id="sharePhotosBtn" onclick="shareCollectionWithPhotos()">
+              <button class="settings-row-btn" id="sharePhotosBtn" onclick="showShareWarn()">
                 <span class="settings-row-icon">
                   <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><line x1="8.59" y1="13.51" x2="15.42" y2="17.49"/><line x1="15.41" y1="6.51" x2="8.59" y2="10.49"/></svg>
                 </span>
@@ -1365,6 +1365,27 @@
         </div>
       </div>
 
+    </div>
+  </div>
+</div>
+
+<!-- ── Share warning ── -->
+<div class="overlay" id="shareWarnOverlay" onclick="if(event.target===this)closeShareWarn()">
+  <div class="modal" style="max-width:420px">
+    <div class="modal-head">
+      <span style="display:flex;align-items:center;gap:8px;font-size:16px;font-weight:700">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="var(--red)" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M10.29 3.86L1.82 18a2 2 0 001.71 3h16.94a2 2 0 001.71-3L13.71 3.86a2 2 0 00-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
+        Your data will be public
+      </span>
+    </div>
+    <div class="modal-body">
+      <p style="margin:0 0 12px;line-height:1.6;font-size:14px">Generating a share link uploads your <strong>entire collection</strong> — item details, photos, paid amounts, estimated values, and certificate numbers — to <strong>dpaste.com</strong>, a public paste service. Anyone who obtains the link can view all of this information.</p>
+      <p style="margin:0 0 12px;line-height:1.6;font-size:14px;color:var(--sub)">If your gallery contains financial details or personal information you wouldn't want others to see, do not proceed. Instead, consider using <strong>Export Collection</strong> to save a <code>.json</code> file and share it privately.</p>
+      <p style="margin:0;line-height:1.6;font-size:13px;color:var(--sub)">Share links expire after 365 days.</p>
+    </div>
+    <div class="modal-foot">
+      <button class="btn-secondary" onclick="closeShareWarn()">Cancel</button>
+      <button class="btn-primary" onclick="confirmShare()">Share publicly</button>
     </div>
   </div>
 </div>
@@ -1994,6 +2015,7 @@
     if (e.key === 'Escape') {
       close('formOverlay');
       close('detailOverlay');
+      close('shareWarnOverlay');
       close('settingsOverlay');
     }
   });
@@ -2150,6 +2172,16 @@
     writer.write(bytes);
     writer.close();
     return new Response(stream.readable).text();
+  }
+
+  function showShareWarn() {
+    if (!items.length) { toast('Nothing to share'); return; }
+    open('shareWarnOverlay');
+  }
+  function closeShareWarn() { close('shareWarnOverlay'); }
+  function confirmShare() {
+    close('shareWarnOverlay');
+    shareCollectionWithPhotos();
   }
 
   async function shareCollectionWithPhotos() {
