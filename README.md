@@ -488,7 +488,7 @@ AutoGallery can generate a short URL that lets anyone view your collection in th
 
 ### What Gets Uploaded
 
-The **entire collection** is included — all item fields and all photos. The JSON is uploaded as a single paste to [dpaste.com](https://dpaste.com), a free public paste service.
+The **entire collection** is included — all item fields, all photos, and all user preferences (`settings`). The JSON is uploaded as a single paste to [dpaste.com](https://dpaste.com), a free public paste service.
 
 > ⚠️ **Your collection data is publicly accessible.** Anyone who has or guesses the URL can read all item data including photos, values, cert numbers, and notes. Do not share if your collection data is sensitive.
 
@@ -542,7 +542,8 @@ The banner contains a **← Back to my collection** button on the right side.
 | **Delete** button in detail modal | Hidden |
 | **Settings → Data** section (Export, Import, Share) | Hidden |
 | **Settings → Local Currency** | Hidden |
-| Saving to localStorage | Never happens |
+| Saving items to localStorage | Never happens |
+| Shared settings applied to localStorage | Temporarily (restored on exit) |
 
 ### What Remains Available
 
@@ -567,6 +568,7 @@ While in view mode, the Settings modal shows a **This Collection** section with 
 2. If confirmed:
    - The shared items (including all photos) are written to `localStorage`
    - The sharer's local currency is set as your new local currency
+   - All shared preferences (theme, sort, columns, photo format, etc.) are applied permanently
    - View mode exits and the full editing UI is restored (Add Item button, Edit/Delete in detail modal, all Settings sections)
    - The exchange rate is re-fetched for your currency pair
    - A toast confirms: *"Saved N items as your collection"*
@@ -580,7 +582,7 @@ The shared collection was recorded in the sharer's local currency (stored in the
 
 ### Your Own Data is Untouched
 
-View mode never writes to `localStorage`. Your own collection remains exactly as it was. Switching back via **← Back to my collection** immediately reloads your own data from localStorage and restores the full editing UI.
+Your own **collection** (items) is never touched in view mode — it remains in `localStorage` exactly as it was. The shared settings (theme, sort, columns, etc.) are applied temporarily to `localStorage` while viewing so you see the collection as the sharer had it configured. When you click **← Back to my collection**, your original preferences are restored from the snapshot taken at the moment you opened the share link, and your own items are reloaded.
 
 ### Exiting View Mode
 
@@ -629,6 +631,18 @@ Click **Export Collection** in the Settings Modal (⚙️ → Data). The browser
 ```json
 {
   "currency": "TWD",
+  "settings": {
+    "ag_display_currency": "USD",
+    "ag_theme": "dark",
+    "ag_cols": "5",
+    "ag_view": "grid",
+    "ag_photo_format": "8x10L",
+    "ag_img_fit": "cover",
+    "ag_info_link": "wiki",
+    "ag_privacy": "off",
+    "ag_sort": "date-desc",
+    "ag_custom_order": "[\"abc123\"]"
+  },
   "items": [
     {
       "id": "abc123",
@@ -651,6 +665,7 @@ Click **Export Collection** in the Settings Modal (⚙️ → Data). The browser
 
 - `currency` is the **local currency** at time of export.
 - All monetary values in `items` are in that local currency.
+- `settings` contains all user preferences at time of export (only keys that were explicitly set are included).
 - `img` is the full base64-encoded JPEG string, or `null` if no photo.
 
 ### Import
@@ -661,6 +676,7 @@ Click **Import Collection** in the Settings Modal (⚙️ → Data). A file pick
 
 - The imported `currency` field is set as the new **local currency**.
 - All items are loaded into `localStorage`, **replacing** the current collection entirely.
+- All preferences in the `settings` field are applied immediately — theme, sort, columns, photo format, etc.
 - The gallery re-renders immediately with the imported data.
 - If the file is malformed or cannot be parsed, a toast error is shown.
 
@@ -673,7 +689,7 @@ Click **Merge Import** in the Settings Modal (⚙️ → Data). A file picker op
 **Merge Import behavior:**
 
 - Items from the file are **appended** to the current collection — nothing is replaced or deleted.
-- The imported `currency` field is ignored; your existing local currency is kept.
+- The imported `currency` and `settings` fields are ignored; your existing preferences are kept.
 - A toast confirms how many items were added (e.g. "Added 12 items").
 - If the file is malformed or contains no items, a toast error is shown.
 

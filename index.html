@@ -1599,6 +1599,8 @@
   let items = [];
   let viewMode = false;
   let viewLocalCurrency = null;
+  let viewSettings = null;
+  let savedSettings = null;
   let pendingImg = null;   // base64 string or null
   let activeDetailId = null;
 
@@ -1721,10 +1723,15 @@
     }
   }
 
-  function enterViewMode(data, currency) {
+  function enterViewMode(data, currency, settings) {
     viewMode = true;
     viewLocalCurrency = currency || null;
+    viewSettings = settings || null;
     items = data;
+    if (settings) {
+      savedSettings = collectSettings();
+      applySettings(settings);
+    }
     document.getElementById('viewBanner').style.display = '';
     document.getElementById('btnAdd').style.display = 'none';
     document.getElementById('btnDetailDelete').style.display = 'none';
@@ -1737,10 +1744,12 @@
     if (!confirm(`Replace your own collection with these ${items.length} item${s}? This cannot be undone.`)) return;
     const sharedItems = items;
     const currency = viewLocalCurrency;
+    const settingsToApply = viewSettings;
     exitViewMode();           // resets viewMode, reloads own items from localStorage
     items = sharedItems;      // overwrite with the shared items
     persist();                // write them to localStorage
-    if (currency) { localStorage.setItem('ag_currency', currency); }
+    if (currency) setLocalCurrency(currency);
+    if (settingsToApply) applySettings(settingsToApply);
     fetchExchangeRate();
     render();
     closeSettings();
@@ -1750,6 +1759,8 @@
   function exitViewMode() {
     viewMode = false;
     viewLocalCurrency = null;
+    viewSettings = null;
+    if (savedSettings) { applySettings(savedSettings); savedSettings = null; }
     load();
     document.getElementById('viewBanner').style.display = 'none';
     document.getElementById('btnAdd').style.display = '';
@@ -2399,11 +2410,46 @@
     toastTimer = setTimeout(() => el.classList.remove('show'), 2400);
   }
 
+  /* ── Settings helpers ── */
+  function collectSettings() {
+    const keys = ['ag_display_currency', 'ag_theme', 'ag_cols', 'ag_view',
+                  'ag_photo_format', 'ag_img_fit', 'ag_info_link', 'ag_privacy',
+                  'ag_sort', 'ag_custom_order'];
+    const s = {};
+    keys.forEach(k => { const v = localStorage.getItem(k); if (v !== null) s[k] = v; });
+    return s;
+  }
+
+  function applySettings(s) {
+    if (!s) return;
+    if (s.ag_display_currency) {
+      localStorage.setItem('ag_display_currency', s.ag_display_currency);
+      const el = document.getElementById('settingsDisplay');
+      if (el) el.value = s.ag_display_currency;
+    }
+    if (s.ag_theme) applyTheme(s.ag_theme);
+    if (s.ag_cols) setCols(s.ag_cols);
+    if (s.ag_view) setView(s.ag_view);
+    if (s.ag_photo_format) setPhotoFormat(s.ag_photo_format);
+    if (s.ag_img_fit) setImgFit(s.ag_img_fit);
+    if (s.ag_info_link) localStorage.setItem('ag_info_link', s.ag_info_link);
+    if (s.ag_privacy) setPrivacyMode(s.ag_privacy);
+    if (s.ag_sort) {
+      const el = document.getElementById('sortSelect');
+      if (el) el.value = s.ag_sort;
+      localStorage.setItem('ag_sort', s.ag_sort);
+    }
+    if (s.ag_custom_order) {
+      try { customOrder = JSON.parse(s.ag_custom_order); saveCustomOrder(); } catch {}
+    }
+  }
+
   /* ── Export / Import ── */
   function exportData() {
     if (!items.length) { toast('Nothing to export'); return; }
     const payload = {
       currency: localStorage.getItem('ag_currency') || 'TWD',
+      settings: collectSettings(),
       items,
     };
     const blob = new Blob([JSON.stringify(payload, null, 2)], { type: 'application/json' });
@@ -2430,6 +2476,7 @@
         items = data;
         persist();
         if (currency) setLocalCurrency(currency);
+        if (parsed.settings) applySettings(parsed.settings);
         render();
         toast(`Imported ${data.length} items`);
       } catch {
@@ -2560,7 +2607,7 @@
     const originalText = txtNode.textContent;
     btn.disabled = true;
     txtNode.textContent = ' Uploading…';
-    const payload = { currency: getLocalCurrency(), items };
+    const payload = { currency: getLocalCurrency(), settings: collectSettings(), items };
     try {
       const fd = new FormData();
       fd.append('content', JSON.stringify(payload));
@@ -2588,9 +2635,10 @@
     async function applyShared(parsed) {
       const data = Array.isArray(parsed) ? parsed : parsed.items;
       const currency = Array.isArray(parsed) ? null : parsed.currency;
+      const settings = Array.isArray(parsed) ? null : (parsed.settings || null);
       if (!Array.isArray(data)) throw new Error('bad format');
       const s = data.length === 1 ? '' : 's';
-      enterViewMode(data, currency);
+      enterViewMode(data, currency, settings);
       toast(`Viewing shared collection — ${data.length} item${s}`);
     }
 
