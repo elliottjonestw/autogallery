@@ -105,6 +105,7 @@ A text input with a magnifying-glass icon. Filters items in real time (on every 
 - Signer name(s) — all signers are searched for multi-signer items
 - Character name
 - Film/show title
+- Tags
 - Notes
 
 The search is **case-insensitive**. Clearing the input restores the full list.
@@ -202,6 +203,7 @@ Opened by clicking **+ Add Item** (new item) or **Edit** inside the detail modal
 | **Est. Value** | Number input | Optional. Current estimated market value, in your **local currency**. |
 | **Value Source URL** | Text input | Optional. A URL linking to a source for the estimated value (e.g. eBay sold listing). |
 | **Notes** | Textarea | Optional. Free-form notes. Resizable vertically. |
+| **Tags** | Tag input | Optional. Type a tag and press **Enter** or **,** to add it as a chip. Press **Backspace** on an empty input to remove the last tag. Click **×** on a chip to remove it. Multiple tags per item are supported. |
 | **Photo** | File upload / drag-and-drop | Optional. See below. |
 
 All monetary inputs (**Paid**, **Est. Value**) are stored in the **local currency** (configured in Settings). They are converted to the display currency at render time using the live exchange rate.
@@ -261,6 +263,7 @@ Clicking any card (grid) or row (table) opens a read-only detail view for that i
   - Paid (in display currency)
   - Est. Value (in display currency, with link if URL is set)
   - ROI — percentage, colored green or red. Only shown when both Paid and Est. Value are set.
+  - Tags — clickable chips. Clicking a tag closes the modal and filters the gallery to items with that tag.
   - Notes
   - Date Added
 
@@ -692,6 +695,7 @@ Each item is a JavaScript object with the following fields:
 | `value` | number \| null | Estimated current value, in the local currency |
 | `valueUrl` | string | URL to a value source (optional, may be empty string) |
 | `notes` | string | Free-form notes (optional, may be empty string) |
+| `tags` | string[] | Array of tag strings (optional, defaults to `[]`) |
 | `img` | string \| null | Base64 JPEG data URL, or `null` if no photo |
 
 ---

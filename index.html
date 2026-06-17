@@ -571,6 +571,65 @@
 
     .card-divider { border: none; border-top: 1px solid var(--border); margin: 10px 0; }
 
+    .tag {
+      display: inline-block;
+      padding: 2px 8px;
+      background: var(--border);
+      border-radius: 20px;
+      font-size: 10px;
+      font-weight: 600;
+      color: var(--sub);
+      white-space: nowrap;
+      cursor: pointer;
+      transition: background .15s, color .15s;
+    }
+    .tag:hover { background: var(--gold); color: #111; }
+
+    .tag-input-wrap {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+      align-items: center;
+      min-height: 40px;
+      padding: 6px 10px;
+      border: 1px solid var(--border-light);
+      border-radius: 8px;
+      background: var(--surface);
+      cursor: text;
+      transition: border-color .15s;
+    }
+    .tag-input-wrap:focus-within { border-color: var(--gold); }
+    .tag-text-input {
+      flex: 1;
+      min-width: 80px;
+      border: none;
+      background: none;
+      color: var(--text);
+      font-family: var(--font);
+      font-size: 13px;
+      outline: none;
+      padding: 2px 0;
+    }
+    .tag-text-input::placeholder { color: var(--sub); opacity: 1; }
+    .form-tag-chip {
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      padding: 3px 6px 3px 10px;
+      background: var(--gold);
+      color: #111;
+      border-radius: 20px;
+      font-size: 11px;
+      font-weight: 600;
+      white-space: nowrap;
+    }
+    .form-tag-chip-x {
+      background: none; border: none; color: inherit;
+      cursor: pointer; font-size: 15px; line-height: 1;
+      padding: 0; opacity: .65; display: flex; align-items: center;
+    }
+    .form-tag-chip-x:hover { opacity: 1; }
+
     .card-row {
       display: flex;
       justify-content: space-between;
@@ -1152,6 +1211,13 @@
         <label class="flabel">Notes</label>
         <textarea class="ftextarea" id="fNotes" placeholder="Additional notes…"></textarea>
       </div>
+
+      <div class="fg">
+        <label class="flabel">Tags</label>
+        <div class="tag-input-wrap" id="tagInputWrap" onclick="document.getElementById('tagTextInput').focus()">
+          <input type="text" id="tagTextInput" class="tag-text-input" placeholder="Type a tag and press Enter…" onkeydown="tagKeydown(event)">
+        </div>
+      </div>
     </div>
     <div class="modal-foot">
       <button class="btn-secondary" onclick="closeForm()">Cancel</button>
@@ -1713,7 +1779,8 @@
           (i.signers ? i.signers.join(' ') : (i.name || '')).toLowerCase().includes(q) ||
           (i.character || '').toLowerCase().includes(q) ||
           (i.film      || '').toLowerCase().includes(q) ||
-          (i.certNum   || '').toLowerCase().includes(q))
+          (i.certNum   || '').toLowerCase().includes(q) ||
+          (i.tags || []).some(t => t.toLowerCase().includes(q)))
       : [...items];
 
     res.sort((a, b) => {
@@ -1832,6 +1899,8 @@
     document.getElementById('fValue').value     = item.value     || '';
     document.getElementById('fValueUrl').value  = item.valueUrl  || '';
     document.getElementById('fNotes').value     = item.notes     || '';
+    formTags = (item.tags || []).slice();
+    renderFormTags();
     if (item.img) showPreview(item.img);
     open('formOverlay');
   }
@@ -1841,6 +1910,8 @@
       .forEach(id => { document.getElementById(id).value = ''; });
     renderSignersList(['']);
     clearImg();
+    formTags = [];
+    renderFormTags();
   }
 
   function closeForm() { close('formOverlay'); }
@@ -1878,6 +1949,51 @@
     renderSignersList(vals);
   }
 
+  /* ── Tags ── */
+  let formTags = [];
+
+  function getFormTags() {
+    const pending = document.getElementById('tagTextInput').value.trim();
+    if (pending && !formTags.includes(pending)) formTags.push(pending);
+    document.getElementById('tagTextInput').value = '';
+    return formTags.slice();
+  }
+
+  function tagKeydown(e) {
+    const input = e.target;
+    if (e.key === 'Enter' || e.key === ',') {
+      e.preventDefault();
+      const val = input.value.trim().replace(/,/g, '');
+      if (val && !formTags.includes(val)) { formTags.push(val); renderFormTags(); }
+      input.value = '';
+    } else if (e.key === 'Backspace' && input.value === '' && formTags.length) {
+      formTags.pop();
+      renderFormTags();
+    }
+  }
+
+  function removeFormTag(i) { formTags.splice(i, 1); renderFormTags(); }
+
+  function renderFormTags() {
+    const wrap = document.getElementById('tagInputWrap');
+    const input = document.getElementById('tagTextInput');
+    wrap.querySelectorAll('.form-tag-chip').forEach(el => el.remove());
+    formTags.forEach((tag, i) => {
+      const chip = document.createElement('span');
+      chip.className = 'form-tag-chip';
+      chip.innerHTML = `${escHtml(tag)}<button type="button" class="form-tag-chip-x" onclick="removeFormTag(${i})">×</button>`;
+      wrap.insertBefore(chip, input);
+    });
+    input.placeholder = formTags.length ? '' : 'Type a tag and press Enter…';
+  }
+
+  function filterByTag(e, tag) {
+    e.stopPropagation();
+    const input = document.getElementById('searchInput');
+    input.value = tag;
+    render();
+  }
+
   function saveItem() {
     const vals = getSignerValues().filter(v => v);
     if (!vals.length) {
@@ -1899,6 +2015,7 @@
       value     : document.getElementById('fValue').value || null,
       valueUrl  : document.getElementById('fValueUrl').value.trim(),
       notes     : document.getElementById('fNotes').value.trim(),
+      tags      : getFormTags(),
       img       : pendingImg,
     };
 
@@ -1991,8 +2108,11 @@
       const cls = r >= 0 ? 'text-green' : 'text-red';
       html += detailRow('ROI', `<span class="${cls}">${rStr}</span>`);
     }
+    if (item.tags && item.tags.length) {
+      const tagHtml = item.tags.map(t => `<span class="tag" onclick="filterByTag(event,'${escHtml(t)}');closeDetail()">${escHtml(t)}</span>`).join('');
+      html += detailRow('Tags', `<span style="display:flex;flex-wrap:wrap;gap:4px">${tagHtml}</span>`);
+    }
     html += '</div>';
-
     if (item.notes) html += `<div class="detail-notes">${escHtml(item.notes)}</div>`;
     html += `<div class="detail-date">Added ${new Date(item.added).toLocaleDateString(undefined, {year:'numeric',month:'long',day:'numeric'})}</div>`;
 
