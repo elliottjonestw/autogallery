@@ -143,16 +143,28 @@ A dropdown to sort the visible items. Options:
 
 | Option | Sort order |
 |---|---|
-| Value: High → Low | Estimated value descending *(default)* |
-| Value: Low → High | Estimated value ascending |
-| Paid: High → Low | Amount paid descending |
-| Paid: Low → High | Amount paid ascending |
-| Newest First | Date added descending |
-| Oldest First | Date added ascending |
-| Name A → Z | Signer name alphabetically |
-| Name Z → A | Signer name reverse alphabetically |
+| Newest first | Date added descending |
+| Oldest first | Date added ascending |
+| Name A–Z | Signer name alphabetically |
+| Value: High–Low | Estimated value descending *(default)* |
+| Paid: High–Low | Amount paid descending |
+| Best ROI | ROI percentage descending |
+| Custom Order | User-defined order (see below) |
 
 Items without a value are sorted to the end when sorting by value or paid.
+
+The selected sort is saved to `localStorage` (`ag_sort`) and restored on page reload.
+
+#### Custom Order
+
+When **Custom Order** is selected, items are displayed in a manually arranged sequence. While in this mode, hovering over any card reveals two small reorder buttons in the top-right corner of the card:
+
+- **+** — move this item one position earlier (towards the front)
+- **−** — move this item one position later (towards the back)
+
+The custom sequence is saved automatically to `localStorage` (`ag_custom_order`) after every move. Switching away from Custom Order and back restores the last saved arrangement. New items added to the collection appear at the end of the custom order by default.
+
+> Custom Order is **not available on mobile** — the option is hidden and disabled on viewports ≤ 640px wide. If Custom Order was previously saved as the active sort, it falls back to Newest First on mobile.
 
 ### Columns (desktop only)
 
@@ -700,6 +712,8 @@ All data is stored in the browser's `localStorage`. The following keys are used:
 | `ag_img_fit` | String | Saved image fit mode: `"cover"`, `"contain"`, or `"blurbg"` |
 | `ag_info_link` | String | Saved info link target: `"wiki"` or `"imdb"` |
 | `ag_privacy` | String | Saved privacy mode: `"off"` or `"on"` |
+| `ag_sort` | String | Saved sort mode (e.g. `"date-desc"`, `"custom"`) |
+| `ag_custom_order` | JSON string | Array of item IDs representing the user-defined custom sort sequence |
 
 **Storage limits:** `localStorage` is typically limited to **5–10 MB** per origin. Because item photos are stored as base64-encoded JPEGs (compressed to max 900px at 0.82 quality), each photo takes roughly 100–400 KB. A collection of 20–50 items with photos is well within typical limits, but very large collections with many high-detail photos could approach the limit. If storage is full, the browser will throw an error and the item will not be saved.
 
@@ -789,7 +803,9 @@ Closing can happen via: the ✕ button, a Cancel button, a backdrop click (on th
 
 ### Sorting Implementation
 
-Sort is applied after search filtering. Items without a value (`null`) are sorted to the bottom when sorting by value or paid. Sort state is not persisted — it resets to "Value: High → Low" on page load.
+Sort is applied after search filtering. Items without a value (`null`) are sorted to the bottom when sorting by value or paid. The selected sort is saved to `localStorage` (`ag_sort`) and restored on page load.
+
+**Custom Order** is a special sort mode that allows manual sequencing. Moving an item via the +/− buttons updates the `ag_custom_order` array in `localStorage` and re-renders the gallery. The merge logic preserves the positions of items that are filtered out — only visible items shift when a move is performed. Items not yet present in `ag_custom_order` (e.g. newly added items) sort to the end.
 
 ### Click Propagation
 

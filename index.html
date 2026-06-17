@@ -483,6 +483,20 @@
     .filter-chip:hover { border-color: var(--gold); color: var(--gold); }
     .filter-chip.active { background: var(--gold); border-color: var(--gold); color: #111; font-weight: 700; }
 
+    /* ── Custom order buttons ── */
+    .card-order-btns {
+      position: absolute; top: 8px; right: 8px; z-index: 5;
+      display: none; gap: 3px;
+    }
+    body.sort-custom .card:hover .card-order-btns { display: flex; }
+    .card-order-btn {
+      width: 26px; height: 26px; border: none; border-radius: 6px;
+      background: rgba(0,0,0,.6); color: #fff; font-size: 18px; line-height: 1;
+      cursor: pointer; display: flex; align-items: center; justify-content: center;
+      backdrop-filter: blur(4px); transition: background .12s, color .12s;
+    }
+    .card-order-btn:hover { background: var(--gold); color: #111; }
+
     /* ── Table view ── */
     .table-wrap {
       padding: 0 24px 32px;
@@ -555,6 +569,7 @@
       border-radius: var(--r);
       overflow: hidden;
       cursor: pointer;
+      position: relative;
       transition: transform .18s, box-shadow .18s, border-color .18s;
     }
     .card:hover {
@@ -1177,6 +1192,7 @@
     <option value="value-desc" selected>Value: High–Low</option>
     <option value="paid-desc">Paid: High–Low</option>
     <option value="roi-desc">Best ROI</option>
+    <option value="custom">Custom Order</option>
   </select>
   <select class="cols-select" id="colsSelect" onchange="setCols(this.value)" title="Items per row">
     <option value="3">3 per row</option>
@@ -1795,6 +1811,8 @@
   function load() {
     try { items = JSON.parse(localStorage.getItem(KEY) || '[]'); }
     catch { items = []; }
+    try { customOrder = JSON.parse(localStorage.getItem('ag_custom_order') || '[]'); }
+    catch { customOrder = []; }
   }
 
   function persist() {
@@ -1862,6 +1880,30 @@
       el.textContent = '—';
       el.style.color = 'var(--gold)';
     }
+  }
+
+  /* ── Custom order ── */
+  let customOrder = [];
+
+  function saveCustomOrder() {
+    localStorage.setItem('ag_custom_order', JSON.stringify(customOrder));
+  }
+
+  function moveItem(id, delta) {
+    const vis = filtered().map(i => i.id);
+    const idx = vis.indexOf(id);
+    if (idx === -1) return;
+    const newIdx = idx + delta;
+    if (newIdx < 0 || newIdx >= vis.length) return;
+    vis.splice(idx, 1);
+    vis.splice(newIdx, 0, id);
+    const oldOrder = customOrder.length ? customOrder : items.map(i => i.id);
+    const newOrder = [...vis];
+    oldOrder.forEach(oid => { if (items.some(i => i.id === oid) && !newOrder.includes(oid)) newOrder.push(oid); });
+    items.forEach(i => { if (!newOrder.includes(i.id)) newOrder.push(i.id); });
+    customOrder = newOrder;
+    saveCustomOrder();
+    render();
   }
 
   /* ── Filter modal ── */
@@ -1967,6 +2009,11 @@
           const rb = roi(b.paid, b.value) ?? -1e9;
           return rb - ra;
         }
+        case 'custom': {
+          const oa = customOrder.indexOf(a.id);
+          const ob = customOrder.indexOf(b.id);
+          return (oa === -1 ? 1e9 : oa) - (ob === -1 ? 1e9 : ob);
+        }
         default: return b.added.localeCompare(a.added);
       }
     });
@@ -1977,8 +2024,14 @@
   /* ── Render gallery ── */
   function render() {
     updateStats();
-    const res = filtered();
     const isMobile = window.innerWidth <= 640;
+    const sortSel = document.getElementById('sortSelect');
+    const customOpt = sortSel.querySelector('option[value="custom"]');
+    if (customOpt) { customOpt.hidden = isMobile; customOpt.disabled = isMobile; }
+    if (isMobile && sortSel.value === 'custom') sortSel.value = 'date-desc';
+    document.body.classList.toggle('sort-custom', sortSel.value === 'custom');
+    localStorage.setItem('ag_sort', sortSel.value);
+    const res = filtered();
     if (currentView === 'table' && !isMobile) { renderTable(res); return; }
     const g = document.getElementById('gallery');
 
@@ -2027,6 +2080,10 @@
 
       return `
         <div class="card" onclick="openDetail('${item.id}')">
+          <div class="card-order-btns">
+            <button class="card-order-btn" onclick="event.stopPropagation();moveItem('${item.id}',-1)" title="Move earlier">+</button>
+            <button class="card-order-btn" onclick="event.stopPropagation();moveItem('${item.id}',1)" title="Move later">−</button>
+          </div>
           ${imgHtml}
           <div class="card-body">
             <div class="card-name">${item.signers && item.signers.length > 1 ? 'Multiple Signers' : escHtml(item.signers ? item.signers[0] : item.name)}</div>
@@ -2663,6 +2720,8 @@
   load();
   const savedCols = localStorage.getItem('ag_cols') || '5';
   setCols(savedCols);
+  const savedSort = localStorage.getItem('ag_sort');
+  if (savedSort) { const el = document.getElementById('sortSelect'); if (el) el.value = savedSort; }
   const savedView = localStorage.getItem('ag_view') || 'grid';
   setView(savedView);
   applyTheme(localStorage.getItem('ag_theme') || 'light');
