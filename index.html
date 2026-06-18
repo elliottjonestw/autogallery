@@ -1302,10 +1302,14 @@
     #printView { display: none; }
 
     @media print {
+      /* Force light-mode palette regardless of UI theme, and preserve exact colors */
+      :root { --text: #111; --bg: #fff; color-scheme: light; }
+      * { print-color-adjust: exact !important; -webkit-print-color-adjust: exact !important; }
+
       @page { size: A4; margin: 12mm 14mm; }
 
       body > *:not(#printView) { display: none !important; }
-      #printView { display: block !important; font-family: system-ui, sans-serif; color: #111; background: #fff; }
+      #printView { display: block !important; font-family: system-ui, -apple-system, 'PingFang TC', 'Microsoft JhengHei', 'Noto Sans TC', sans-serif; color: #111 !important; background: #fff !important; }
 
       .pv-header {
         display: flex;
@@ -1315,11 +1319,11 @@
         padding-bottom: 4mm;
         margin-bottom: 3mm;
       }
-      .pv-logo { font-size: 18pt; font-weight: 800; letter-spacing: -.02em; }
+      .pv-logo { font-size: 18pt; font-weight: 800; letter-spacing: -.02em; color: #111; }
       .pv-logo span { color: #b8962e; }
       .pv-stats { display: flex; gap: 7mm; }
       .pv-stat { display: flex; flex-direction: column; align-items: flex-end; }
-      .pv-stat-val { font-size: 12pt; font-weight: 700; line-height: 1; }
+      .pv-stat-val { font-size: 12pt; font-weight: 700; line-height: 1; color: #111; }
       .pv-stat-lbl { font-size: 7pt; text-transform: uppercase; letter-spacing: .06em; color: #666; margin-top: 1mm; }
       .pv-date { font-size: 7.5pt; color: #888; text-align: right; margin-top: 5mm; margin-bottom: 5mm; }
 
@@ -1353,7 +1357,7 @@
         font-size: 9pt;
       }
       .pv-card-body { padding: 2mm 3mm; }
-      .pv-card-name { font-size: 8.5pt; font-weight: 700; line-height: 1.25; margin-bottom: .5mm; }
+      .pv-card-name { font-size: 8.5pt; font-weight: 700; line-height: 1.25; margin-bottom: .5mm; color: #111; }
       .pv-card-sub { font-size: 7pt; color: #555; line-height: 1.3; }
       .pv-card-divider { border: none; border-top: 1px solid #e8e8e8; margin: 1.5mm 0; }
       .pv-card-row { display: flex; justify-content: space-between; font-size: 7pt; line-height: 1.5; }
@@ -1383,7 +1387,7 @@
     <input type="file" id="batchImgFile" accept="image/*" multiple onchange="batchImportImages(event.target.files)">
     <button class="btn-add" id="btnAdd" onclick="openAdd()">
       <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
-      Add Item
+      <span data-i18n="form_add_title">Add Item</span>
     </button>
   </div>
 </header>
@@ -1394,55 +1398,55 @@
 </div>
 
 <div id="viewBanner" style="display:none" class="view-banner">
-  <span>👁 Viewing a shared collection — your own collection is untouched</span>
-  <button class="view-banner-btn" onclick="exitViewMode()">← Back to my collection</button>
+  <span data-i18n="viewing_shared">👁 Viewing a shared collection — your own collection is untouched</span>
+  <button class="view-banner-btn" onclick="exitViewMode()" data-i18n="back_to_mine">← Back to my collection</button>
 </div>
 
 <div class="stats-bar" id="statsBar">
   <div class="stat">
     <div class="stat-val" id="sCount">0</div>
-    <div class="stat-lbl">Items</div>
+    <div class="stat-lbl" data-i18n="lbl_items">Items</div>
   </div>
   <div class="stat">
     <div class="stat-val priv-val" id="sPaid">—</div>
-    <div class="stat-lbl">Total Paid</div>
+    <div class="stat-lbl" data-i18n="lbl_total_paid">Total Paid</div>
   </div>
   <div class="stat">
     <div class="stat-val priv-val" id="sValue">—</div>
-    <div class="stat-lbl">Est. Value</div>
+    <div class="stat-lbl" data-i18n="lbl_est_value">Est. Value</div>
   </div>
   <div class="stat">
     <div class="stat-val" id="sROI">—</div>
-    <div class="stat-lbl">Return</div>
+    <div class="stat-lbl" data-i18n="lbl_return">Return</div>
   </div>
 </div>
 
 <div class="controls">
   <div class="search-wrap">
     <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
-    <input class="search-input" id="searchInput" placeholder="Search name, character, film…" oninput="render()">
+    <input class="search-input" id="searchInput" placeholder="Search name, character, film…" data-i18n-placeholder="search_ph" oninput="render()">
   </div>
   <button class="btn-filter" id="filterBtn" onclick="openFilterModal()">
     <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="22 3 2 3 10 12.46 10 19 14 21 14 12.46 22 3"/></svg>
-    Filter
+    <span data-i18n="filter_btn">Filter</span>
     <span class="filter-badge" id="filterBadge" style="display:none">0</span>
   </button>
   <select class="sort-select" id="sortSelect" onchange="render()">
-    <option value="date-desc">Newest first</option>
-    <option value="date-asc">Oldest first</option>
-    <option value="name-asc">Name A–Z</option>
-    <option value="value-desc" selected>Value: High–Low</option>
-    <option value="paid-desc">Paid: High–Low</option>
-    <option value="roi-desc">Best ROI</option>
-    <option value="custom">Custom Order</option>
+    <option value="date-desc" data-i18n="sort_newest">Newest first</option>
+    <option value="date-asc" data-i18n="sort_oldest">Oldest first</option>
+    <option value="name-asc" data-i18n="sort_name">Name A–Z</option>
+    <option value="value-desc" selected data-i18n="sort_value">Value: High–Low</option>
+    <option value="paid-desc" data-i18n="sort_paid">Paid: High–Low</option>
+    <option value="roi-desc" data-i18n="sort_roi">Best ROI</option>
+    <option value="custom" data-i18n="sort_custom">Custom Order</option>
   </select>
   <select class="cols-select" id="colsSelect" onchange="setCols(this.value)" title="Items per row">
-    <option value="3">3 per row</option>
-    <option value="4">4 per row</option>
-    <option value="5" selected>5 per row</option>
-    <option value="6">6 per row</option>
-    <option value="7">7 per row</option>
-    <option value="8">8 per row</option>
+    <option value="3" data-i18n="cols_3">3 per row</option>
+    <option value="4" data-i18n="cols_4">4 per row</option>
+    <option value="5" selected data-i18n="cols_5">5 per row</option>
+    <option value="6" data-i18n="cols_6">6 per row</option>
+    <option value="7" data-i18n="cols_7">7 per row</option>
+    <option value="8" data-i18n="cols_8">8 per row</option>
   </select>
   <div class="view-toggle">
     <button class="view-btn active" id="btnGrid" onclick="setView('grid')" title="Grid view">
@@ -1460,13 +1464,13 @@
     <thead>
       <tr>
         <th></th>
-        <th>Signer</th>
-        <th>Character</th>
-        <th>Film / Show</th>
-        <th>Cert #</th>
-        <th>Paid</th>
-        <th>Est. Value</th>
-        <th>ROI</th>
+        <th data-i18n="tbl_signer">Signer</th>
+        <th data-i18n="tbl_character">Character</th>
+        <th data-i18n="tbl_film">Film / Show</th>
+        <th data-i18n="cert_lbl">Cert #</th>
+        <th data-i18n="paid_lbl">Paid</th>
+        <th data-i18n="est_val_lbl">Est. Value</th>
+        <th data-i18n="roi_lbl">ROI</th>
       </tr>
     </thead>
     <tbody id="agTableBody"></tbody>
@@ -1484,7 +1488,7 @@
       <input type="hidden" id="editId">
 
       <div class="fg">
-        <label class="flabel">Photos</label>
+        <label class="flabel" data-i18n="lbl_photos">Photos</label>
         <div class="img-upload-row" id="imgUploadRow"></div>
         <input type="file" accept="image/*" multiple id="imgInput" onchange="handleImg(event)" style="display:none">
       </div>
@@ -1492,18 +1496,18 @@
       <div id="multiSignerSection">
         <div class="fg" id="signersList"></div>
         <div class="fg">
-          <label class="flabel">Character</label>
+          <label class="flabel" data-i18n="lbl_character">Character</label>
           <input class="finput" id="fCharacter" placeholder="e.g. Darth Vader">
         </div>
       </div>
 
       <div class="fg">
-        <label class="flabel">Film / Show</label>
+        <label class="flabel" data-i18n="lbl_film">Film / Show</label>
         <input class="finput" id="fFilm" placeholder="e.g. A New Hope">
       </div>
 
       <div class="fg">
-        <label class="flabel">Item Type</label>
+        <label class="flabel" data-i18n="lbl_item_type">Item Type</label>
         <select class="finput" id="fItemType">
           <option value="">— None —</option>
           <option value="Photo">Photo</option>
@@ -1531,11 +1535,11 @@
 
       <div class="frow">
         <div class="fg">
-          <label class="flabel">Cert Number</label>
+          <label class="flabel" data-i18n="lbl_cert_num">Cert Number</label>
           <input class="finput" id="fCertNum" placeholder="e.g. BD13964">
         </div>
         <div class="fg">
-          <label class="flabel">Cert Company</label>
+          <label class="flabel" data-i18n="lbl_cert_co">Cert Company</label>
           <select class="finput" id="fCertCompany">
             <option value="">— None —</option>
             <option value="beckett">Beckett</option>
@@ -1547,28 +1551,28 @@
       </div>
 
       <div class="fg">
-        <label class="flabel">Amount Paid</label>
+        <label class="flabel" data-i18n="lbl_amount_paid">Amount Paid</label>
         <input class="finput" id="fPaid" type="number" min="0" placeholder="5025">
       </div>
 
       <div class="frow">
         <div class="fg">
-          <label class="flabel">Est. Value</label>
+          <label class="flabel" data-i18n="lbl_est_val">Est. Value</label>
           <input class="finput" id="fValue" type="number" min="0" placeholder="9204">
         </div>
         <div class="fg">
-          <label class="flabel">Value URL</label>
+          <label class="flabel" data-i18n="lbl_value_url">Value URL</label>
           <input class="finput" id="fValueUrl" placeholder="https://…" type="url">
         </div>
       </div>
 
       <div class="fg">
-        <label class="flabel">Notes</label>
+        <label class="flabel" data-i18n="lbl_notes">Notes</label>
         <textarea class="ftextarea" id="fNotes" placeholder="Additional notes…"></textarea>
       </div>
 
       <div class="fg">
-        <label class="flabel">Tags</label>
+        <label class="flabel" data-i18n="lbl_tags">Tags</label>
         <div class="tag-suggest-wrap">
           <div class="tag-input-wrap" id="tagInputWrap" onclick="document.getElementById('tagTextInput').focus()">
             <input type="text" id="tagTextInput" class="tag-text-input" placeholder="Type a tag and press Enter…" onkeydown="tagKeydown(event)" oninput="tagInput(event)" onblur="closeTagSuggestions()">
@@ -1578,18 +1582,18 @@
       </div>
 
       <details class="advanced-details" id="advancedDetails">
-        <summary class="advanced-summary">Advanced Fields</summary>
+        <summary class="advanced-summary" data-i18n="lbl_advanced">Advanced Fields</summary>
         <div class="advanced-fields">
           <div class="fg">
-            <label class="flabel">Signing Event / Venue</label>
+            <label class="flabel" data-i18n="lbl_signing_event">Signing Event / Venue</label>
             <input class="finput" id="fSigningEvent" placeholder="e.g. Star Wars Celebration 2023">
           </div>
           <div class="fg">
-            <label class="flabel">Signing Date</label>
+            <label class="flabel" data-i18n="lbl_signing_date">Signing Date</label>
             <input class="finput" id="fSigningDate" type="date">
           </div>
           <div class="fg">
-            <label class="flabel">Acquisition Method</label>
+            <label class="flabel" data-i18n="lbl_acquired">Acquisition Method</label>
             <select class="finput" id="fAcquiredHow">
               <option value="">— None —</option>
               <option value="In-Person">In-Person</option>
@@ -1605,7 +1609,7 @@
             </select>
           </div>
           <div class="fg">
-            <label class="flabel">Condition</label>
+            <label class="flabel" data-i18n="lbl_condition">Condition</label>
             <select class="finput" id="fCondition">
               <option value="">— Select —</option>
               <option value="Mint">Mint</option>
@@ -1618,15 +1622,15 @@
             </select>
           </div>
           <div class="fg">
-            <label class="flabel">Physical Location</label>
+            <label class="flabel" data-i18n="lbl_location">Physical Location</label>
             <input class="finput" id="fLocation" placeholder="e.g. Binder A, Frame #3">
           </div>
         </div>
       </details>
     </div>
     <div class="modal-foot">
-      <button class="btn-secondary" onclick="closeForm()">Cancel</button>
-      <button class="btn-primary" onclick="saveItem()">Save Item</button>
+      <button class="btn-secondary" onclick="closeForm()" data-i18n="cancel">Cancel</button>
+      <button class="btn-primary" onclick="saveItem()" data-i18n="save_item">Save Item</button>
     </div>
   </div>
 </div>
@@ -1640,8 +1644,8 @@
     </div>
     <div class="modal-body" id="dBody"></div>
     <div class="modal-foot">
-      <button class="btn-danger" id="btnDetailDelete" onclick="deleteItem()">Delete</button>
-      <button class="btn-secondary" id="btnDetailEdit" onclick="editFromDetail()">Edit</button>
+      <button class="btn-danger" id="btnDetailDelete" onclick="deleteItem()" data-i18n="delete">Delete</button>
+      <button class="btn-secondary" id="btnDetailEdit" onclick="editFromDetail()" data-i18n="edit">Edit</button>
     </div>
   </div>
 </div>
@@ -1650,21 +1654,32 @@
 <div class="overlay" id="settingsOverlay" onclick="overlayClick(event,'settingsOverlay')">
   <div class="modal modal-settings" style="max-width:400px">
     <div class="modal-head">
-      <span class="modal-title">Settings</span>
+      <span class="modal-title" data-i18n="settings_title">Settings</span>
       <button class="btn-x" onclick="closeSettings()">✕</button>
     </div>
     <div class="modal-body" style="padding-top:0">
 
       <div class="settings-tabs">
-        <button class="settings-tab active" data-tab="display" onclick="switchSettingsTab('display')">Display</button>
-        <button class="settings-tab" data-tab="data" onclick="switchSettingsTab('data')">Data</button>
-        <button class="settings-tab" data-tab="currency" onclick="switchSettingsTab('currency')">Currency</button>
+        <button class="settings-tab active" data-tab="display" onclick="switchSettingsTab('display')" data-i18n="tab_display">Display</button>
+        <button class="settings-tab" data-tab="data" onclick="switchSettingsTab('data')" data-i18n="tab_data">Data</button>
+        <button class="settings-tab" data-tab="currency" onclick="switchSettingsTab('currency')" data-i18n="tab_currency">Currency</button>
       </div>
 
       <!-- Display tab -->
       <div class="settings-panel active" id="stab-display">
         <div class="fg tip-container">
-          <label class="flabel">Appearance</label>
+          <label class="flabel" data-i18n="lbl_language">Language</label>
+          <div class="ctrl-row">
+            <select class="finput" id="settingsLang" onchange="setLang(this.value)">
+              <option value="en">English</option>
+              <option value="zh-TW">繁體中文</option>
+            </select>
+            <button class="tip-btn" onclick="toggleTip(this)">i</button>
+          </div>
+          <div class="tip-box" data-i18n="tip_language">Sets the display language for the app.</div>
+        </div>
+        <div class="fg tip-container">
+          <label class="flabel" data-i18n="lbl_appearance">Appearance</label>
           <div class="ctrl-row">
             <button class="settings-row-btn" id="themeToggle" onclick="toggleTheme()">
               <span class="settings-row-icon">
@@ -1675,40 +1690,40 @@
             </button>
             <button class="tip-btn" onclick="toggleTip(this)">i</button>
           </div>
-          <div class="tip-box">Switches between light and dark color schemes. Your choice is saved automatically.</div>
+          <div class="tip-box" data-i18n="tip_appearance">Switches between light and dark color schemes. Your choice is saved automatically.</div>
         </div>
         <div class="fg tip-container">
-          <label class="flabel">Photo Format</label>
+          <label class="flabel" data-i18n="lbl_photo_format">Photo Format</label>
           <div class="ctrl-row">
             <select class="finput" id="settingsPhotoFormat" onchange="setPhotoFormat(this.value)">
-              <option value="8x10L">8×10 Landscape</option>
-              <option value="8x10P">8×10 Portrait</option>
-              <option value="5x7L">5×7 Landscape</option>
-              <option value="5x7P">5×7 Portrait</option>
-              <option value="4x6L">4×6 Landscape</option>
-              <option value="4x6P">4×6 Portrait</option>
-              <option value="3x5">Index Card (3×5)</option>
-              <option value="trading">Trading Card (2.5×3.5)</option>
-              <option value="square">Square (1×1)</option>
+              <option value="8x10L" data-i18n="fmt_8x10L">8×10 Landscape</option>
+              <option value="8x10P" data-i18n="fmt_8x10P">8×10 Portrait</option>
+              <option value="5x7L" data-i18n="fmt_5x7L">5×7 Landscape</option>
+              <option value="5x7P" data-i18n="fmt_5x7P">5×7 Portrait</option>
+              <option value="4x6L" data-i18n="fmt_4x6L">4×6 Landscape</option>
+              <option value="4x6P" data-i18n="fmt_4x6P">4×6 Portrait</option>
+              <option value="3x5" data-i18n="fmt_3x5">Index Card (3×5)</option>
+              <option value="trading" data-i18n="fmt_trading">Trading Card (2.5×3.5)</option>
+              <option value="square" data-i18n="fmt_square">Square (1×1)</option>
             </select>
             <button class="tip-btn" onclick="toggleTip(this)">i</button>
           </div>
-          <div class="tip-box">Sets the aspect ratio of image cards to match your memorabilia — e.g. 8×10 photos, index cards, or trading cards.</div>
+          <div class="tip-box" data-i18n="tip_photo_format">Sets the aspect ratio of image cards to match your memorabilia — e.g. 8×10 photos, index cards, or trading cards.</div>
         </div>
         <div class="fg tip-container">
-          <label class="flabel">Image Fit</label>
+          <label class="flabel" data-i18n="lbl_image_fit">Image Fit</label>
           <div class="ctrl-row">
             <select class="finput" id="settingsImgFit" onchange="setImgFit(this.value)">
-              <option value="cover">Crop to fill</option>
-              <option value="contain">Fit with black bars</option>
-              <option value="blurbg">Fit with blurred background</option>
+              <option value="cover" data-i18n="fit_cover">Crop to fill</option>
+              <option value="contain" data-i18n="fit_contain">Fit with black bars</option>
+              <option value="blurbg" data-i18n="fit_blurbg">Fit with blurred background</option>
             </select>
             <button class="tip-btn" onclick="toggleTip(this)">i</button>
           </div>
-          <div class="tip-box">Controls how photos are shown when the uploaded image doesn't match the selected format.</div>
+          <div class="tip-box" data-i18n="tip_image_fit">Controls how photos are shown when the uploaded image doesn't match the selected format.</div>
         </div>
         <div class="fg tip-container">
-          <label class="flabel">Info Links</label>
+          <label class="flabel" data-i18n="lbl_info_links">Info Links</label>
           <div class="ctrl-row">
             <select class="finput" id="settingsInfoLink" onchange="setInfoLink(this.value)">
               <option value="wiki">Wikipedia</option>
@@ -1716,18 +1731,18 @@
             </select>
             <button class="tip-btn" onclick="toggleTip(this)">i</button>
           </div>
-          <div class="tip-box">Choose which site signer names and film/show titles link to in table view and item detail.</div>
+          <div class="tip-box" data-i18n="tip_info_links">Choose which site signer names and film/show titles link to in table view and item detail.</div>
         </div>
         <div class="fg tip-container">
-          <label class="flabel">Privacy Mode</label>
+          <label class="flabel" data-i18n="lbl_privacy">Privacy Mode</label>
           <div class="ctrl-row">
             <select class="finput" id="settingsPrivacy" onchange="setPrivacyMode(this.value)">
-              <option value="off">Off</option>
-              <option value="on">On — blur monetary values</option>
+              <option value="off" data-i18n="privacy_off">Off</option>
+              <option value="on" data-i18n="privacy_on">On — blur monetary values</option>
             </select>
             <button class="tip-btn" onclick="toggleTip(this)">i</button>
           </div>
-          <div class="tip-box">Hides monetary values (paid amounts and estimates) from view. Reveal them using the eye button in the header.</div>
+          <div class="tip-box" data-i18n="tip_privacy">Hides monetary values (paid amounts and estimates) from view. Reveal them using the eye button in the header.</div>
         </div>
       </div>
 
@@ -1740,11 +1755,11 @@
                 <span class="settings-row-icon">
                   <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
                 </span>
-                Export Collection
+                <span data-i18n="export_collection">Export Collection</span>
               </button>
               <button class="tip-btn" onclick="toggleTip(this)">i</button>
             </div>
-            <div class="tip-box">Saves a complete backup of your collection as a JSON file.</div>
+            <div class="tip-box" data-i18n="tip_export">Saves a complete backup of your collection as a JSON file.</div>
           </div>
           <div class="tip-container" style="margin-top:6px">
             <div class="ctrl-row">
@@ -1752,11 +1767,11 @@
                 <span class="settings-row-icon">
                   <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="7 16 12 21 17 16"/><line x1="12" y1="21" x2="12" y2="9"/></svg>
                 </span>
-                Import Collection
+                <span data-i18n="import_collection">Import Collection</span>
               </button>
               <button class="tip-btn" onclick="toggleTip(this)">i</button>
             </div>
-            <div class="tip-box">⚠️ Loads a JSON file and replaces your entire current collection. Export a backup first if you want to keep it.</div>
+            <div class="tip-box" data-i18n="tip_import">⚠️ Loads a JSON file and replaces your entire current collection. Export a backup first if you want to keep it.</div>
           </div>
           <div class="tip-container" style="margin-top:6px">
             <div class="ctrl-row">
@@ -1764,11 +1779,11 @@
                 <span class="settings-row-icon">
                   <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M8 17l4 4 4-4"/><path d="M12 12v9"/><path d="M20.88 18.09A5 5 0 0018 9h-1.26A8 8 0 103 16.29"/></svg>
                 </span>
-                Merge Import
+                <span data-i18n="merge_import">Merge Import</span>
               </button>
               <button class="tip-btn" onclick="toggleTip(this)">i</button>
             </div>
-            <div class="tip-box">Adds items from a JSON file to your existing collection without removing anything.</div>
+            <div class="tip-box" data-i18n="tip_merge">Adds items from a JSON file to your existing collection without removing anything.</div>
           </div>
           <div class="tip-container" style="margin-top:6px">
             <div class="ctrl-row">
@@ -1776,11 +1791,11 @@
                 <span class="settings-row-icon">
                   <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg>
                 </span>
-                Batch Import Photos
+                <span data-i18n="batch_import">Batch Import Photos</span>
               </button>
               <button class="tip-btn" onclick="toggleTip(this)">i</button>
             </div>
-            <div class="tip-box">Select multiple photos to create one stub item per image. Each stub uses the filename as the signer name — fill in the rest later. You can also drag photos anywhere onto the page.</div>
+            <div class="tip-box" data-i18n="tip_batch_import">Select multiple photos to create one stub item per image. Each stub uses the filename as the signer name — fill in the rest later. You can also drag photos anywhere onto the page.</div>
           </div>
           <div class="tip-container" style="margin-top:6px">
             <div class="ctrl-row">
@@ -1788,11 +1803,11 @@
                 <span class="settings-row-icon">
                   <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><line x1="8.59" y1="13.51" x2="15.42" y2="17.49"/><line x1="15.41" y1="6.51" x2="8.59" y2="10.49"/></svg>
                 </span>
-                Copy Share Link
+                <span data-i18n="copy_share">Copy Share Link</span>
               </button>
               <button class="tip-btn" onclick="toggleTip(this)">i</button>
             </div>
-            <div class="tip-box">⚠️ Uploads your collection publicly to dpaste.com and copies a shareable URL to the clipboard.</div>
+            <div class="tip-box" data-i18n="tip_share">⚠️ Uploads your collection publicly to dpaste.com and copies a shareable URL to the clipboard.</div>
           </div>
           <div class="tip-container" style="margin-top:6px">
             <div class="ctrl-row">
@@ -1800,11 +1815,11 @@
                 <span class="settings-row-icon">
                   <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2"/><line x1="3" y1="9" x2="21" y2="9"/><line x1="3" y1="15" x2="21" y2="15"/><line x1="9" y1="3" x2="9" y2="21"/></svg>
                 </span>
-                Download CSV
+                <span data-i18n="download_csv">Download CSV</span>
               </button>
               <button class="tip-btn" onclick="toggleTip(this)">i</button>
             </div>
-            <div class="tip-box">Downloads your collection as a CSV spreadsheet. Includes all metadata fields. Photos are not included.</div>
+            <div class="tip-box" data-i18n="tip_csv">Downloads your collection as a CSV spreadsheet. Includes all metadata fields. Photos are not included.</div>
           </div>
           <div class="tip-container" style="margin-top:6px">
             <div class="ctrl-row">
@@ -1812,11 +1827,11 @@
                 <span class="settings-row-icon">
                   <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 6 2 18 2 18 9"/><path d="M6 18H4a2 2 0 01-2-2v-5a2 2 0 012-2h16a2 2 0 012 2v5a2 2 0 01-2 2h-2"/><rect x="6" y="14" width="12" height="8"/></svg>
                 </span>
-                Print Collection
+                <span data-i18n="print_collection">Print Collection</span>
               </button>
               <button class="tip-btn" onclick="toggleTip(this)">i</button>
             </div>
-            <div class="tip-box">Prints an A4 layout of your collection sorted by value, matching your current photo format settings.</div>
+            <div class="tip-box" data-i18n="tip_print">Prints an A4 layout of your collection sorted by value, matching your current photo format settings.</div>
           </div>
           <div class="tip-container" style="margin-top:6px;border-top:1px solid var(--border);padding-top:10px">
             <div class="ctrl-row">
@@ -1824,11 +1839,11 @@
                 <span class="settings-row-icon">
                   <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 01-2 2H8a2 2 0 01-2-2L5 6"/><path d="M10 11v6"/><path d="M14 11v6"/><path d="M9 6V4a1 1 0 011-1h4a1 1 0 011 1v2"/></svg>
                 </span>
-                Reset Collection
+                <span data-i18n="reset_collection">Reset Collection</span>
               </button>
               <button class="tip-btn" onclick="toggleTip(this)">i</button>
             </div>
-            <div class="tip-box">⚠️ Permanently deletes your entire collection. Export a backup first if you want to keep your data.</div>
+            <div class="tip-box" data-i18n="tip_reset">⚠️ Permanently deletes your entire collection. Export a backup first if you want to keep your data.</div>
           </div>
         </div>
         <div class="fg" id="settingsViewSection" style="display:none">
@@ -1838,11 +1853,11 @@
                 <span class="settings-row-icon">
                   <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 21H5a2 2 0 01-2-2V5a2 2 0 012-2h11l5 5v11a2 2 0 01-2 2z"/><polyline points="17 21 17 13 7 13 7 21"/><polyline points="7 3 7 8 15 8"/></svg>
                 </span>
-                Save as My Collection
+                <span data-i18n="save_as_mine">Save as My Collection</span>
               </button>
               <button class="tip-btn" onclick="toggleTip(this)">i</button>
             </div>
-            <div class="tip-box">Saves the collection you're currently viewing as your own, replacing your existing data.</div>
+            <div class="tip-box" data-i18n="tip_save_as_mine">Saves the collection you're currently viewing as your own, replacing your existing data.</div>
           </div>
         </div>
       </div>
@@ -1850,7 +1865,7 @@
       <!-- Currency tab -->
       <div class="settings-panel" id="stab-currency">
         <div class="fg tip-container" id="settingsLocalSection">
-          <label class="flabel">Local Currency</label>
+          <label class="flabel" data-i18n="lbl_local_currency">Local Currency</label>
           <div class="ctrl-row">
             <select class="finput" id="settingsLocal" onchange="setLocalCurrency(this.value)">
               <option value="USD">USD — $</option>
@@ -1867,10 +1882,10 @@
             </select>
             <button class="tip-btn" onclick="toggleTip(this)">i</button>
           </div>
-          <div class="tip-box">The currency used when recording Paid and Est. Value amounts on your items.</div>
+          <div class="tip-box" data-i18n="tip_local_currency">The currency used when recording Paid and Est. Value amounts on your items.</div>
         </div>
         <div class="fg tip-container">
-          <label class="flabel">Display Currency</label>
+          <label class="flabel" data-i18n="lbl_display_currency">Display Currency</label>
           <div class="ctrl-row">
             <select class="finput" id="settingsDisplay" onchange="setDisplayCurrency(this.value)">
               <option value="USD">USD — $</option>
@@ -1887,10 +1902,10 @@
             </select>
             <button class="tip-btn" onclick="toggleTip(this)">i</button>
           </div>
-          <div class="tip-box">The currency shown in the gallery UI. If different from your local currency, values are converted automatically.</div>
+          <div class="tip-box" data-i18n="tip_display_currency">The currency shown in the gallery UI. If different from your local currency, values are converted automatically.</div>
         </div>
         <div class="fg tip-container">
-          <label class="flabel">Exchange Rate</label>
+          <label class="flabel" data-i18n="lbl_exchange_rate">Exchange Rate</label>
           <div class="ctrl-row">
             <div class="rate-box">
               <div class="rate-text" id="rateInfo">—</div>
@@ -1898,7 +1913,7 @@
             </div>
             <button class="tip-btn" onclick="toggleTip(this)">i</button>
           </div>
-          <div class="tip-box">Shows the current conversion rate between your local and display currencies. Rates are cached for 1 hour.</div>
+          <div class="tip-box" data-i18n="tip_exchange_rate">Shows the current conversion rate between your local and display currencies. Rates are cached for 1 hour.</div>
         </div>
       </div>
 
@@ -1910,13 +1925,13 @@
 <div class="overlay" id="filterOverlay" onclick="overlayClick(event,'filterOverlay')">
   <div class="modal modal-filter" style="max-width:460px">
     <div class="modal-head">
-      <span class="modal-title">Filter</span>
+      <span class="modal-title" data-i18n="filter_btn">Filter</span>
       <button class="btn-x" onclick="closeFilterModal()">✕</button>
     </div>
     <div class="modal-body" id="filterBody"></div>
     <div class="modal-foot">
-      <button class="btn-secondary" onclick="clearAllFilters()">Clear All</button>
-      <button class="btn-primary" onclick="closeFilterModal()">Done</button>
+      <button class="btn-secondary" onclick="clearAllFilters()" data-i18n="clear_all">Clear All</button>
+      <button class="btn-primary" onclick="closeFilterModal()" data-i18n="done">Done</button>
     </div>
   </div>
 </div>
@@ -1927,17 +1942,17 @@
     <div class="modal-head">
       <span style="display:flex;align-items:center;gap:8px;font-size:16px;font-weight:700">
         <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="var(--red)" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M10.29 3.86L1.82 18a2 2 0 001.71 3h16.94a2 2 0 001.71-3L13.71 3.86a2 2 0 00-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
-        Your data will be public
+        <span data-i18n="share_warn_title">Your data will be public</span>
       </span>
     </div>
     <div class="modal-body">
-      <p style="margin:0 0 12px;line-height:1.6;font-size:14px">Generating a share link uploads your <strong>entire collection</strong> — item details, photos, paid amounts, estimated values, and certificate numbers — to <strong>dpaste.com</strong>, a public paste service. Anyone who obtains the link can view all of this information.</p>
-      <p style="margin:0 0 12px;line-height:1.6;font-size:14px;color:var(--sub)">If your gallery contains financial details or personal information you wouldn't want others to see, do not proceed. Instead, consider using <strong>Export Collection</strong> to save a <code>.json</code> file and share it privately.</p>
-      <p style="margin:0;line-height:1.6;font-size:13px;color:var(--sub)">Share links expire after 365 days.</p>
+      <p style="margin:0 0 12px;line-height:1.6;font-size:14px" data-i18n-html="share_warn_p1">Generating a share link uploads your <strong>entire collection</strong> — item details, photos, paid amounts, estimated values, and certificate numbers — to <strong>dpaste.com</strong>, a public paste service. Anyone who obtains the link can view all of this information.</p>
+      <p style="margin:0 0 12px;line-height:1.6;font-size:14px;color:var(--sub)" data-i18n-html="share_warn_p2">If your gallery contains financial details or personal information you wouldn't want others to see, do not proceed. Instead, consider using <strong>Export Collection</strong> to save a <code>.json</code> file and share it privately.</p>
+      <p style="margin:0;line-height:1.6;font-size:13px;color:var(--sub)" data-i18n="share_warn_p3">Share links expire after 365 days.</p>
     </div>
     <div class="modal-foot">
-      <button class="btn-secondary" onclick="closeShareWarn()">Cancel</button>
-      <button class="btn-primary" onclick="confirmShare()">Share publicly</button>
+      <button class="btn-secondary" onclick="closeShareWarn()" data-i18n="cancel">Cancel</button>
+      <button class="btn-primary" onclick="confirmShare()" data-i18n="share_publicly">Share publicly</button>
     </div>
   </div>
 </div>
@@ -1982,6 +1997,219 @@
 
   let exchangeRate = 1;
   let rateState = 'idle'; // 'idle' | 'loading' | 'ok' | 'error'
+
+  /* ── i18n ── */
+  const TRANSLATIONS = {
+    en: {
+      lbl_items: 'Items', lbl_total_paid: 'Total Paid', lbl_est_value: 'Est. Value', lbl_return: 'Return',
+      search_ph: 'Search name, character, film…',
+      filter_btn: 'Filter',
+      sort_newest: 'Newest first', sort_oldest: 'Oldest first', sort_name: 'Name A–Z',
+      sort_value: 'Value: High–Low', sort_paid: 'Paid: High–Low', sort_roi: 'Best ROI', sort_custom: 'Custom Order',
+      cols_3: '3 per row', cols_4: '4 per row', cols_5: '5 per row',
+      cols_6: '6 per row', cols_7: '7 per row', cols_8: '8 per row',
+      no_photo: 'No photo', multiple_signers: 'Multiple Signers',
+      cert_lbl: 'Cert #', paid_lbl: 'Paid', est_val_lbl: 'Est. Value', roi_lbl: 'ROI',
+      no_matches: 'No matches', no_matches_sub: 'Try a different search term',
+      empty_title: 'Your collection is empty', empty_sub: 'Add your first autograph to get started',
+      add_item: '+ Add Item', load_demo: 'Load Demo Collection',
+      viewing_shared: '👁 Viewing a shared collection — your own collection is untouched',
+      back_to_mine: '← Back to my collection',
+      settings_title: 'Settings', tab_display: 'Display', tab_data: 'Data', tab_currency: 'Currency',
+      lbl_appearance: 'Appearance', switch_dark: 'Switch to Dark Mode', switch_light: 'Switch to Light Mode',
+      lbl_photo_format: 'Photo Format',
+      fmt_8x10L: '8×10 Landscape', fmt_8x10P: '8×10 Portrait',
+      fmt_5x7L: '5×7 Landscape', fmt_5x7P: '5×7 Portrait',
+      fmt_4x6L: '4×6 Landscape', fmt_4x6P: '4×6 Portrait',
+      fmt_3x5: 'Index Card (3×5)', fmt_trading: 'Trading Card (2.5×3.5)', fmt_square: 'Square (1×1)',
+      lbl_image_fit: 'Image Fit',
+      fit_cover: 'Crop to fill', fit_contain: 'Fit with black bars', fit_blurbg: 'Fit with blurred background',
+      lbl_info_links: 'Info Links', lbl_privacy: 'Privacy Mode',
+      privacy_off: 'Off', privacy_on: 'On — blur monetary values',
+      lbl_language: 'Language', lang_tip: 'Sets the display language for the app.',
+      export_collection: 'Export Collection', import_collection: 'Import Collection',
+      merge_import: 'Merge Import', batch_import: 'Batch Import Photos',
+      copy_share: 'Copy Share Link', download_csv: 'Download CSV',
+      share_warn_title: 'Your data will be public',
+      share_warn_p1: 'Generating a share link uploads your <strong>entire collection</strong> — item details, photos, paid amounts, estimated values, and certificate numbers — to <strong>dpaste.com</strong>, a public paste service. Anyone who obtains the link can view all of this information.',
+      share_warn_p2: 'If your gallery contains financial details or personal information you wouldn\'t want others to see, do not proceed. Instead, consider using <strong>Export Collection</strong> to save a <code>.json</code> file and share it privately.',
+      share_warn_p3: 'Share links expire after 365 days.',
+      share_publicly: 'Share publicly',
+      print_collection: 'Print Collection', reset_collection: 'Reset Collection',
+      save_as_mine: 'Save as My Collection',
+      det_signer: 'Signer', det_character: 'Character', det_film: 'Film / Show',
+      det_item_type: 'Item Type', det_condition: 'Condition', det_cert: 'Cert #',
+      det_est_val: 'Estimated Value', det_signing_date: 'Signing Date',
+      det_signing_event: 'Signing Event', det_acquired: 'Acquired',
+      det_location: 'Location', det_tags: 'Tags', det_added: 'Added',
+      description: 'Description', copy: 'Copy', edit: 'Edit', delete: 'Delete',
+      form_add_title: 'Add Item', form_edit_title: 'Edit Item',
+      add_photo: 'Add photo', add_photo_more: 'Add',
+      lbl_photos: 'Photos', lbl_character: 'Character', lbl_film: 'Film / Show',
+      lbl_item_type: 'Item Type', lbl_cert_num: 'Cert Number', lbl_cert_co: 'Cert Company',
+      lbl_amount_paid: 'Amount Paid', lbl_est_val: 'Est. Value', lbl_value_url: 'Value URL',
+      lbl_notes: 'Notes', lbl_tags: 'Tags', lbl_advanced: 'Advanced Fields',
+      lbl_signing_event: 'Signing Event / Venue', lbl_signing_date: 'Signing Date',
+      lbl_acquired: 'Acquisition Method', lbl_condition: 'Condition', lbl_location: 'Physical Location',
+      cancel: 'Cancel', save_item: 'Save Item',
+      filt_tags: 'Tags', filt_item_type: 'Item Type', filt_condition: 'Condition',
+      filt_cert_co: 'Cert Company', filt_acquired: 'Acquisition Method',
+      filt_event: 'Signing Event', filt_location: 'Physical Location',
+      filt_film: 'Film / Show', filt_signer: 'Signer', filt_empty: 'No items to filter.',
+      clear_all: 'Clear All', done: 'Done',
+      drop_title: 'Drop photos to import', drop_sub: 'One stub item will be created per image',
+      print_generated: 'Generated', print_items: 'Items',
+      print_total_paid: 'Total Paid', print_est_val: 'Est. Value', print_return: 'Return',
+      print_no_photo: 'No photo',
+      lbl_local_currency: 'Local Currency', lbl_display_currency: 'Display Currency',
+      lbl_exchange_rate: 'Exchange Rate',
+      tbl_signer: 'Signer', tbl_character: 'Character', tbl_film: 'Film / Show',
+      tip_language: 'Sets the display language for the app.',
+      tip_appearance: 'Switches between light and dark color schemes. Your choice is saved automatically.',
+      tip_photo_format: 'Sets the aspect ratio of image cards to match your memorabilia — e.g. 8×10 photos, index cards, or trading cards.',
+      tip_image_fit: "Controls how photos are shown when the uploaded image doesn't match the selected format.",
+      tip_info_links: 'Choose which site signer names and film/show titles link to in table view and item detail.',
+      tip_privacy: 'Hides monetary values (paid amounts and estimates) from view. Reveal them using the eye button in the header.',
+      tip_export: 'Saves a complete backup of your collection as a JSON file.',
+      tip_import: '⚠️ Loads a JSON file and replaces your entire current collection. Export a backup first if you want to keep it.',
+      tip_merge: 'Adds items from a JSON file to your existing collection without removing anything.',
+      tip_batch_import: 'Select multiple photos to create one stub item per image. Each stub uses the filename as the signer name — fill in the rest later. You can also drag photos anywhere onto the page.',
+      tip_share: '⚠️ Uploads your collection publicly to dpaste.com and copies a shareable URL to the clipboard.',
+      tip_csv: 'Downloads your collection as a CSV spreadsheet. Includes all metadata fields. Photos are not included.',
+      tip_print: 'Prints an A4 layout of your collection sorted by value, matching your current photo format settings.',
+      tip_reset: '⚠️ Permanently deletes your entire collection. Export a backup first if you want to keep your data.',
+      tip_save_as_mine: "Saves the collection you're currently viewing as your own, replacing your existing data.",
+      tip_local_currency: 'The currency used when recording Paid and Est. Value amounts on your items.',
+      tip_display_currency: 'The currency shown in the gallery UI. If different from your local currency, values are converted automatically.',
+      tip_exchange_rate: 'Shows the current conversion rate between your local and display currencies. Rates are cached for 1 hour.',
+    },
+    'zh-TW': {
+      lbl_items: '項目', lbl_total_paid: '總購入', lbl_est_value: '估計價值', lbl_return: '回報率',
+      search_ph: '搜尋名稱、角色、影視…',
+      filter_btn: '篩選',
+      sort_newest: '最新優先', sort_oldest: '最舊優先', sort_name: '名稱 A–Z',
+      sort_value: '價值：高至低', sort_paid: '購入：高至低', sort_roi: '最高回報', sort_custom: '自訂排序',
+      cols_3: '每列 3 個', cols_4: '每列 4 個', cols_5: '每列 5 個',
+      cols_6: '每列 6 個', cols_7: '每列 7 個', cols_8: '每列 8 個',
+      no_photo: '無相片', multiple_signers: '多位簽名者',
+      cert_lbl: '證書 #', paid_lbl: '購入價', est_val_lbl: '估計價值', roi_lbl: '回報率',
+      no_matches: '無符合結果', no_matches_sub: '請嘗試不同的搜尋詞',
+      empty_title: '您的收藏是空的', empty_sub: '新增您的第一件簽名收藏品以開始使用',
+      add_item: '+ 新增項目', load_demo: '載入範例收藏',
+      viewing_shared: '👁 正在瀏覽共享收藏 — 您的收藏未受影響',
+      back_to_mine: '← 返回我的收藏',
+      settings_title: '設定', tab_display: '顯示', tab_data: '資料', tab_currency: '貨幣',
+      lbl_appearance: '外觀', switch_dark: '切換至深色模式', switch_light: '切換至淺色模式',
+      lbl_photo_format: '相片格式',
+      fmt_8x10L: '8×10 橫向', fmt_8x10P: '8×10 縱向',
+      fmt_5x7L: '5×7 橫向', fmt_5x7P: '5×7 縱向',
+      fmt_4x6L: '4×6 橫向', fmt_4x6P: '4×6 縱向',
+      fmt_3x5: '索引卡 (3×5)', fmt_trading: '球員卡 (2.5×3.5)', fmt_square: '正方形 (1×1)',
+      lbl_image_fit: '圖片填充',
+      fit_cover: '裁切填滿', fit_contain: '完整顯示（黑邊）', fit_blurbg: '完整顯示（模糊背景）',
+      lbl_info_links: '資訊連結', lbl_privacy: '隱私模式',
+      privacy_off: '關閉', privacy_on: '開啟 — 模糊金額顯示',
+      lbl_language: '語言', lang_tip: '設定應用程式的顯示語言。',
+      export_collection: '匯出收藏', import_collection: '匯入收藏',
+      merge_import: '合併匯入', batch_import: '批次匯入相片',
+      copy_share: '複製分享連結', download_csv: '下載 CSV',
+      share_warn_title: '您的資料將公開',
+      share_warn_p1: '產生分享連結會將您的<strong>完整收藏</strong>——項目詳情、相片、購入金額、估計價值及證書編號——上傳至 <strong>dpaste.com</strong>，一個公開的貼文服務。任何取得連結的人均可查看所有資訊。',
+      share_warn_p2: '若您的收藏含有您不希望他人看到的財務細節或個人資訊，請勿繼續。請改用<strong>匯出收藏</strong>將 <code>.json</code> 檔案儲存並私下分享。',
+      share_warn_p3: '分享連結將於 365 天後過期。',
+      share_publicly: '公開分享',
+      print_collection: '列印收藏', reset_collection: '重置收藏',
+      save_as_mine: '儲存為我的收藏',
+      det_signer: '簽名者', det_character: '角色', det_film: '電影／影集',
+      det_item_type: '項目類型', det_condition: '品相', det_cert: '證書 #',
+      det_est_val: '估計價值', det_signing_date: '簽名日期',
+      det_signing_event: '簽名活動', det_acquired: '取得方式',
+      det_location: '存放位置', det_tags: '標籤', det_added: '新增於',
+      description: '描述', copy: '複製', edit: '編輯', delete: '刪除',
+      form_add_title: '新增項目', form_edit_title: '編輯項目',
+      add_photo: '新增相片', add_photo_more: '新增',
+      lbl_photos: '相片', lbl_character: '角色', lbl_film: '電影／影集',
+      lbl_item_type: '項目類型', lbl_cert_num: '證書編號', lbl_cert_co: '認證公司',
+      lbl_amount_paid: '購入金額', lbl_est_val: '估計價值', lbl_value_url: '價值來源網址',
+      lbl_notes: '備註', lbl_tags: '標籤', lbl_advanced: '進階欄位',
+      lbl_signing_event: '簽名活動／場地', lbl_signing_date: '簽名日期',
+      lbl_acquired: '取得方式', lbl_condition: '品相', lbl_location: '實體位置',
+      cancel: '取消', save_item: '儲存項目',
+      filt_tags: '標籤', filt_item_type: '項目類型', filt_condition: '品相',
+      filt_cert_co: '認證公司', filt_acquired: '取得方式',
+      filt_event: '簽名活動', filt_location: '存放位置',
+      filt_film: '電影／影集', filt_signer: '簽名者', filt_empty: '無可篩選的項目。',
+      clear_all: '清除全部', done: '完成',
+      drop_title: '拖放相片以匯入', drop_sub: '每張圖片將建立一個項目',
+      print_generated: '產生於', print_items: '項目',
+      print_total_paid: '總購入', print_est_val: '估計價值', print_return: '回報率',
+      print_no_photo: '無相片',
+      lbl_local_currency: '本地貨幣', lbl_display_currency: '顯示貨幣',
+      lbl_exchange_rate: '匯率',
+      tbl_signer: '簽名者', tbl_character: '角色', tbl_film: '電影／影集',
+      tip_language: '設定應用程式的顯示語言。',
+      tip_appearance: '在淺色與深色配色之間切換。您的選擇將自動儲存。',
+      tip_photo_format: '設定圖片卡的比例以符合您的收藏品，例如 8×10 相片、索引卡或球員卡。',
+      tip_image_fit: '控制上傳圖片與所選格式不符時的顯示方式。',
+      tip_info_links: '選擇簽名者名稱與電影／影集標題在表格檢視與項目詳情中的連結網站。',
+      tip_privacy: '隱藏金額相關資訊（購入金額與估計價值）。可透過標題列的眼睛按鈕顯示。',
+      tip_export: '將您的收藏完整備份為 JSON 檔案。',
+      tip_import: '⚠️ 從 JSON 檔案載入並取代您目前的完整收藏。若要保留現有資料，請先匯出備份。',
+      tip_merge: '從 JSON 檔案新增項目至您的現有收藏，不會刪除任何內容。',
+      tip_batch_import: '選取多張相片，每張圖片將建立一個項目。每個項目預設使用檔名作為簽名者名稱，稍後再填寫詳細資料。您也可以將相片拖曳至頁面任意位置。',
+      tip_share: '⚠️ 將您的收藏公開上傳至 dpaste.com，並複製可分享的網址至剪貼簿。',
+      tip_csv: '將您的收藏下載為 CSV 試算表。包含所有中繼資料欄位，不含相片。',
+      tip_print: '以 A4 格式列印您的收藏，依價值排序，並符合您目前的相片格式設定。',
+      tip_reset: '⚠️ 永久刪除您的整個收藏。若要保留資料，請先匯出備份。',
+      tip_save_as_mine: '將您目前瀏覽的收藏儲存為您自己的，並取代您現有的資料。',
+      tip_local_currency: '錄入購入金額與估計價值時使用的貨幣。',
+      tip_display_currency: '在收藏介面中顯示的貨幣。若與本地貨幣不同，價值將自動換算。',
+      tip_exchange_rate: '顯示本地貨幣與顯示貨幣之間的目前匯率。匯率快取有效期為 1 小時。',
+    },
+  };
+
+  const SUPPORTED_LANGS = ['en', 'zh-TW'];
+
+  function detectBrowserLang(supported) {
+    const langs = navigator.languages && navigator.languages.length ? navigator.languages : [navigator.language || 'en'];
+    for (const lang of langs) {
+      const l = lang.toLowerCase();
+      if (l === 'zh-tw' || l === 'zh-hant' || l === 'zh-hk') { if (supported.includes('zh-TW')) return 'zh-TW'; }
+      if (l.startsWith('en') && supported.includes('en')) return 'en';
+    }
+    return 'en';
+  }
+
+  function getLang() { return localStorage.getItem('ag_lang') || detectBrowserLang(SUPPORTED_LANGS); }
+
+  function setLang(code) {
+    localStorage.setItem('ag_lang', code);
+    applyI18n();
+    applyTheme(localStorage.getItem('ag_theme') || 'light');
+    render();
+  }
+
+  function t(key) {
+    const lang = getLang();
+    return (TRANSLATIONS[lang] && TRANSLATIONS[lang][key]) || TRANSLATIONS['en'][key] || key;
+  }
+
+  function applyI18n() {
+    document.querySelectorAll('[data-i18n]').forEach(el => {
+      const text = t(el.dataset.i18n);
+      if (text) el.textContent = text;
+    });
+    document.querySelectorAll('[data-i18n-html]').forEach(el => {
+      const text = t(el.dataset.i18nHtml);
+      if (text) el.innerHTML = text;
+    });
+    document.querySelectorAll('[data-i18n-placeholder]').forEach(el => {
+      const text = t(el.dataset.i18nPlaceholder);
+      if (text) el.placeholder = text;
+    });
+    const langSel = document.getElementById('settingsLang');
+    if (langSel) langSel.value = getLang();
+  }
 
   function getLocalCurrency()   { return (viewMode && viewLocalCurrency) ? viewLocalCurrency : (localStorage.getItem('ag_currency') || 'TWD'); }
   function getDisplayCurrency() { return localStorage.getItem('ag_display_currency') || getLocalCurrency(); }
@@ -2169,6 +2397,8 @@
     document.getElementById('settingsImgFit').value      = getImgFit();
     document.getElementById('settingsInfoLink').value    = getInfoLinkMode();
     document.getElementById('settingsPrivacy').value     = getPrivacyMode();
+    const langSel = document.getElementById('settingsLang');
+    if (langSel) langSel.value = getLang();
     document.getElementById('settingsDataSection').style.display  = viewMode ? 'none' : '';
     document.getElementById('settingsLocalSection').style.display = viewMode ? 'none' : '';
     document.getElementById('settingsViewSection').style.display  = viewMode ? '' : 'none';
@@ -2435,19 +2665,19 @@
 
     const CONDITION_ORDER = ['Mint','Near Mint','Excellent','Very Good','Good','Fair','Poor'];
     const sections = [];
-    if (allTags.size)       sections.push({ key: 'tags',         label: 'Tags',               values: [...allTags].sort() });
-    if (allItemTypes.size)  sections.push({ key: 'itemType',     label: 'Item Type',           values: [...allItemTypes].sort() });
-    if (allConditions.size) sections.push({ key: 'condition',    label: 'Condition',           values: CONDITION_ORDER.filter(c => allConditions.has(c)) });
-    if (allCerts.size)      sections.push({ key: 'certCompany',  label: 'Cert Company',        values: [...allCerts].sort(), display: CERT_LABELS });
-    if (allAcquired.size)   sections.push({ key: 'acquiredHow',  label: 'Acquisition Method',  values: [...allAcquired].sort() });
-    if (allEvents.size)     sections.push({ key: 'signingEvent', label: 'Signing Event',       values: [...allEvents].sort() });
-    if (allLocations.size)  sections.push({ key: 'location',     label: 'Physical Location',   values: [...allLocations].sort() });
-    if (allFilms.size)      sections.push({ key: 'film',         label: 'Film / Show',         values: [...allFilms].sort() });
-    if (allSigners.size)    sections.push({ key: 'signer',       label: 'Signer',              values: [...allSigners].sort() });
+    if (allTags.size)       sections.push({ key: 'tags',         label: t('filt_tags'),        values: [...allTags].sort() });
+    if (allItemTypes.size)  sections.push({ key: 'itemType',     label: t('filt_item_type'),   values: [...allItemTypes].sort() });
+    if (allConditions.size) sections.push({ key: 'condition',    label: t('filt_condition'),   values: CONDITION_ORDER.filter(c => allConditions.has(c)) });
+    if (allCerts.size)      sections.push({ key: 'certCompany',  label: t('filt_cert_co'),     values: [...allCerts].sort(), display: CERT_LABELS });
+    if (allAcquired.size)   sections.push({ key: 'acquiredHow',  label: t('filt_acquired'),    values: [...allAcquired].sort() });
+    if (allEvents.size)     sections.push({ key: 'signingEvent', label: t('filt_event'),       values: [...allEvents].sort() });
+    if (allLocations.size)  sections.push({ key: 'location',     label: t('filt_location'),    values: [...allLocations].sort() });
+    if (allFilms.size)      sections.push({ key: 'film',         label: t('filt_film'),        values: [...allFilms].sort() });
+    if (allSigners.size)    sections.push({ key: 'signer',       label: t('filt_signer'),      values: [...allSigners].sort() });
 
     const body = document.getElementById('filterBody');
     if (!sections.length) {
-      body.innerHTML = '<p style="color:var(--sub);text-align:center;padding:30px 20px">No items to filter.</p>';
+      body.innerHTML = `<p style="color:var(--sub);text-align:center;padding:30px 20px">${t('filt_empty')}</p>`;
       return;
     }
     body.innerHTML = sections.map(s => `
@@ -2564,9 +2794,9 @@
       g.innerHTML = `
         <div class="empty">
           <div class="empty-icon">✍️</div>
-          <div class="empty-title">${items.length ? 'No matches' : 'Your collection is empty'}</div>
-          <div class="empty-sub">${items.length ? 'Try a different search term' : 'Add your first autograph to get started'}</div>
-          ${!items.length ? '<div style="display:flex;gap:10px;justify-content:center"><button class="btn-add" onclick="openAdd()">+ Add Item</button><button class="btn-secondary" style="height:36px" onclick="loadDemoData()">Load Demo Collection</button></div>' : ''}
+          <div class="empty-title">${items.length ? t('no_matches') : t('empty_title')}</div>
+          <div class="empty-sub">${items.length ? t('no_matches_sub') : t('empty_sub')}</div>
+          ${!items.length ? `<div style="display:flex;gap:10px;justify-content:center"><button class="btn-add" onclick="openAdd()">${t('add_item')}</button><button class="btn-secondary" style="height:36px" onclick="loadDemoData()">${t('load_demo')}</button></div>` : ''}
         </div>`;
       return;
     }
@@ -2581,7 +2811,7 @@
         ? `<div class="card-img-wrap" style="--bg-img:url('${coverImg}')"><img src="${coverImg}" alt="${escHtml(item.name)}" loading="lazy">${imgCount > 1 ? `<span class="img-count-badge">${imgCount}</span>` : ''}</div>`
         : `<div class="card-img-wrap"><div class="card-no-img">
             <svg width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.2" stroke-linecap="round"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg>
-            <span style="font-size:11px">No photo</span>
+            <span style="font-size:11px">${t('no_photo')}</span>
            </div></div>`;
 
       let rows = '';
@@ -2590,20 +2820,20 @@
         const v = cUrl
           ? `<a class="card-link" href="${escHtml(cUrl)}" target="_blank" rel="noopener" data-cert="${escHtml(item.certNum)}" onclick="copyCert(this); event.stopPropagation()">${escHtml(item.certNum)}</a>`
           : escHtml(item.certNum);
-        rows += cardRow('Cert #', v);
+        rows += cardRow(t('cert_lbl'), v);
       }
       if (item.paid) {
         let paidStr = escHtml(fmt(item.paid));
         if (item.shipping) paidStr += ` <span style="font-size:11px;color:var(--sub)">(${escHtml(item.shipping)})</span>`;
-        rows += cardRow('Paid', `<span class="priv-val">${paidStr}</span>`);
+        rows += cardRow(t('paid_lbl'), `<span class="priv-val">${paidStr}</span>`);
       }
       if (item.value) {
         const cls = r !== null ? (r >= 0 ? 'text-green' : 'text-red') : '';
         let vStr = escHtml(fmt(item.value));
         if (item.valueUrl) vStr = `<a class="card-link ${cls}" href="${escHtml(item.valueUrl)}" target="_blank" rel="noopener" onclick="event.stopPropagation()" style="color:inherit">${vStr}</a>`;
-        rows += cardRow('Est. Value', `<span class="priv-val"><span class="${cls}">${vStr}</span></span>`);
+        rows += cardRow(t('est_val_lbl'), `<span class="priv-val"><span class="${cls}">${vStr}</span></span>`);
       }
-      if (rStr) rows += cardRow('ROI', `<span class="${r >= 0 ? 'text-green' : 'text-red'}">${rStr}</span>`);
+      if (rStr) rows += cardRow(t('roi_lbl'), `<span class="${r >= 0 ? 'text-green' : 'text-red'}">${rStr}</span>`);
 
       return `
         <div class="card" onclick="openDetail('${item.id}')">
@@ -2613,7 +2843,7 @@
           </div>
           ${imgHtml}
           <div class="card-body">
-            <div class="card-name">${item.signers && item.signers.length > 1 ? 'Multiple Signers' : escHtml(item.signers ? item.signers[0] : item.name)}</div>
+            <div class="card-name">${item.signers && item.signers.length > 1 ? t('multiple_signers') : escHtml(item.signers ? item.signers[0] : item.name)}</div>
             ${item.character ? `<div class="card-character">${escHtml(item.character)}</div>` : ''}
             ${item.film ? `<div class="card-character">${escHtml(item.film)}</div>` : ''}
             ${rows ? `<hr class="card-divider">${rows}` : ''}
@@ -2636,7 +2866,7 @@
     pendingImgs = [];
     resetForm();
     document.getElementById('editId').value = '';
-    document.getElementById('formTitle').textContent = 'Add Item';
+    document.getElementById('formTitle').textContent = t('form_add_title');
     open('formOverlay');
   }
 
@@ -2646,7 +2876,7 @@
     resetForm();
     pendingImgs = (item.imgs || []).slice();
     document.getElementById('editId').value    = id;
-    document.getElementById('formTitle').textContent = 'Edit Item';
+    document.getElementById('formTitle').textContent = t('form_edit_title');
     renderSignersList(item.signers && item.signers.length ? item.signers : [item.name || '']);
     document.getElementById('fCharacter').value = item.character || '';
     document.getElementById('fFilm').value      = item.film      || '';
@@ -2692,7 +2922,7 @@
     const list = document.getElementById('signersList');
     list.innerHTML = values.map((val, i) => `
       <div class="fg signer-entry" style="margin-bottom:${i < values.length - 1 ? '8px' : '0'}">
-        <label class="flabel">Signer ${i + 1}${i === 0 ? ' <span style="color:var(--red)">*</span>' : ''}</label>
+        <label class="flabel">${t('det_signer')} ${i + 1}${i === 0 ? ' <span style="color:var(--red)">*</span>' : ''}</label>
         <div class="signer-row">
           <input class="finput signer-input" id="fSigner${i}" value="${escHtml(val)}" placeholder="e.g. Harrison Ford">
           ${i > 0 ? `<button type="button" class="signer-btn" onclick="removeSignerRow(${i})">−</button>` : ''}
@@ -2884,7 +3114,7 @@
     const addBtn = `
       <div class="img-thumb-add" onclick="document.getElementById('imgInput').click()">
         <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg>
-        <span>${pendingImgs.length ? 'Add' : 'Add photo'}</span>
+        <span>${pendingImgs.length ? t('add_photo_more') : t('add_photo')}</span>
       </div>`;
     row.innerHTML = thumbs + addBtn;
   }
@@ -2903,7 +3133,7 @@
     const r    = roi(item.paid, item.value);
     const rStr = roiStr(r);
 
-    const displayTitle = item.signers && item.signers.length > 1 ? 'Multiple Signers' : (item.signers ? item.signers[0] : item.name);
+    const displayTitle = item.signers && item.signers.length > 1 ? t('multiple_signers') : (item.signers ? item.signers[0] : item.name);
     document.getElementById('dTitle').textContent = displayTitle;
 
     let html = '';
@@ -2919,53 +3149,53 @@
 
     html += '<div class="detail-rows">';
     if (item.signers && item.signers.length > 1) {
-      item.signers.forEach((s, i) => { html += detailRow(`Signer ${i + 1}`, `<a class="card-link" href="${escHtml(signerUrl(s))}" target="_blank" rel="noopener">${escHtml(s)}</a>`); });
+      item.signers.forEach((s, i) => { html += detailRow(`${t('det_signer')} ${i + 1}`, `<a class="card-link" href="${escHtml(signerUrl(s))}" target="_blank" rel="noopener">${escHtml(s)}</a>`); });
     } else {
       const signerName = item.signers ? item.signers[0] : item.name;
-      html += detailRow('Signer', `<a class="card-link" href="${escHtml(signerUrl(signerName))}" target="_blank" rel="noopener">${escHtml(signerName)}</a>`);
+      html += detailRow(t('det_signer'), `<a class="card-link" href="${escHtml(signerUrl(signerName))}" target="_blank" rel="noopener">${escHtml(signerName)}</a>`);
     }
-    if (item.character) html += detailRow('Character', escHtml(item.character));
-    if (item.film)      html += detailRow('Film / Show', `<a class="card-link" href="${escHtml(filmUrl(item.film))}" target="_blank" rel="noopener">${escHtml(item.film)}</a>`);
-    if (item.itemType)     html += detailRow('Item Type',    escHtml(item.itemType));
-    if (item.condition)    html += detailRow('Condition',    escHtml(item.condition));
+    if (item.character) html += detailRow(t('det_character'), escHtml(item.character));
+    if (item.film)      html += detailRow(t('det_film'), `<a class="card-link" href="${escHtml(filmUrl(item.film))}" target="_blank" rel="noopener">${escHtml(item.film)}</a>`);
+    if (item.itemType)     html += detailRow(t('det_item_type'), escHtml(item.itemType));
+    if (item.condition)    html += detailRow(t('det_condition'), escHtml(item.condition));
     if (item.certNum) {
       const cUrl = getCertUrl(item);
       const v = cUrl
         ? `<a class="card-link" href="${escHtml(cUrl)}" target="_blank" rel="noopener" data-cert="${escHtml(item.certNum)}" onclick="copyCert(this)">${escHtml(item.certNum)}</a>`
         : escHtml(item.certNum);
-      const lbl = item.certCompany ? `${CERT_LABELS[item.certCompany]} Cert #` : 'Certification #';
+      const lbl = item.certCompany ? `${CERT_LABELS[item.certCompany]} ${t('det_cert')}` : t('det_cert');
       html += detailRow(lbl, v);
     }
     if (item.paid) {
       let s = escHtml(fmt(item.paid));
       if (item.shipping) s += ` <span style="font-size:12px;color:var(--sub)">(${escHtml(item.shipping)})</span>`;
-      html += detailRow('Paid', `<span class="priv-val">${s}</span>`);
+      html += detailRow(t('paid_lbl'), `<span class="priv-val">${s}</span>`);
     }
     if (item.value) {
       const cls = r !== null ? (r >= 0 ? 'text-green' : 'text-red') : '';
       let v = `<span class="${cls}">${escHtml(fmt(item.value))}</span>`;
       if (item.valueUrl) v = `<a class="card-link ${cls}" href="${escHtml(item.valueUrl)}" target="_blank" rel="noopener" style="color:inherit">${escHtml(fmt(item.value))}</a>`;
-      html += detailRow('Estimated Value', `<span class="priv-val">${v}</span>`);
+      html += detailRow(t('det_est_val'), `<span class="priv-val">${v}</span>`);
     }
     if (rStr) {
       const cls = r >= 0 ? 'text-green' : 'text-red';
-      html += detailRow('ROI', `<span class="${cls}">${rStr}</span>`);
+      html += detailRow(t('roi_lbl'), `<span class="${cls}">${rStr}</span>`);
     }
-    if (item.signingDate)  html += detailRow('Signing Date',  new Date(item.signingDate + 'T12:00:00').toLocaleDateString(undefined, {year:'numeric',month:'long',day:'numeric'}));
-    if (item.signingEvent) html += detailRow('Signing Event', escHtml(item.signingEvent));
-    if (item.acquiredHow)  html += detailRow('Acquired',      escHtml(item.acquiredHow));
-    if (item.location)     html += detailRow('Location',      escHtml(item.location));
+    if (item.signingDate)  html += detailRow(t('det_signing_date'), new Date(item.signingDate + 'T12:00:00').toLocaleDateString(undefined, {year:'numeric',month:'long',day:'numeric'}));
+    if (item.signingEvent) html += detailRow(t('det_signing_event'), escHtml(item.signingEvent));
+    if (item.acquiredHow)  html += detailRow(t('det_acquired'),      escHtml(item.acquiredHow));
+    if (item.location)     html += detailRow(t('det_location'),      escHtml(item.location));
     if (item.tags && item.tags.length) {
-      const tagHtml = item.tags.map(t => `<span class="tag" onclick="filterByTag(event,'${escHtml(t)}');closeDetail()">${escHtml(t)}</span>`).join('');
-      html += detailRow('Tags', `<span style="display:flex;flex-wrap:wrap;gap:4px">${tagHtml}</span>`);
+      const tagHtml = item.tags.map(tag => `<span class="tag" onclick="filterByTag(event,'${escHtml(tag)}');closeDetail()">${escHtml(tag)}</span>`).join('');
+      html += detailRow(t('det_tags'), `<span style="display:flex;flex-wrap:wrap;gap:4px">${tagHtml}</span>`);
     }
     html += '</div>';
     if (item.notes) html += `<div class="detail-notes">${escHtml(item.notes)}</div>`;
-    html += `<div class="detail-date">Added ${new Date(item.added).toLocaleDateString(undefined, {year:'numeric',month:'long',day:'numeric'})}</div>`;
+    html += `<div class="detail-date">${t('det_added')} ${new Date(item.added).toLocaleDateString(undefined, {year:'numeric',month:'long',day:'numeric'})}</div>`;
     html += `<div class="detail-desc">
       <div class="detail-desc-header">
-        <span class="detail-desc-label">Description</span>
-        <button class="detail-desc-copy" onclick="copyEbayDesc(this)">Copy</button>
+        <span class="detail-desc-label">${t('description')}</span>
+        <button class="detail-desc-copy" onclick="copyEbayDesc(this)">${t('copy')}</button>
       </div>
       <textarea class="detail-desc-textarea" id="ebayDescText" oninput="this.style.height='auto';this.style.height=this.scrollHeight+'px'">${escHtml(buildEbayDescription(item))}</textarea>
     </div>`;
@@ -3081,7 +3311,7 @@
   function collectSettings() {
     const keys = ['ag_display_currency', 'ag_theme', 'ag_cols', 'ag_view',
                   'ag_photo_format', 'ag_img_fit', 'ag_info_link', 'ag_privacy',
-                  'ag_sort', 'ag_custom_order'];
+                  'ag_sort', 'ag_custom_order', 'ag_lang'];
     const s = {};
     keys.forEach(k => { const v = localStorage.getItem(k); if (v !== null) s[k] = v; });
     return s;
@@ -3421,7 +3651,7 @@
     document.getElementById('iconSun').style.display  = theme === 'light' ? 'block' : 'none';
     document.getElementById('iconMoon').style.display = theme === 'light' ? 'none'  : 'block';
     const lbl = document.getElementById('themeLabel');
-    if (lbl) lbl.textContent = theme === 'light' ? 'Switch to Dark Mode' : 'Switch to Light Mode';
+    if (lbl) lbl.textContent = theme === 'light' ? t('switch_dark') : t('switch_light');
   }
 
   /* ── Init ── */
@@ -3563,6 +3793,7 @@
   (async () => {
     // Visual prefs need no item data — apply them synchronously first so the
     // page paints correctly before the (async) image load resolves.
+    applyI18n();
     applyTheme(localStorage.getItem('ag_theme') || 'light');
     const savedCols = localStorage.getItem('ag_cols') || '5';
     setCols(savedCols);
@@ -3748,28 +3979,28 @@
     const sorted = [...items].sort((a, b) => (parseFloat(b.value) || 0) - (parseFloat(a.value) || 0));
 
     const stats = [
-      { val: items.length, lbl: 'Items' },
-      ...(totalPaid && !privacy ? [{ val: fmtMoney(totalPaid), lbl: 'Total Paid' }]  : []),
-      ...(totalVal  && !privacy ? [{ val: fmtMoney(totalVal),  lbl: 'Est. Value' }]  : []),
-      ...(roi !== null && !privacy ? [{ val: (roi >= 0 ? '+' : '') + roi + '%', lbl: 'Return', cls: roi >= 0 ? 'pv-roi-pos' : 'pv-roi-neg' }] : []),
+      { val: items.length, lbl: t('print_items') },
+      ...(totalPaid && !privacy ? [{ val: fmtMoney(totalPaid), lbl: t('print_total_paid') }]  : []),
+      ...(totalVal  && !privacy ? [{ val: fmtMoney(totalVal),  lbl: t('print_est_val') }]  : []),
+      ...(roi !== null && !privacy ? [{ val: (roi >= 0 ? '+' : '') + roi + '%', lbl: t('print_return'), cls: roi >= 0 ? 'pv-roi-pos' : 'pv-roi-neg' }] : []),
     ].map(s => `<div class="pv-stat"><span class="pv-stat-val ${s.cls || ''}">${s.val}</span><span class="pv-stat-lbl">${s.lbl}</span></div>`).join('');
 
     const cards = sorted.map(it => {
       const name    = it.signers && it.signers.length > 1 ? it.signers.join(', ') : (it.signers ? it.signers[0] : it.name || '');
       const imgHtml = it.imgs && it.imgs[0]
         ? `<img class="pv-card-img" src="${it.imgs[0]}" alt="${escHtml(name)}">`
-        : `<div class="pv-card-no-img">No photo</div>`;
+        : `<div class="pv-card-no-img">${t('print_no_photo')}</div>`;
 
       let rows = '';
       if (it.certNum) {
         const co = it.certCompany ? CERT_LABELS[it.certCompany] : 'Cert';
         rows += `<div class="pv-card-row"><span class="pv-card-row-lbl">${escHtml(co || 'Cert')} #</span><span class="pv-card-row-val">${escHtml(it.certNum)}</span></div>`;
       }
-      if (it.paid && !privacy)  rows += `<div class="pv-card-row"><span class="pv-card-row-lbl">Paid</span><span class="pv-card-row-val">${escHtml(fmt(it.paid))}</span></div>`;
-      if (it.value && !privacy) rows += `<div class="pv-card-row"><span class="pv-card-row-lbl">Est. Value</span><span class="pv-card-row-val">${escHtml(fmt(it.value))}</span></div>`;
+      if (it.paid && !privacy)  rows += `<div class="pv-card-row"><span class="pv-card-row-lbl">${t('paid_lbl')}</span><span class="pv-card-row-val">${escHtml(fmt(it.paid))}</span></div>`;
+      if (it.value && !privacy) rows += `<div class="pv-card-row"><span class="pv-card-row-lbl">${t('print_est_val')}</span><span class="pv-card-row-val">${escHtml(fmt(it.value))}</span></div>`;
       if (it.paid && it.value && !privacy) {
         const r = Math.round((parseFloat(it.value) - parseFloat(it.paid)) / parseFloat(it.paid) * 100);
-        if (!isNaN(r)) rows += `<div class="pv-card-row"><span class="pv-card-row-lbl">ROI</span><span class="pv-card-row-val ${r >= 0 ? 'pv-roi-pos' : 'pv-roi-neg'}">${r >= 0 ? '+' : ''}${r}%</span></div>`;
+        if (!isNaN(r)) rows += `<div class="pv-card-row"><span class="pv-card-row-lbl">${t('roi_lbl')}</span><span class="pv-card-row-val ${r >= 0 ? 'pv-roi-pos' : 'pv-roi-neg'}">${r >= 0 ? '+' : ''}${r}%</span></div>`;
       }
 
       return `<div class="pv-card">
@@ -3792,7 +4023,7 @@
         <div class="pv-logo">Auto<span>Gallery</span></div>
         <div class="pv-stats">${stats}</div>
       </div>
-      <div class="pv-date">Generated ${date}</div>
+      <div class="pv-date">${t('print_generated')} ${date}</div>
       <div class="pv-grid">${cards}</div>`;
 
     window.print();
@@ -3803,8 +4034,8 @@
 <div id="batchDropOverlay">
   <div class="batch-drop-box">
     <div class="batch-drop-icon">🖼️</div>
-    <div class="batch-drop-title">Drop photos to import</div>
-    <div class="batch-drop-sub">One stub item will be created per image</div>
+    <div class="batch-drop-title" data-i18n="drop_title">Drop photos to import</div>
+    <div class="batch-drop-sub" data-i18n="drop_sub">One stub item will be created per image</div>
   </div>
 </div>
 </body>

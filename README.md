@@ -431,7 +431,7 @@ Opened by clicking the **⚙️ gear icon** in the header. Settings are organize
 
 | Tab | Contents |
 |---|---|
-| **Display** | Appearance, Photo Format, Image Fit, Info Links, Privacy Mode |
+| **Display** | Language, Appearance, Photo Format, Image Fit, Info Links, Privacy Mode |
 | **Data** | Backup & Share (normal mode) or Save as My Collection (view mode) |
 | **Currency** | Local Currency, Display Currency, Exchange Rate (Local Currency hidden in view mode) |
 
@@ -444,6 +444,25 @@ Every setting has a small italic **i** circle button at the right end of its con
 ---
 
 ### Display Tab
+
+#### Language
+
+A dropdown to set the display language for the entire app. Currently supported:
+
+| Value | Language |
+|---|---|
+| **English** *(default)* | English |
+| **繁體中文** | Traditional Chinese (Taiwan) |
+
+**Language priority:**
+
+1. If the user has previously changed the language in Settings, that choice is stored in `localStorage` (`ag_lang`) and used on every visit.
+2. If no preference is saved, the app checks the browser's language preference (`navigator.languages`). If the browser language matches a supported language, it is used automatically.
+3. If the browser language is not supported, the app falls back to English.
+
+This priority means first-time visitors and shared-link viewers always see the app in their own browser language (if supported), without any setting from the original creator overriding it. Shared collections never carry language preferences that would force a language on the viewer.
+
+All translations live inside `index.html` in a `TRANSLATIONS` object. The `data-i18n` attribute on static HTML elements is updated by `applyI18n()` on startup and whenever the language changes. Dynamic content uses the `t(key)` helper function.
 
 #### Appearance
 
@@ -899,6 +918,7 @@ AutoGallery uses a **hybrid storage model**: lightweight item metadata and prefe
 | `ag_privacy` | String | Saved privacy mode: `"off"` or `"on"` |
 | `ag_sort` | String | Saved sort mode (e.g. `"date-desc"`, `"custom"`) |
 | `ag_custom_order` | JSON string | Array of item IDs representing the user-defined custom sort sequence |
+| `ag_lang` | String | Saved language preference (e.g. `"en"`, `"zh-TW"`). Only present when the user has manually selected a language — absence means auto-detect from browser. |
 
 ### IndexedDB (photos)
 
