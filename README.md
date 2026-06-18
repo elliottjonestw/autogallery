@@ -492,11 +492,12 @@ A dropdown to choose which site signer names and film/show titles link to in the
 
 ### Data Tab
 
-Six row buttons, each with its own `(i)` tooltip on the right:
+Seven row buttons, each with its own `(i)` tooltip on the right:
 
 - **Export Collection** — downloads the full collection as a `.json` file. See [Import & Export](#import--export).
 - **Import Collection** — opens a file picker to load a previously exported `.json` file, **replacing** the current collection. See [Import & Export](#import--export).
 - **Merge Import** — opens a file picker to load a `.json` file and **add** its items to the existing collection without replacing anything. Useful for combining collections. See [Import & Export](#import--export).
+- **Batch Import Photos** — opens a multi-file picker to select multiple images at once. Creates one stub item per image, using the filename (minus extension) as the signer name, with all other fields blank to fill in later. You can also drag image files directly onto the page anywhere outside the form to trigger the same flow. See [Import & Export](#import--export).
 - **Copy Share Link** — uploads the collection to dpaste.com and copies a short shareable URL to the clipboard. See [Sharing a Collection](#sharing-a-collection).
 - **Download CSV** — downloads all item metadata as a `.csv` spreadsheet (photos are not included). Columns cover every field: signers, character, film, item type, cert number, cert company, condition, paid, estimated value, value URL, tags, signing event, signing date, acquired how, location, notes, and date added. Paid and Est. Value column headers include the local currency code. Values containing commas or quotes are properly escaped.
 - **Reset Collection** — permanently deletes your entire collection (items and photos) from both localStorage and IndexedDB, and returns the gallery to the empty state. A confirmation dialog is shown first. Separated from the other buttons by a divider and labelled in red to signal it is destructive. Export a backup first if you want to keep your data.
@@ -792,6 +793,21 @@ Click **Merge Import** in the Settings Modal (⚙️ → Data). A file picker op
 - If the file is malformed or contains no items, a toast error is shown.
 
 Merge Import is useful for combining collections exported from different devices or sessions.
+
+### Batch Import Photos
+
+Click **Batch Import Photos** in the Settings Modal (⚙️ → Data), or drag one or more image files directly onto the page (outside the Add/Edit form).
+
+**Batch import behavior:**
+
+- One stub item is created per image file. The filename (minus extension) is used as the signer name; all other fields (character, film, cert, paid, value, tags, etc.) are left blank for you to fill in later.
+- Images are run through the same compression pipeline as manual photo uploads — resized to a maximum of 900px on the longest edge, re-encoded as JPEG at 0.82 quality, and stripped of EXIF metadata.
+- Items land at the top of the collection (newest first when sorted by date added). The sort order depends on the active sort setting.
+- A toast confirms how many stubs were created (e.g. "Created 5 stub items — fill in details on each card"). Settings close automatically after import.
+
+**Drag-and-drop:**
+
+Dragging image files over the browser window (when the Add/Edit form is not open) triggers a full-screen drop overlay: a dark backdrop with a dashed gold box reading "Drop photos to import / One stub item will be created per image." Dropping the files runs the same import flow. Non-image files in the drop are silently ignored; if none of the dropped files are images, a toast error is shown.
 
 ---
 
