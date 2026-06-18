@@ -335,8 +335,26 @@ Clicking any card (grid) or row (table) opens a read-only detail view for that i
   - Tags — clickable chips. Clicking a tag closes the modal and filters the gallery to items with that tag.
   - Notes
   - Date Added
+- **Description** — an auto-generated text block below the date, separated by a divider. See [Description](#description) below.
 
 Fields with no value are omitted (not shown as blank rows).
+
+### Description
+
+A **Description** section appears at the bottom of every detail modal. It auto-generates a plain-text description from the item's fields, formatted for pasting into a listing or elsewhere.
+
+**Format:**
+
+> *[Signer(s)] ([Character] in [Film/Show]) signed [item type]. Professionally authenticated by [Cert Company] (Certificate #[Cert #]). The [item type] is in [condition] condition. The [item type] was signed at [Signing Event] on [Date Signed].*
+
+Rules:
+- The signer name and character/film parenthetical open the description. For multi-signer items the character parenthetical is omitted.
+- Item type is always lowercase (e.g. "photo", not "Photo").
+- The cert sentence is included only if a cert number is set. The condition sentence is included only if condition is set. The signing sentence is included only if a signing event or signing date is set — it uses whichever of the two are available.
+- If Notes are set they are appended at the end.
+- Paid, Est. Value, ROI, and tags are never included.
+
+The text is editable directly in the textarea before copying — changes are local to the open modal and not saved to the item. Click **Copy** to copy the current text to the clipboard; the button briefly reads "Copied!" to confirm.
 
 ### Buttons
 

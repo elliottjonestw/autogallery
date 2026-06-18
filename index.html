@@ -1183,6 +1183,53 @@
       opacity: .6;
     }
 
+    .detail-desc {
+      margin-top: 20px;
+      padding-top: 16px;
+      border-top: 1px solid var(--border);
+    }
+    .detail-desc-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 8px;
+    }
+    .detail-desc-label {
+      font-size: 11px;
+      font-weight: 700;
+      letter-spacing: .06em;
+      text-transform: uppercase;
+      color: var(--sub);
+    }
+    .detail-desc-copy {
+      font-size: 12px;
+      padding: 3px 10px;
+      border-radius: 6px;
+      border: 1px solid var(--border);
+      background: transparent;
+      color: var(--text);
+      cursor: pointer;
+      font-family: var(--font);
+      transition: background .15s;
+    }
+    .detail-desc-copy:hover { background: var(--border); }
+    .detail-desc-textarea {
+      width: 100%;
+      box-sizing: border-box;
+      border: 1px solid var(--border-light);
+      border-radius: 8px;
+      padding: 10px 12px;
+      font-family: var(--font);
+      font-size: 12px;
+      line-height: 1.6;
+      color: var(--text);
+      background: var(--surface);
+      outline: none;
+      resize: none;
+      overflow: hidden;
+    }
+    .detail-desc-textarea:focus { border-color: var(--gold); }
+
     /* ── Toast ── */
     .toast {
       position: fixed;
@@ -2838,9 +2885,70 @@
     html += '</div>';
     if (item.notes) html += `<div class="detail-notes">${escHtml(item.notes)}</div>`;
     html += `<div class="detail-date">Added ${new Date(item.added).toLocaleDateString(undefined, {year:'numeric',month:'long',day:'numeric'})}</div>`;
+    html += `<div class="detail-desc">
+      <div class="detail-desc-header">
+        <span class="detail-desc-label">Description</span>
+        <button class="detail-desc-copy" onclick="copyEbayDesc(this)">Copy</button>
+      </div>
+      <textarea class="detail-desc-textarea" id="ebayDescText" oninput="this.style.height='auto';this.style.height=this.scrollHeight+'px'">${escHtml(buildEbayDescription(item))}</textarea>
+    </div>`;
 
     document.getElementById('dBody').innerHTML = html;
+    const _ta = document.getElementById('ebayDescText');
+    if (_ta) { _ta.style.height = 'auto'; _ta.style.height = _ta.scrollHeight + 'px'; }
     open('detailOverlay');
+  }
+
+  function buildEbayDescription(item) {
+    const signers = item.signers && item.signers.length ? item.signers : [item.name || ''];
+    const isMult  = signers.length > 1;
+    const type    = (item.itemType || 'item').toLowerCase();
+
+    const signerStr = isMult
+      ? signers.slice(0, -1).join(', ') + ' and ' + signers[signers.length - 1]
+      : signers[0];
+
+    let charFilm = '';
+    if (!isMult) {
+      if (item.character && item.film) charFilm = ` (${item.character} in ${item.film})`;
+      else if (item.character)         charFilm = ` (${item.character})`;
+      else if (item.film)              charFilm = ` (${item.film})`;
+    }
+
+    const paras = [`${signerStr}${charFilm} signed ${type}.`];
+
+    if (item.certNum) {
+      const co = item.certCompany ? CERT_LABELS[item.certCompany] : null;
+      paras.push(co
+        ? `Professionally authenticated by ${co} (Certificate #${item.certNum}).`
+        : `Certificate of authenticity #${item.certNum}.`);
+    }
+
+    if (item.condition) {
+      paras.push(`The ${type} is in ${item.condition.toLowerCase()} condition.`);
+    }
+
+    if (item.signingEvent || item.signingDate) {
+      let s = `The ${type} was signed`;
+      if (item.signingEvent) s += ` at ${item.signingEvent}`;
+      if (item.signingDate) {
+        const d = new Date(item.signingDate + 'T12:00:00');
+        s += ` on ${d.toLocaleDateString(undefined, { year: 'numeric', month: 'long', day: 'numeric' })}`;
+      }
+      paras.push(s + '.');
+    }
+
+    if (item.notes) paras.push(item.notes);
+
+    return paras.join(' ');
+  }
+
+  function copyEbayDesc(btn) {
+    const text = document.getElementById('ebayDescText').value;
+    navigator.clipboard.writeText(text).then(() => {
+      btn.textContent = 'Copied!';
+      setTimeout(() => btn.textContent = 'Copy', 2000);
+    }).catch(() => toast('⚠️ Could not copy to clipboard'));
   }
 
   function detailRow(lbl, val) {
