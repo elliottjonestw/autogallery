@@ -1297,6 +1297,71 @@
     @media (max-width: 360px) {
       .gallery { grid-template-columns: 1fr; }
     }
+
+    /* ── Print layout ── */
+    #printView { display: none; }
+
+    @media print {
+      @page { size: A4; margin: 12mm 14mm; }
+
+      body > *:not(#printView) { display: none !important; }
+      #printView { display: block !important; font-family: system-ui, sans-serif; color: #111; background: #fff; }
+
+      .pv-header {
+        display: flex;
+        align-items: flex-end;
+        justify-content: space-between;
+        border-bottom: 2px solid #111;
+        padding-bottom: 4mm;
+        margin-bottom: 3mm;
+      }
+      .pv-logo { font-size: 18pt; font-weight: 800; letter-spacing: -.02em; }
+      .pv-logo span { color: #b8962e; }
+      .pv-stats { display: flex; gap: 7mm; }
+      .pv-stat { display: flex; flex-direction: column; align-items: flex-end; }
+      .pv-stat-val { font-size: 12pt; font-weight: 700; line-height: 1; }
+      .pv-stat-lbl { font-size: 7pt; text-transform: uppercase; letter-spacing: .06em; color: #666; margin-top: 1mm; }
+      .pv-date { font-size: 7.5pt; color: #888; text-align: right; margin-top: 5mm; margin-bottom: 5mm; }
+
+      .pv-grid {
+        display: grid;
+        grid-template-columns: repeat(var(--print-cols, 3), 1fr);
+        gap: 3.5mm;
+      }
+      .pv-card {
+        break-inside: avoid;
+        border: 1px solid #ddd;
+        border-radius: 5pt;
+        overflow: hidden;
+        background: #fff;
+      }
+      .pv-card-img {
+        width: 100%;
+        aspect-ratio: var(--card-img-ratio, 5/4);
+        object-fit: var(--card-img-fit, cover);
+        background: var(--card-img-bg, #f2f2f2);
+        display: block;
+      }
+      .pv-card-no-img {
+        width: 100%;
+        aspect-ratio: var(--card-img-ratio, 5/4);
+        background: #f2f2f2;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: #bbb;
+        font-size: 9pt;
+      }
+      .pv-card-body { padding: 2mm 3mm; }
+      .pv-card-name { font-size: 8.5pt; font-weight: 700; line-height: 1.25; margin-bottom: .5mm; }
+      .pv-card-sub { font-size: 7pt; color: #555; line-height: 1.3; }
+      .pv-card-divider { border: none; border-top: 1px solid #e8e8e8; margin: 1.5mm 0; }
+      .pv-card-row { display: flex; justify-content: space-between; font-size: 7pt; line-height: 1.5; }
+      .pv-card-row-lbl { color: #888; }
+      .pv-card-row-val { font-weight: 600; color: #111; }
+      .pv-roi-pos { color: #2a9d6a; }
+      .pv-roi-neg { color: #d94f4f; }
+    }
   </style>
 </head>
 <body>
@@ -1740,6 +1805,18 @@
               <button class="tip-btn" onclick="toggleTip(this)">i</button>
             </div>
             <div class="tip-box">Downloads your collection as a CSV spreadsheet. Includes all metadata fields. Photos are not included.</div>
+          </div>
+          <div class="tip-container" style="margin-top:6px">
+            <div class="ctrl-row">
+              <button class="settings-row-btn" onclick="printCollection();closeSettings()">
+                <span class="settings-row-icon">
+                  <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 6 2 18 2 18 9"/><path d="M6 18H4a2 2 0 01-2-2v-5a2 2 0 012-2h16a2 2 0 012 2v5a2 2 0 01-2 2h-2"/><rect x="6" y="14" width="12" height="8"/></svg>
+                </span>
+                Print Collection
+              </button>
+              <button class="tip-btn" onclick="toggleTip(this)">i</button>
+            </div>
+            <div class="tip-box">Prints an A4 layout of your collection sorted by value, matching your current photo format settings.</div>
           </div>
           <div class="tip-container" style="margin-top:6px;border-top:1px solid var(--border);padding-top:10px">
             <div class="ctrl-row">
@@ -3654,8 +3731,75 @@
       reader.readAsDataURL(file);
     });
   }
+
+  function printCollection() {
+    if (!items.length) { toast('Nothing to print'); return; }
+
+    const sym     = getCurrencySymbol();
+    const privacy = getPrivacyMode() === 'on';
+    const cols    = 3;
+
+    const totalPaid = items.reduce((s, it) => s + (parseFloat(it.paid)  || 0), 0);
+    const totalVal  = items.reduce((s, it) => s + (parseFloat(it.value) || 0), 0);
+    const roi       = totalPaid > 0 ? Math.round((totalVal - totalPaid) / totalPaid * 100) : null;
+
+    const fmtMoney = n => sym + n.toLocaleString(undefined, { minimumFractionDigits: 0 });
+
+    const sorted = [...items].sort((a, b) => (parseFloat(b.value) || 0) - (parseFloat(a.value) || 0));
+
+    const stats = [
+      { val: items.length, lbl: 'Items' },
+      ...(totalPaid && !privacy ? [{ val: fmtMoney(totalPaid), lbl: 'Total Paid' }]  : []),
+      ...(totalVal  && !privacy ? [{ val: fmtMoney(totalVal),  lbl: 'Est. Value' }]  : []),
+      ...(roi !== null && !privacy ? [{ val: (roi >= 0 ? '+' : '') + roi + '%', lbl: 'Return', cls: roi >= 0 ? 'pv-roi-pos' : 'pv-roi-neg' }] : []),
+    ].map(s => `<div class="pv-stat"><span class="pv-stat-val ${s.cls || ''}">${s.val}</span><span class="pv-stat-lbl">${s.lbl}</span></div>`).join('');
+
+    const cards = sorted.map(it => {
+      const name    = it.signers && it.signers.length > 1 ? it.signers.join(', ') : (it.signers ? it.signers[0] : it.name || '');
+      const imgHtml = it.imgs && it.imgs[0]
+        ? `<img class="pv-card-img" src="${it.imgs[0]}" alt="${escHtml(name)}">`
+        : `<div class="pv-card-no-img">No photo</div>`;
+
+      let rows = '';
+      if (it.certNum) {
+        const co = it.certCompany ? CERT_LABELS[it.certCompany] : 'Cert';
+        rows += `<div class="pv-card-row"><span class="pv-card-row-lbl">${escHtml(co || 'Cert')} #</span><span class="pv-card-row-val">${escHtml(it.certNum)}</span></div>`;
+      }
+      if (it.paid && !privacy)  rows += `<div class="pv-card-row"><span class="pv-card-row-lbl">Paid</span><span class="pv-card-row-val">${escHtml(fmt(it.paid))}</span></div>`;
+      if (it.value && !privacy) rows += `<div class="pv-card-row"><span class="pv-card-row-lbl">Est. Value</span><span class="pv-card-row-val">${escHtml(fmt(it.value))}</span></div>`;
+      if (it.paid && it.value && !privacy) {
+        const r = Math.round((parseFloat(it.value) - parseFloat(it.paid)) / parseFloat(it.paid) * 100);
+        if (!isNaN(r)) rows += `<div class="pv-card-row"><span class="pv-card-row-lbl">ROI</span><span class="pv-card-row-val ${r >= 0 ? 'pv-roi-pos' : 'pv-roi-neg'}">${r >= 0 ? '+' : ''}${r}%</span></div>`;
+      }
+
+      return `<div class="pv-card">
+        ${imgHtml}
+        <div class="pv-card-body">
+          <div class="pv-card-name">${escHtml(name)}</div>
+          ${it.character ? `<div class="pv-card-sub">${escHtml(it.character)}</div>` : ''}
+          ${it.film ? `<div class="pv-card-sub">${escHtml(it.film)}</div>` : ''}
+          ${rows ? `<hr class="pv-card-divider">${rows}` : ''}
+        </div>
+      </div>`;
+    }).join('');
+
+    const date = new Date().toLocaleDateString(undefined, { year: 'numeric', month: 'long', day: 'numeric' });
+
+    const view = document.getElementById('printView');
+    view.style.setProperty('--print-cols', cols);
+    view.innerHTML = `
+      <div class="pv-header">
+        <div class="pv-logo">Auto<span>Gallery</span></div>
+        <div class="pv-stats">${stats}</div>
+      </div>
+      <div class="pv-date">Generated ${date}</div>
+      <div class="pv-grid">${cards}</div>`;
+
+    window.print();
+  }
 </script>
 
+<div id="printView"></div>
 <div id="batchDropOverlay">
   <div class="batch-drop-box">
     <div class="batch-drop-icon">🖼️</div>

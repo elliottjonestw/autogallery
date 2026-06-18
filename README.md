@@ -19,13 +19,14 @@ A single-file, no-backend browser app for managing an autograph and memorabilia 
 11. [Presentation Mode](#presentation-mode)
 12. [Settings Modal](#settings-modal)
 13. [Import & Export](#import--export)
-14. [Sharing a Collection](#sharing-a-collection)
-15. [View Mode](#view-mode)
-16. [Light & Dark Mode](#light--dark-mode)
-17. [Mobile Behavior](#mobile-behavior)
-18. [Data Storage](#data-storage)
-19. [Item Schema](#item-schema)
-20. [Technical Notes](#technical-notes)
+14. [Print Layout](#print-layout)
+15. [Sharing a Collection](#sharing-a-collection)
+16. [View Mode](#view-mode)
+17. [Light & Dark Mode](#light--dark-mode)
+18. [Mobile Behavior](#mobile-behavior)
+19. [Data Storage](#data-storage)
+20. [Item Schema](#item-schema)
+21. [Technical Notes](#technical-notes)
 
 ---
 
@@ -510,7 +511,7 @@ A dropdown to choose which site signer names and film/show titles link to in the
 
 ### Data Tab
 
-Seven row buttons, each with its own `(i)` tooltip on the right:
+Eight row buttons, each with its own `(i)` tooltip on the right:
 
 - **Export Collection** — downloads the full collection as a `.json` file. See [Import & Export](#import--export).
 - **Import Collection** — opens a file picker to load a previously exported `.json` file, **replacing** the current collection. See [Import & Export](#import--export).
@@ -518,6 +519,7 @@ Seven row buttons, each with its own `(i)` tooltip on the right:
 - **Batch Import Photos** — opens a multi-file picker to select multiple images at once. Creates one stub item per image, using the filename (minus extension) as the signer name, with all other fields blank to fill in later. You can also drag image files directly onto the page anywhere outside the form to trigger the same flow. See [Import & Export](#import--export).
 - **Copy Share Link** — uploads the collection to dpaste.com and copies a short shareable URL to the clipboard. See [Sharing a Collection](#sharing-a-collection).
 - **Download CSV** — downloads all item metadata as a `.csv` spreadsheet (photos are not included). Columns cover every field: signers, character, film, item type, cert number, cert company, condition, paid, estimated value, value URL, tags, signing event, signing date, acquired how, location, notes, and date added. Paid and Est. Value column headers include the local currency code. Values containing commas or quotes are properly escaped.
+- **Print Collection** — generates and opens a print-ready A4 layout of the collection. See [Print Layout](#print-layout).
 - **Reset Collection** — permanently deletes your entire collection (items and photos) from both localStorage and IndexedDB, and returns the gallery to the empty state. A confirmation dialog is shown first. Separated from the other buttons by a divider and labelled in red to signal it is destructive. Export a backup first if you want to keep your data.
 
 > ⚠️ In [View Mode](#view-mode) the Data tab shows a single **Save as My Collection** button instead of the backup and share buttons.
@@ -577,6 +579,39 @@ Changing either currency in the settings modal:
 2. Clears any cached exchange rate (to prevent stale rates when the currency pair changes)
 3. Triggers a fresh `fetchExchangeRate()` call
 4. Re-renders the gallery with the new rate once it arrives
+
+---
+
+## Print Layout
+
+Click **Print Collection** in the Settings Modal (⚙️ → Data) to generate a print-ready A4 layout of your collection and open the browser's print dialog.
+
+### Layout
+
+The page is formatted for **A4 paper** (`@page { size: A4; margin: 12mm 14mm }`).
+
+**Header** (top of the page):
+
+- **AutoGallery** logo (left) with the same gold/dark two-tone styling as the app header
+- Summary statistics (right): total item count, total paid, estimated value, and overall ROI — in the display currency. Monetary stats are omitted if Privacy Mode is on.
+- **Generated [date]** — a timestamp line below the header rule, right-aligned.
+
+**Card grid:**
+
+- **3 columns**, regardless of the current screen column setting.
+- Items are sorted **by estimated value, high to low** (independent of the active gallery sort).
+- Each card mirrors the grid view layout:
+  - Photo at the top, using the current **Photo Format** aspect ratio and **Image Fit** mode from Display settings.
+  - Signer name in bold, followed by character name and film/show title on separate lines.
+  - A thin divider, then rows for Cert #, Paid, Est. Value, and ROI — each label on the left, value on the right. Monetary rows are omitted if Privacy Mode is on.
+- Cards with no photo show a "No photo" placeholder in the image area.
+- Cards use `break-inside: avoid` so a single card is never split across two pages.
+
+### Notes
+
+- The print layout is generated fresh each time — it reflects the current collection and settings at the moment you click the button.
+- Privacy Mode is respected: if enabled, Paid, Est. Value, and ROI are omitted from both the summary header and individual cards.
+- The print CSS applies only inside `@media print` and has no effect on the normal browser view.
 
 ---
 
