@@ -2042,7 +2042,7 @@
       det_est_val: 'Estimated Value', det_signing_date: 'Signing Date',
       det_signing_event: 'Signing Event', det_acquired: 'Acquired',
       det_location: 'Location', det_tags: 'Tags', det_added: 'Added',
-      description: 'Description', copy: 'Copy', edit: 'Edit', delete: 'Delete',
+      description: 'Description', description_sub: 'Auto-generated from item details.', copy: 'Copy', edit: 'Edit', delete: 'Delete',
       form_add_title: 'Add Item', form_edit_title: 'Edit Item',
       add_photo: 'Add photo', add_photo_more: 'Add',
       lbl_photos: 'Photos', lbl_character: 'Character', lbl_film: 'Film / Show',
@@ -2125,7 +2125,7 @@
       det_est_val: '估計價值', det_signing_date: '簽名日期',
       det_signing_event: '簽名活動', det_acquired: '取得方式',
       det_location: '存放位置', det_tags: '標籤', det_added: '新增於',
-      description: '描述', copy: '複製', edit: '編輯', delete: '刪除',
+      description: '描述', description_sub: '根據項目資料自動產生。', copy: '複製', edit: '編輯', delete: '刪除',
       form_add_title: '新增項目', form_edit_title: '編輯項目',
       add_photo: '新增相片', add_photo_more: '新增',
       lbl_photos: '相片', lbl_character: '角色', lbl_film: '電影／影集',
@@ -3191,14 +3191,15 @@
     }
     html += '</div>';
     if (item.notes) html += `<div class="detail-notes">${escHtml(item.notes)}</div>`;
-    html += `<div class="detail-date">${t('det_added')} ${new Date(item.added).toLocaleDateString(undefined, {year:'numeric',month:'long',day:'numeric'})}</div>`;
     html += `<div class="detail-desc">
       <div class="detail-desc-header">
         <span class="detail-desc-label">${t('description')}</span>
         <button class="detail-desc-copy" onclick="copyEbayDesc(this)">${t('copy')}</button>
       </div>
+      <p style="margin:0 0 8px;font-size:12px;color:var(--sub)">${t('description_sub')}</p>
       <textarea class="detail-desc-textarea" id="ebayDescText" oninput="this.style.height='auto';this.style.height=this.scrollHeight+'px'">${escHtml(buildEbayDescription(item))}</textarea>
     </div>`;
+    html += `<div class="detail-date">${t('det_added')} ${new Date(item.added).toLocaleDateString(undefined, {year:'numeric',month:'long',day:'numeric'})}</div>`;
 
     document.getElementById('dBody').innerHTML = html;
     const _ta = document.getElementById('ebayDescText');
@@ -3581,10 +3582,10 @@
   async function shareCollectionWithPhotos() {
     if (!items.length) { toast('Nothing to share'); return; }
     const btn = document.getElementById('sharePhotosBtn');
-    const txtNode = [...btn.childNodes].find(n => n.nodeType === 3 && n.textContent.trim());
-    const originalText = txtNode.textContent;
+    const txtSpan = btn.querySelector('[data-i18n]');
+    const originalText = txtSpan.textContent;
     btn.disabled = true;
-    txtNode.textContent = ' Uploading…';
+    txtSpan.textContent = ' Uploading…';
     const payload = { currency: getLocalCurrency(), settings: collectSettings(), items };
     try {
       const fd = new FormData();
@@ -3601,7 +3602,7 @@
       toast('⚠️ Upload failed — check your connection');
     } finally {
       btn.disabled = false;
-      txtNode.textContent = originalText;
+      txtSpan.textContent = originalText;
     }
   }
 
