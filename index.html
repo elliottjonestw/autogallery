@@ -3617,7 +3617,14 @@
   function renderTable(res) {
     const tbody = document.getElementById('agTableBody');
     if (!res.length) {
-      tbody.innerHTML = `<tr><td colspan="8" style="text-align:center;padding:60px;color:var(--sub)">${items.length ? 'No matches' : 'No items yet'}</td></tr>`;
+      tbody.innerHTML = `<tr><td colspan="8">
+        <div class="empty">
+          <div class="empty-icon">✍️</div>
+          <div class="empty-title">${items.length ? t('no_matches') : t('empty_title')}</div>
+          <div class="empty-sub">${items.length ? t('no_matches_sub') : t('empty_sub')}</div>
+          ${!items.length ? `<div style="display:flex;gap:10px;justify-content:center"><button class="btn-add" onclick="openAdd()">${t('add_item')}</button><button class="btn-secondary" style="height:36px" onclick="loadDemoData()">${t('load_demo')}</button></div>` : ''}
+        </div>
+      </td></tr>`;
       return;
     }
     tbody.innerHTML = res.map(item => {

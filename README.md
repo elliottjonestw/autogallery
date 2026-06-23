@@ -230,6 +230,7 @@ An alternative view available on desktop. Items are shown as rows in a sortable 
 - Clicking any **row** opens the **Item Detail Modal** for that item.
 - Clicking the **Est. Value link**, **Cert link**, **Signer link**, or **Detail 2 link** opens the URL in a new tab without opening the detail modal (click propagation is stopped).
 - Rows have a hover background highlight.
+- When the collection is empty or a search/filter returns no results, the table body shows the same empty state as the grid view: an icon, a title, a subtitle, and (on a completely empty collection) the **+ Add Item** and **Load Demo Collection** buttons.
 
 ---
 
