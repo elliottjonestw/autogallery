@@ -548,6 +548,25 @@ A dropdown to choose which site signer names and Detail 2 values link to in the 
 - Saved to `localStorage` (`ag_info_link`). Takes effect immediately (gallery re-renders on change).
 - Links appear in **table view** (Signer column, Film / Show column) and **detail modal** (Signer row, Film / Show row). Grid card text is plain — no links.
 
+#### Grid View Visibility
+
+A set of checkboxes that control which elements are shown on each card in the grid view. All are **checked (visible) by default**. Changes take effect immediately without closing Settings.
+
+| Checkbox | Controls |
+|---|---|
+| **Image** | The photo area (including the "no photo" placeholder when no image is uploaded) |
+| **Signer's Name** | The signer name in bold at the top of the card body |
+| **Detail 1** | The first contextual field (e.g. character name, player name) |
+| **Detail 2** | The second contextual field (e.g. film/show, team, album) |
+| **Cert #** | The certificate number row (only shown when a cert number is set) |
+| **Paid** | The amount paid row |
+| **Est. Value** | The estimated value row |
+| **ROI** | The return on investment percentage row |
+
+- Each setting is saved individually to `localStorage` (`ag_grid_image`, `ag_grid_signer`, `ag_grid_detail1`, `ag_grid_detail2`, `ag_grid_cert`, `ag_grid_paid`, `ag_grid_value`, `ag_grid_roi`). Values are `"1"` (visible) or `"0"` (hidden); absence of a key means visible (default).
+- These settings are included in Export/Import and shared collections.
+- Hiding a field only affects the grid card display — the field still exists on the item and appears in the detail modal, table view, and exports.
+
 ---
 
 ### Data Tab
@@ -941,6 +960,14 @@ AutoGallery uses a **hybrid storage model**: lightweight item metadata and prefe
 | `ag_sort` | String | Saved sort mode (e.g. `"date-desc"`, `"custom"`) |
 | `ag_custom_order` | JSON string | Array of item IDs representing the user-defined custom sort sequence |
 | `ag_lang` | String | Saved language preference (e.g. `"en"`, `"zh-TW"`). Only present when the user has manually selected a language — absence means auto-detect from browser. |
+| `ag_grid_image` | String | Grid card image visibility: `"1"` (visible) or `"0"` (hidden). Absent = visible. |
+| `ag_grid_signer` | String | Grid card signer name visibility: `"1"` or `"0"`. Absent = visible. |
+| `ag_grid_detail1` | String | Grid card Detail 1 field visibility: `"1"` or `"0"`. Absent = visible. |
+| `ag_grid_detail2` | String | Grid card Detail 2 field visibility: `"1"` or `"0"`. Absent = visible. |
+| `ag_grid_cert` | String | Grid card Cert # row visibility: `"1"` or `"0"`. Absent = visible. |
+| `ag_grid_paid` | String | Grid card Paid row visibility: `"1"` or `"0"`. Absent = visible. |
+| `ag_grid_value` | String | Grid card Est. Value row visibility: `"1"` or `"0"`. Absent = visible. |
+| `ag_grid_roi` | String | Grid card ROI row visibility: `"1"` or `"0"`. Absent = visible. |
 
 ### IndexedDB (photos)
 
