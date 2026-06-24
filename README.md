@@ -127,7 +127,7 @@ The modal shows sections populated from values that actually exist in the curren
 | **Tags** | All tags used across the collection |
 | **Item Type** | All item types in the collection |
 | **Condition** | Condition grades, sorted from best to worst (Mint → Near Mint → Excellent → Very Good → Good → Fair → Poor) |
-| **Cert Company** | Authentication companies used (Beckett, PSA, JSA, SWAU) |
+| **Cert Type** | Authentication types used across the collection |
 | **Acquisition Method** | All acquisition methods in the collection |
 | **Signing Event** | All signing events or venues in the collection |
 | **Location** | All physical storage locations in the collection |
@@ -138,7 +138,7 @@ Each option is a toggleable chip. Click a chip to select it (turns gold); click 
 
 **Filter logic:**
 - Within a category — **OR**: an item matches if it has *any* of the selected values (e.g. tag "sci-fi" OR tag "horror")
-- Across categories — **AND**: an item must satisfy *all* active categories (e.g. tag "sci-fi" AND cert company "Beckett")
+- Across categories — **AND**: an item must satisfy *all* active categories (e.g. tag "sci-fi" AND cert type "PSA Authenticated")
 
 **Buttons:**
 - **Clear All** — removes all active filters and re-renders the full list
@@ -200,7 +200,7 @@ Each card from top to bottom:
    - **Detail 1** (e.g. character name, player name) — smaller, muted color, on its own line. Plain text.
    - **Detail 2** (e.g. film/show title, team name) — smaller, muted color, on its own line below Detail 1. Plain text.
    - A thin horizontal divider
-   - **Cert** label + a gold clickable link to the authentication company's verification page (if a cert company is selected). Clicking the link **also copies the cert number to the clipboard** and shows a toast. The link click does **not** open the detail modal.
+   - **Cert** label + a gold clickable link to the authentication company's verification page (if a cert type is selected). Clicking the link **also copies the cert number to the clipboard** and shows a toast. The link click does **not** open the detail modal.
    - **Paid** label + value (or `—` if not set)
    - **Est. Value** label + value; if a value URL is set, the value is a clickable gold link that opens the source in a new tab. The link click does **not** open the detail modal.
    - **ROI** label + percentage value, green or red. Only shown when both Paid and Est. Value are set.
@@ -249,7 +249,7 @@ Opened by clicking **+ Add Item** (new item) or **Edit** inside the detail modal
 | **Signer 1** | Text input | Required. The first (or only) autograph signer's real name. |
 | **+ button** | Button | Adds a Signer 2 field. Each additional signer row has a − button to remove it. There is no upper limit on the number of signers. |
 | **Cert #** | Text input | Optional. The authentication certificate number. |
-| **Cert Company** | Dropdown | Options: *(none)*, Beckett, PSA, JSA, SWAU. Controls the verification URL. |
+| **Cert Type** | Dropdown | Controls the verification URL linked from the cert number. See [Certification URL Derivation](#certification-url-derivation) for the full list of options and their URLs. |
 | **Paid** | Number input | Optional. What you paid, in your **local currency**. |
 | **Est. Value** | Number input | Optional. Current estimated market value, in your **local currency**. |
 | **Value Source URL** | Text input | Optional. A URL linking to a source for the estimated value (e.g. eBay sold listing). |
@@ -349,7 +349,7 @@ Clicking any card (grid) or row (table) opens a read-only detail view for that i
   - **Detail 2** — clickable link (Wikipedia or IMDb); label reflects the item type (e.g. "Film / Show", "Team", "Album")
   - Item Type — plain text (only shown if set)
   - Condition — plain text (only shown if set)
-  - Cert # — clickable link to the cert company's verification page. Clicking **also copies the cert number to the clipboard** and shows a toast confirmation.
+  - Cert # — clickable link to the cert type's verification page. Clicking **also copies the cert number to the clipboard** and shows a toast confirmation.
   - Paid (in display currency)
   - Est. Value (in display currency, with link if URL is set)
   - ROI — percentage, colored green or red. Only shown when both Paid and Est. Value are set.
@@ -371,7 +371,7 @@ A **Description** section appears at the bottom of every detail modal. It auto-g
 
 **Format:**
 
-> *[Signer(s)] ([Detail 1] in [Detail 2]) signed [item type]. Professionally authenticated by [Cert Company] (Certificate #[Cert #]). The [item type] is in [condition] condition. The [item type] was signed at [Signing Event] on [Date Signed].*
+> *[Signer(s)] ([Detail 1] in [Detail 2]) signed [item type]. Professionally authenticated by [Cert Type] (Certificate #[Cert #]). The [item type] is in [condition] condition. The [item type] was signed at [Signing Event] on [Date Signed].*
 
 Rules:
 - The signer name and Detail 1 / Detail 2 parenthetical open the description. For multi-signer items the parenthetical is omitted.
@@ -608,7 +608,7 @@ Eight row buttons, each with its own `(i)` tooltip on the right:
 - **Merge Import** — opens a file picker to load a `.json` file and **add** its items to the existing collection without replacing anything. Useful for combining collections. See [Import & Export](#import--export).
 - **Batch Import Photos** — opens a multi-file picker to select multiple images at once. Creates one stub item per image, using the filename (minus extension) as the signer name, with all other fields blank to fill in later. You can also drag image files directly onto the page anywhere outside the form to trigger the same flow. See [Import & Export](#import--export).
 - **Copy Share Link** — uploads the collection to dpaste.com and copies a short shareable URL to the clipboard. See [Sharing a Collection](#sharing-a-collection).
-- **Download CSV** — downloads all item metadata as a `.csv` spreadsheet (photos are not included). Columns cover every field: signers, **Detail 1**, **Detail 2**, item type, cert number, cert company, condition, paid, estimated value, value URL, tags, signing event, signing date, acquired how, location, notes, and date added. Paid and Est. Value column headers include the local currency code. Values containing commas or quotes are properly escaped.
+- **Download CSV** — downloads all item metadata as a `.csv` spreadsheet (photos are not included). Columns cover every field: signers, **Detail 1**, **Detail 2**, item type, cert number, cert type, condition, paid, estimated value, value URL, tags, signing event, signing date, acquired how, location, notes, and date added. Paid and Est. Value column headers include the local currency code. Values containing commas or quotes are properly escaped.
 - **Print Collection** — generates and opens a print-ready A4 layout of the collection. See [Print Layout](#print-layout).
 - **Reset Collection** — permanently deletes your entire collection (items and photos) from both localStorage and IndexedDB, and returns the gallery to the empty state. A confirmation dialog is shown first. Separated from the other buttons by a divider and labelled in red to signal it is destructive. Export a backup first if you want to keep your data.
 
@@ -1039,7 +1039,7 @@ Each item is a JavaScript object with the following fields:
 | `detail1` | string | First contextual field value — label depends on item type (e.g. character name, player name, artist, author). Optional, may be empty string. |
 | `detail2` | string | Second contextual field value — label depends on item type (e.g. film/show title, team name, album, title). Used as a Wikipedia/IMDb link target. Optional, may be empty string. |
 | `certNum` | string | Certificate number (optional, may be empty string) |
-| `certCompany` | string | One of: `"beckett"`, `"psa"`, `"jsa"`, `"swau"`, or `""` (none) |
+| `certCompany` | string | Stored code for the cert type (e.g. `"beckett"`, `"psa-witnessed"`, `"mlb"`). See [Certification URL Derivation](#certification-url-derivation) for all valid values. Empty string means none. |
 | `paid` | number \| null | Amount paid, in the local currency |
 | `value` | number \| null | Estimated current value, in the local currency |
 | `valueUrl` | string | URL to a value source (optional, may be empty string) |
@@ -1066,16 +1066,31 @@ The app uses only:
 
 ### Certification URL Derivation
 
-Cert company codes map to verification URLs as follows:
+Cert type codes map to display labels and verification URLs as follows:
 
-| Code | Company | Verification URL |
+| Code | Display label | Verification URL |
 |---|---|---|
-| `beckett` | Beckett | `https://www.beckett-authentication.com/verify-certificate` |
-| `psa` | PSA | `https://www.psacard.com/cert` |
-| `jsa` | JSA | `https://www.spenceloa.com/verify-authenticity` |
+| `beckett` | Beckett Authenticated | `https://www.beckett-authentication.com/verify-certificate` |
+| `beckett-witnessed` | Beckett Witnessed | `https://www.beckett-authentication.com/verify-certificate` |
+| `psa` | PSA Authenticated | `https://www.psacard.com/cert` |
+| `psa-witnessed` | PSA Witnessed | `https://www.psacard.com/cert` |
+| `jsa` | JSA Authenticated | `https://www.spenceloa.com/verify-authenticity` |
+| `jsa-witnessed` | JSA Witnessed | `https://www.spenceloa.com/verify-authenticity` |
+| `gai` | GAI Authenticated | *(no public cert lookup — cert # shown as plain text)* |
+| `gai-witnessed` | GAI Witnessed | *(no public cert lookup — cert # shown as plain text)* |
+| `sgc` | SGC Authenticated | *(no public cert lookup — cert # shown as plain text)* |
+| `sgc-witnessed` | SGC Witnessed | *(no public cert lookup — cert # shown as plain text)* |
+| `aga` | AGA Authenticated | *(no public cert lookup — cert # shown as plain text)* |
 | `swau` | SWAU | `https://auth.swau.com/pages/verify-hologram` |
+| `fanatics` | Fanatics Authentic | *(no public cert lookup — cert # shown as plain text)* |
+| `leaf` | Leaf Authentic | *(no public cert lookup — cert # shown as plain text)* |
+| `mlb` | MLB Authentication | `https://www.mlb.com/authentication` |
+| `panini` | Panini Authentic | *(no public cert lookup — cert # shown as plain text)* |
+| `steiner` | Steiner Sports | *(no public cert lookup — cert # shown as plain text)* |
+| `tristar` | Tristar | *(no public cert lookup — cert # shown as plain text)* |
+| `uda` | UDA | *(no public cert lookup — cert # shown as plain text)* |
 
-The URL is derived at render time from `item.certCompany`. No URL is stored in the item data — only the company code.
+The URL and display label are derived at render time from `item.certCompany` via `CERT_URLS` and `CERT_LABELS`. No URL or label is stored in the item data — only the code. When no URL exists for a cert type, the cert number is displayed as plain text rather than a clickable link.
 
 ### ROI Calculation
 

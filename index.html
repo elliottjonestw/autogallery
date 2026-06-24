@@ -1580,13 +1580,28 @@
           <input class="finput" id="fCertNum" placeholder="e.g. BD13964">
         </div>
         <div class="fg">
-          <label class="flabel" data-i18n="lbl_cert_co">Cert Company</label>
+          <label class="flabel" data-i18n="lbl_cert_co">Cert Type</label>
           <select class="finput" id="fCertCompany">
             <option value="" data-i18n="opt_none">— None —</option>
-            <option value="beckett">Beckett</option>
-            <option value="psa">PSA</option>
-            <option value="jsa">JSA</option>
+            <option value="beckett">Beckett Authenticated</option>
+            <option value="beckett-witnessed">Beckett Witnessed</option>
+            <option value="psa">PSA Authenticated</option>
+            <option value="psa-witnessed">PSA Witnessed</option>
+            <option value="jsa">JSA Authenticated</option>
+            <option value="jsa-witnessed">JSA Witnessed</option>
+            <option value="gai">GAI Authenticated</option>
+            <option value="gai-witnessed">GAI Witnessed</option>
+            <option value="sgc">SGC Authenticated</option>
+            <option value="sgc-witnessed">SGC Witnessed</option>
+            <option value="aga">AGA Authenticated</option>
             <option value="swau">SWAU</option>
+            <option value="fanatics">Fanatics Authentic</option>
+            <option value="leaf">Leaf Authentic</option>
+            <option value="mlb">MLB Authentication</option>
+            <option value="panini">Panini Authentic</option>
+            <option value="steiner">Steiner Sports</option>
+            <option value="tristar">Tristar</option>
+            <option value="uda">UDA</option>
           </select>
         </div>
       </div>
@@ -2463,14 +2478,14 @@
       add_photo: 'Add photo', add_photo_more: 'Add',
       lbl_photos: 'Photos', lbl_character: 'Character', lbl_film: 'Film / Show',
       lbl_item_type: 'Item Type', hint_item_type: 'If you can\'t find a suitable Item Type, select "Other".',
-      lbl_cert_num: 'Cert Number', lbl_cert_co: 'Cert Company',
+      lbl_cert_num: 'Cert Number', lbl_cert_co: 'Cert Type',
       lbl_amount_paid: 'Amount Paid', lbl_est_val: 'Est. Value', lbl_value_url: 'Value URL',
       lbl_notes: 'Notes', lbl_tags: 'Tags', lbl_advanced: 'Advanced Fields',
       lbl_signing_event: 'Signing Event / Venue', lbl_signing_date: 'Signing Date',
       lbl_acquired: 'Acquisition Method', lbl_condition: 'Condition', lbl_location: 'Physical Location',
       cancel: 'Cancel', save_item: 'Save Item',
       filt_tags: 'Tags', filt_item_type: 'Item Type', filt_condition: 'Condition',
-      filt_cert_co: 'Cert Company', filt_acquired: 'Acquisition Method',
+      filt_cert_co: 'Cert Type', filt_acquired: 'Acquisition Method',
       filt_event: 'Signing Event', filt_location: 'Physical Location',
       filt_film: 'Detail 2', filt_signer: 'Signer', filt_empty: 'No items to filter.',
       clear_all: 'Clear All', done: 'Done',
@@ -2589,14 +2604,14 @@
       add_photo: 'Agregar foto', add_photo_more: 'Agregar',
       lbl_photos: 'Fotos', lbl_character: 'Personaje', lbl_film: 'Película / Serie',
       lbl_item_type: 'Tipo de artículo', hint_item_type: 'Si no encuentras un tipo adecuado, selecciona "Otro".',
-      lbl_cert_num: 'Número de certificado', lbl_cert_co: 'Empresa certificadora',
+      lbl_cert_num: 'Número de certificado', lbl_cert_co: 'Tipo de certificación',
       lbl_amount_paid: 'Monto pagado', lbl_est_val: 'Valor est.', lbl_value_url: 'URL del valor',
       lbl_notes: 'Notas', lbl_tags: 'Etiquetas', lbl_advanced: 'Campos avanzados',
       lbl_signing_event: 'Evento / Lugar de firma', lbl_signing_date: 'Fecha de firma',
       lbl_acquired: 'Método de adquisición', lbl_condition: 'Estado', lbl_location: 'Ubicación física',
       cancel: 'Cancelar', save_item: 'Guardar artículo',
       filt_tags: 'Etiquetas', filt_item_type: 'Tipo de artículo', filt_condition: 'Estado',
-      filt_cert_co: 'Empresa certificadora', filt_acquired: 'Método de adquisición',
+      filt_cert_co: 'Tipo de certificación', filt_acquired: 'Método de adquisición',
       filt_event: 'Evento de firma', filt_location: 'Ubicación física',
       filt_film: 'Detalle 2', filt_signer: 'Firmante', filt_empty: 'No hay artículos para filtrar.',
       clear_all: 'Borrar todo', done: 'Listo',
@@ -2715,14 +2730,14 @@
       add_photo: '新增相片', add_photo_more: '新增',
       lbl_photos: '相片', lbl_character: '角色', lbl_film: '電影／影集',
       lbl_item_type: '項目類型', hint_item_type: '若找不到合適的項目類型，請選擇「其他」。',
-      lbl_cert_num: '證書編號', lbl_cert_co: '認證公司',
+      lbl_cert_num: '證書編號', lbl_cert_co: '認證類型',
       lbl_amount_paid: '購入金額', lbl_est_val: '估計價值', lbl_value_url: '價值來源網址',
       lbl_notes: '備註', lbl_tags: '標籤', lbl_advanced: '進階欄位',
       lbl_signing_event: '簽名活動／場地', lbl_signing_date: '簽名日期',
       lbl_acquired: '取得方式', lbl_condition: '品相', lbl_location: '實體位置',
       cancel: '取消', save_item: '儲存項目',
       filt_tags: '標籤', filt_item_type: '項目類型', filt_condition: '品相',
-      filt_cert_co: '認證公司', filt_acquired: '取得方式',
+      filt_cert_co: '認證類型', filt_acquired: '取得方式',
       filt_event: '簽名活動', filt_location: '存放位置',
       filt_film: '詳細 2', filt_signer: '簽名者', filt_empty: '無可篩選的項目。',
       clear_all: '清除全部', done: '完成',
@@ -3118,12 +3133,27 @@
 
   /* ── Cert company URL map ── */
   const CERT_URLS = {
-    beckett : 'https://www.beckett-authentication.com/verify-certificate',
-    psa     : 'https://www.psacard.com/cert',
-    jsa     : 'https://www.spenceloa.com/verify-authenticity',
-    swau    : 'https://auth.swau.com/pages/verify-hologram',
+    beckett            : 'https://www.beckett-authentication.com/verify-certificate',
+    'beckett-witnessed': 'https://www.beckett-authentication.com/verify-certificate',
+    psa                : 'https://www.psacard.com/cert',
+    'psa-witnessed'    : 'https://www.psacard.com/cert',
+    jsa                : 'https://www.spenceloa.com/verify-authenticity',
+    'jsa-witnessed'    : 'https://www.spenceloa.com/verify-authenticity',
+    swau               : 'https://auth.swau.com/pages/verify-hologram',
+    mlb                : 'https://www.mlb.com/authentication',
   };
-  const CERT_LABELS = { beckett: 'Beckett', psa: 'PSA', jsa: 'JSA', swau: 'SWAU' };
+  const CERT_LABELS = {
+    beckett: 'Beckett Authenticated', 'beckett-witnessed': 'Beckett Witnessed',
+    psa: 'PSA Authenticated', 'psa-witnessed': 'PSA Witnessed',
+    jsa: 'JSA Authenticated', 'jsa-witnessed': 'JSA Witnessed',
+    gai: 'GAI Authenticated', 'gai-witnessed': 'GAI Witnessed',
+    sgc: 'SGC Authenticated', 'sgc-witnessed': 'SGC Witnessed',
+    aga: 'AGA Authenticated',
+    swau: 'SWAU',
+    fanatics: 'Fanatics Authentic', leaf: 'Leaf Authentic',
+    mlb: 'MLB Authentication', panini: 'Panini Authentic',
+    steiner: 'Steiner Sports', tristar: 'Tristar', uda: 'UDA',
+  };
 
   function getCertUrl(item) {
     return CERT_URLS[item.certCompany] || null;
@@ -4113,7 +4143,7 @@
     const currency = localStorage.getItem('ag_currency') || '';
     const headers = [
       'Signer(s)', 'Detail 1', 'Detail 2', 'Item Type',
-      'Cert #', 'Cert Company', 'Condition',
+      'Cert #', 'Cert Type', 'Condition',
       `Paid (${currency})`, `Est. Value (${currency})`, 'Value URL',
       'Tags', 'Signing Event', 'Signing Date', 'Acquired How',
       'Location', 'Notes', 'Date Added',
