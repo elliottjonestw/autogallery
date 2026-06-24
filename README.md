@@ -631,11 +631,15 @@ If local and display currencies differ, a live exchange rate is fetched from the
 
 #### Currency Options
 
-Both dropdowns offer the same list of currencies:
+Both dropdowns offer 152 currencies covering all national currencies, organized into two optgroup sections:
+
+**Popular** — the 11 most commonly used currencies, shown at the top:
 
 `USD`, `GBP`, `EUR`, `TWD`, `JPY`, `CNY`, `AUD`, `CAD`, `HKD`, `SGD`, `KRW`
 
-Each is shown with its symbol in the UI: `$`, `£`, `€`, `NT$`, `¥`, `¥`, `A$`, `CA$`, `HK$`, `S$`, `₩`.
+**Other** — all remaining national currencies in alphabetical order by ISO 4217 code, shown with their full name for identification (e.g. `BRL — R$ (Brazilian Real)`, `INR — ₹ (Indian Rupee)`).
+
+The optgroup labels ("Popular" / "Other") are translated along with the rest of the UI when the language is changed.
 
 #### Exchange Rate
 
