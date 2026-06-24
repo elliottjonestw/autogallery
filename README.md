@@ -1,4 +1,4 @@
-# AutoGallery
+# autographed.app
 
 A single-file, no-backend browser app for managing an autograph and memorabilia collection. All data is stored locally in the browser — nothing is ever sent to a server.
 
@@ -32,7 +32,7 @@ A single-file, no-backend browser app for managing an autograph and memorabilia 
 
 ## Overview
 
-AutoGallery is a **single HTML file** (`index.html`). There is no server, no database, no external JavaScript libraries, and no external CSS files. Everything — markup, styles, and logic — lives inside one self-contained file.
+autographed.app is a **single HTML file** (`index.html`). There is no server, no database, no external JavaScript libraries, and no external CSS files. Everything — markup, styles, and logic — lives inside one self-contained file.
 
 Key characteristics:
 
@@ -62,7 +62,7 @@ The header is sticky — it stays at the top of the viewport while you scroll. I
 
 ### Logo
 
-**Auto**Gallery — "Auto" is styled in gold, "Gallery" in the default text color.
+**autographed**.app — "autographed" is styled in gold, ".app" in the default text color.
 
 ### Header Controls (right side, left to right)
 
@@ -138,7 +138,7 @@ Each option is a toggleable chip. Click a chip to select it (turns gold); click 
 
 **Filter logic:**
 - Within a category — **OR**: an item matches if it has *any* of the selected values (e.g. tag "sci-fi" OR tag "horror")
-- Across categories — **AND**: an item must satisfy *all* active categories (e.g. tag "sci-fi" AND cert type "PSA Authenticated")
+- Across categories — **AND**: an item must satisfy *all* active categories (e.g. tag "sci-fi" AND cert type "PSA/DNA Authenticated")
 
 **Buttons:**
 - **Clear All** — removes all active filters and re-renders the full list
@@ -620,7 +620,7 @@ Eight row buttons, each with its own `(i)` tooltip on the right:
 
 #### Two-Currency System
 
-AutoGallery separates **where you record values** from **how you display them**:
+autographed.app separates **where you record values** from **how you display them**:
 
 | Currency | Purpose |
 |---|---|
@@ -686,7 +686,7 @@ The page is formatted for **A4 paper** (`@page { size: A4; margin: 12mm 14mm }`)
 
 **Header** (top of the page):
 
-- **AutoGallery** logo (left) with the same gold/dark two-tone styling as the app header
+- **autographed.app** logo (left) with the same gold/dark two-tone styling as the app header
 - Summary statistics (right): total item count, total paid, estimated value, and overall ROI — in the display currency. Monetary stats are omitted if Privacy Mode is on.
 - **Generated [date]** — a timestamp line below the header rule, right-aligned.
 
@@ -711,7 +711,7 @@ The page is formatted for **A4 paper** (`@page { size: A4; margin: 12mm 14mm }`)
 
 ## Sharing a Collection
 
-AutoGallery can generate a short URL that lets anyone view your collection in their own browser — no account, no app install required.
+autographed.app can generate a short URL that lets anyone view your collection in their own browser — no account, no app install required.
 
 ### How to Share
 
@@ -723,7 +723,7 @@ AutoGallery can generate a short URL that lets anyone view your collection in th
    ```
    http://localhost:4200/index.html#blob=G9GW3KB53
    ```
-5. Send that URL to anyone. When they open it, AutoGallery loads and immediately displays your collection in read-only [View Mode](#view-mode)
+5. Send that URL to anyone. When they open it, autographed.app loads and immediately displays your collection in read-only [View Mode](#view-mode)
 
 ### What Gets Uploaded
 
@@ -733,7 +733,7 @@ The **entire collection** is included — all item fields, all photos, and all u
 
 ### How the URL Works
 
-The URL contains only a short blob ID in the hash fragment (`#blob=<id>`). The hash is never sent to the server hosting AutoGallery — it is processed entirely in the browser. When someone opens the URL:
+The URL contains only a short blob ID in the hash fragment (`#blob=<id>`). The hash is never sent to the server hosting autographed.app — it is processed entirely in the browser. When someone opens the URL:
 
 1. The app detects `#blob=<id>` in the URL hash on page load
 2. It immediately shows a full-page loading spinner ("Loading shared collection…")
@@ -743,11 +743,11 @@ The URL contains only a short blob ID in the hash fragment (`#blob=<id>`). The h
 
 ### Loading in the Same Tab
 
-If AutoGallery is already open and you paste a share URL into the browser's address bar (changing only the hash), the app detects the `hashchange` event and loads the shared collection without a full page reload.
+If autographed.app is already open and you paste a share URL into the browser's address bar (changing only the hash), the app detects the `hashchange` event and loads the shared collection without a full page reload.
 
 ### Paste Expiry
 
-dpaste.com pastes created by AutoGallery are set to expire after **365 days**. After that, the share URL will stop working. There is no way to renew a paste — generate a new share link if needed.
+dpaste.com pastes created by autographed.app are set to expire after **365 days**. After that, the share URL will stop working. There is no way to renew a paste — generate a new share link if needed.
 
 ### Error Handling
 
@@ -863,7 +863,7 @@ The theme toggle lives inside the **Settings Modal** under the Appearance sectio
 
 ### Export
 
-Click **Export Collection** in the Settings Modal (⚙️ → Data). The browser downloads a `.json` file named with today's date (e.g. `autogallery-2024-11-15.json`).
+Click **Export Collection** in the Settings Modal (⚙️ → Data). The browser downloads a `.json` file named with today's date (e.g. `autographed-2024-11-15.json`).
 
 **File format:**
 
@@ -974,13 +974,13 @@ The app is designed to work on small screens. On viewports **640px wide or narro
 
 ## Data Storage
 
-AutoGallery uses a **hybrid storage model**: lightweight item metadata and preferences live in `localStorage`, while the bulky photo data lives in **IndexedDB**. This keeps the collection from being capped by the small `localStorage` quota once you add lots of images.
+autographed.app uses a **hybrid storage model**: lightweight item metadata and preferences live in `localStorage`, while the bulky photo data lives in **IndexedDB**. This keeps the collection from being capped by the small `localStorage` quota once you add lots of images.
 
 ### localStorage (metadata & preferences)
 
 | Key | Type | Contents |
 |---|---|---|
-| `autogallery_v2` | JSON string | Array of all item objects, **without** the `imgs` photo data (photos are stored separately in IndexedDB) |
+| `autographed_v2` | JSON string | Array of all item objects, **without** the `imgs` photo data (photos are stored separately in IndexedDB) |
 | `ag_currency` | String | Local currency code (e.g. `"TWD"`) |
 | `ag_display_currency` | String | Display currency code (e.g. `"USD"`) |
 | `ag_rate_cache` | JSON string | Cached exchange rate: `{from, to, rate, ts}` |
@@ -1008,21 +1008,21 @@ AutoGallery uses a **hybrid storage model**: lightweight item metadata and prefe
 
 | Database | Object store | Key | Value |
 |---|---|---|---|
-| `autogallery` | `images` | item `id` | The item's `imgs` array (base64 JPEG data URLs) |
+| `autographed` | `images` | item `id` | The item's `imgs` array (base64 JPEG data URLs) |
 
 At runtime, each item still carries its `imgs` array in memory, so all rendering, export, import, and share logic is unchanged. Photos only cross the storage boundary in two places: `load()` reads them from IndexedDB and reattaches them to each item, and `persist()` writes metadata to `localStorage` and syncs photos to IndexedDB (deleting records for items that no longer exist).
 
 ### Automatic migration
 
-On first load after upgrading from a localStorage-only version, AutoGallery detects photos stored inline in `localStorage`, moves them into IndexedDB, and rewrites the `localStorage` item array without the image data. This happens transparently — no user action is needed, and nothing is lost.
+On first load after upgrading from a localStorage-only version, autographed.app detects photos stored inline in `localStorage`, moves them into IndexedDB, and rewrites the `localStorage` item array without the image data. This happens transparently — no user action is needed, and nothing is lost.
 
-AutoGallery also automatically migrates items that used the older `character` and `film` field names (from before the Item Type redesign) to the new `detail1` and `detail2` names. This runs on first load and on import — the renamed fields are written back to storage immediately. No data is lost in the process.
+autographed.app also automatically migrates items that used the older `character` and `film` field names (from before the Item Type redesign) to the new `detail1` and `detail2` names. This runs on first load and on import — the renamed fields are written back to storage immediately. No data is lost in the process.
 
 ### Storage limits
 
 - **IndexedDB** typically allows hundreds of MB up to several GB per origin (browsers permit roughly 50–60% of free disk space), so photo-heavy collections are no longer constrained the way they were under `localStorage`.
 - Item photos are still stored as base64-encoded JPEGs (compressed to max 900px at 0.82 quality), roughly 100–400 KB each.
-- **Fallback:** if IndexedDB is unavailable (e.g. some private-browsing modes or very old browsers), AutoGallery automatically falls back to the original behavior of storing photos inline in `localStorage`, and shows a notice. In that mode the older 5–10 MB `localStorage` limit applies.
+- **Fallback:** if IndexedDB is unavailable (e.g. some private-browsing modes or very old browsers), autographed.app automatically falls back to the original behavior of storing photos inline in `localStorage`, and shows a notice. In that mode the older 5–10 MB `localStorage` limit applies.
 
 ---
 
@@ -1181,4 +1181,4 @@ let viewLocalCurrency = null;  // the sharer's local currency, used for conversi
 window.addEventListener('hashchange', checkShareURL);
 ```
 
-This single listener means share URLs work whether the page is freshly loaded or already open. When the user pastes a share URL into the address bar while AutoGallery is already running, the browser fires `hashchange` and `checkShareURL` handles it identically to the initial page load case. The hash is immediately cleared via `history.replaceState` so the loaded state is not tied to the URL.
+This single listener means share URLs work whether the page is freshly loaded or already open. When the user pastes a share URL into the address bar while autographed.app is already running, the browser fires `hashchange` and `checkShareURL` handles it identically to the initial page load case. The hash is immediately cleared via `history.replaceState` so the loaded state is not tied to the URL.

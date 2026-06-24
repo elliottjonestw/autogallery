@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>AutoGallery</title>
+  <title>autographed.app</title>
   <style>
     :root {
       --bg: #0c0c10;
@@ -1389,7 +1389,7 @@
 <body>
 
 <header>
-  <div class="logo">Auto<span>Gallery</span></div>
+  <div class="logo">autographed<span>.app</span></div>
   <div class="header-right">
     <button class="btn-icon" id="privacyRevealBtn" title="Reveal values" style="display:none" onclick="setPrivacyMode('off')">
       <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
@@ -2344,7 +2344,7 @@
 </div>
 
 <script>
-  const KEY = 'autogallery_v2';
+  const KEY = 'autographed_v2';
   let items = [];
   let viewMode = false;
   let viewLocalCurrency = null;
@@ -3167,7 +3167,7 @@
      here, so a collection isn't capped by the ~5 MB localStorage limit. In
      memory each item still carries its `imgs` array, so every rendering / export
      / share path is unchanged — only load() and persist() cross this boundary. */
-  const IDB_NAME  = 'autogallery';
+  const IDB_NAME  = 'autographed';
   const IDB_STORE = 'images';
   let _idbPromise = null;
   let idbBroken   = false;   // set if IndexedDB is unavailable → fall back to inline localStorage
@@ -4131,7 +4131,7 @@
     const blob = new Blob([JSON.stringify(payload, null, 2)], { type: 'application/json' });
     const a    = document.createElement('a');
     a.href     = URL.createObjectURL(blob);
-    a.download = `autogallery-${new Date().toISOString().slice(0,10)}.json`;
+    a.download = `autographed-${new Date().toISOString().slice(0,10)}.json`;
     a.click();
     URL.revokeObjectURL(a.href);
     toast('Collection exported');
@@ -4178,7 +4178,7 @@
     const blob = new Blob([rows.join('\r\n')], { type: 'text/csv' });
     const a    = document.createElement('a');
     a.href     = URL.createObjectURL(blob);
-    a.download = `autogallery-${new Date().toISOString().slice(0, 10)}.csv`;
+    a.download = `autographed-${new Date().toISOString().slice(0, 10)}.csv`;
     a.click();
     URL.revokeObjectURL(a.href);
     toast('CSV downloaded');
@@ -4815,7 +4815,7 @@
     view.style.setProperty('--print-cols', cols);
     view.innerHTML = `
       <div class="pv-header">
-        <div class="pv-logo">Auto<span>Gallery</span></div>
+        <div class="pv-logo">autographed<span>.app</span></div>
         <div class="pv-stats">${stats}</div>
       </div>
       <div class="pv-date">${t('print_generated')} ${date}</div>
