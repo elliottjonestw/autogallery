@@ -1728,6 +1728,7 @@
           <div class="ctrl-row">
             <select class="finput" id="settingsLang" onchange="setLang(this.value)">
               <option value="en">English</option>
+              <option value="de">Deutsch</option>
               <option value="es">Español</option>
               <option value="zh-TW">繁體中文</option>
             </select>
@@ -2779,6 +2780,132 @@
       tip_display_currency: '在收藏介面中顯示的貨幣。若與本地貨幣不同，價值將自動換算。',
       tip_exchange_rate: '顯示本地貨幣與顯示貨幣之間的目前匯率。匯率快取有效期為 1 小時。',
     },
+    de: {
+      lbl_items: 'Objekte', lbl_total_paid: 'Gesamt gezahlt', lbl_est_value: 'Gesch. Wert', lbl_return: 'Rendite',
+      search_ph: 'Name, Charakter, Film suchen…',
+      filter_btn: 'Filtern',
+      sort_newest: 'Neueste zuerst', sort_oldest: 'Älteste zuerst', sort_name: 'Name A–Z',
+      sort_value: 'Wert: Hoch–Niedrig', sort_paid: 'Bezahlt: Hoch–Niedrig', sort_roi: 'Beste Rendite', sort_custom: 'Benutzerdefiniert',
+      cols_3: '3 pro Reihe', cols_4: '4 pro Reihe', cols_5: '5 pro Reihe',
+      cols_6: '6 pro Reihe', cols_7: '7 pro Reihe', cols_8: '8 pro Reihe',
+      no_photo: 'Kein Foto', multiple_signers: 'Mehrere Unterzeichner',
+      cert_lbl: 'Zert. #', paid_lbl: 'Bezahlt', est_val_lbl: 'Gesch. Wert', roi_lbl: 'Rendite',
+      no_matches: 'Keine Treffer', no_matches_sub: 'Versuche einen anderen Suchbegriff',
+      empty_title: 'Deine Sammlung ist leer', empty_sub: 'Füge dein erstes signiertes Objekt hinzu',
+      add_item: '+ Objekt hinzufügen', load_demo: 'Beispielsammlung laden',
+      viewing_shared: '👁 Geteilte Sammlung wird angezeigt — deine Sammlung ist unverändert',
+      back_to_mine: '← Zurück zu meiner Sammlung',
+      settings_title: 'Einstellungen', tab_display: 'Anzeige', tab_data: 'Daten', tab_currency: 'Währung',
+      lbl_appearance: 'Erscheinungsbild', switch_dark: 'Zum Dunkelmodus wechseln', switch_light: 'Zum Hellmodus wechseln',
+      lbl_photo_format: 'Fotoformat',
+      fmt_8x10L: '8×10 Querformat', fmt_8x10P: '8×10 Hochformat',
+      fmt_5x7L: '5×7 Querformat', fmt_5x7P: '5×7 Hochformat',
+      fmt_4x6L: '4×6 Querformat', fmt_4x6P: '4×6 Hochformat',
+      fmt_3x5: 'Karteikarte (3×5)', fmt_trading: 'Sammelkarte (2,5×3,5)', fmt_square: 'Quadratisch (1×1)',
+      lbl_image_fit: 'Bildanpassung',
+      fit_cover: 'Zuschneiden', fit_contain: 'Anpassen (Balken)', fit_blurbg: 'Anpassen (unscharfer Hintergrund)',
+      lbl_info_links: 'Infolinks', lbl_privacy: 'Datenschutzmodus',
+      privacy_off: 'Aus', privacy_on: 'Ein — Geldwerte ausblenden',
+      lbl_desc_settings: 'Automatische Beschreibung', desc_notes_label: 'Notizen in automatische Beschreibung einbeziehen',
+      lbl_grid_visibility: 'Rasteransicht Sichtbarkeit',
+      grid_vis_image: 'Bild', grid_vis_signer: 'Name des Unterzeichners',
+      grid_vis_detail1: 'Detail 1', grid_vis_detail2: 'Detail 2',
+      grid_vis_cert: 'Zert. #', grid_vis_paid: 'Bezahlt',
+      grid_vis_value: 'Gesch. Wert', grid_vis_roi: 'Rendite',
+      lbl_language: 'Sprache', lang_tip: 'Legt die Anzeigesprache der App fest.',
+      export_collection: 'Sammlung exportieren', import_collection: 'Sammlung importieren',
+      merge_import: 'Importieren und zusammenführen', batch_import: 'Fotos stapelweise importieren',
+      copy_share: 'Link zum Teilen kopieren', download_csv: 'CSV herunterladen',
+      share_warn_title: 'Deine Daten werden öffentlich',
+      share_warn_p1: 'Das Erstellen eines Teilungslinks lädt deine <strong>gesamte Sammlung</strong> — Objektdetails, Fotos, gezahlte Beträge, geschätzte Werte und Zertifikatsnummern — auf <strong>dpaste.com</strong>, einen öffentlichen Einfügedienst, hoch. Jeder, der den Link erhält, kann alle diese Informationen einsehen.',
+      share_warn_p2: 'Wenn deine Sammlung finanzielle oder persönliche Informationen enthält, die du nicht teilen möchtest, fahre nicht fort. Verwende stattdessen <strong>Sammlung exportieren</strong>, um eine <code>.json</code>-Datei zu speichern und sie privat zu teilen.',
+      share_warn_p3: 'Links zum Teilen laufen nach 365 Tagen ab.',
+      share_publicly: 'Öffentlich teilen',
+      print_collection: 'Sammlung drucken', reset_collection: 'Sammlung zurücksetzen',
+      save_as_mine: 'Als meine Sammlung speichern',
+      det_signer: 'Unterzeichner', det_character: 'Charakter', det_film: 'Film / Serie',
+      type_film_tv_card: 'Sammelkarte',
+      // Item type display names
+      type_photo: 'Foto', type_poster: 'Poster', type_prop: 'Requisite', type_script: 'Drehbuch',
+      type_funko_pop: 'Funko Pop', type_lithograph: 'Lithografie', type_program: 'Programm',
+      type_trading_card: 'Sammelkarte',
+      type_jersey: 'Trikot', type_baseball: 'Baseball', type_bat: 'Schläger',
+      type_helmet: 'Helm', type_mini_helmet: 'Mini-Helm', type_football: 'American Football',
+      type_basketball: 'Basketball', type_hockey_puck: 'Eishockeypuck',
+      type_glove: 'Handschuh', type_shoe_cleat: 'Schuh / Stollen',
+      type_album_record: 'Album / Platte', type_cd: 'CD', type_vinyl: 'Vinyl',
+      type_instrument: 'Instrument', type_setlist: 'Setlist',
+      type_book: 'Buch', type_comic: 'Comic', type_magazine: 'Zeitschrift', type_other: 'Sonstiges',
+      // Item type optgroup labels
+      grp_film_tv: 'Film und Fernsehen', grp_sports: 'Sport', grp_music: 'Musik',
+      grp_books: 'Bücher und Literatur', grp_other: 'Sonstiges', grp_popular: 'Beliebt',
+      // Condition grades
+      cond_mint: 'Perfekt', cond_near_mint: 'Fast perfekt', cond_excellent: 'Ausgezeichnet',
+      cond_very_good: 'Sehr gut', cond_good: 'Gut', cond_fair: 'Befriedigend', cond_poor: 'Schlecht',
+      // Acquisition methods
+      opt_none: '— Keiner —', opt_select: '— Auswählen —',
+      acq_in_person: 'Persönlich', acq_mail_in: 'Per Post / TTM', acq_convention: 'Messe / Convention',
+      acq_purchased_online: 'Online gekauft', acq_purchased_show: 'Am Event gekauft',
+      acq_auction: 'Auktion', acq_gift: 'Geschenk', acq_trade: 'Tausch',
+      acq_gallery: 'Galerie / Händler', acq_other: 'Sonstiges',
+      det_item_type: 'Objekttyp', det_condition: 'Zustand', det_cert: 'Zert. #',
+      det_est_val: 'Geschätzter Wert', det_signing_date: 'Datum der Unterschrift',
+      det_signing_event: 'Signing-Event', det_acquired: 'Erworben',
+      det_location: 'Standort', det_tags: 'Schlagwörter', det_added: 'Hinzugefügt',
+      description: 'Beschreibung', description_sub: 'Automatisch aus den Objektdetails generiert.', copy: 'Kopieren', edit: 'Bearbeiten', delete: 'Löschen',
+      form_add_title: 'Objekt hinzufügen', form_edit_title: 'Objekt bearbeiten',
+      add_photo: 'Foto hinzufügen', add_photo_more: 'Hinzufügen',
+      lbl_photos: 'Fotos', lbl_character: 'Charakter', lbl_film: 'Film / Serie',
+      lbl_item_type: 'Objekttyp', hint_item_type: 'Falls kein passender Typ vorhanden ist, wähle „Sonstiges".',
+      lbl_cert_num: 'Zertifikatsnummer', lbl_cert_co: 'Zertifizierungstyp',
+      lbl_amount_paid: 'Bezahlter Betrag', lbl_est_val: 'Gesch. Wert', lbl_value_url: 'Wert-URL',
+      lbl_notes: 'Notizen', lbl_tags: 'Schlagwörter', lbl_advanced: 'Erweiterte Felder',
+      lbl_signing_event: 'Signing-Event / Ort', lbl_signing_date: 'Datum der Unterschrift',
+      lbl_acquired: 'Erwerbsart', lbl_condition: 'Zustand', lbl_location: 'Physischer Standort',
+      cancel: 'Abbrechen', save_item: 'Objekt speichern',
+      filt_tags: 'Schlagwörter', filt_item_type: 'Objekttyp', filt_condition: 'Zustand',
+      filt_cert_co: 'Zertifizierungstyp', filt_acquired: 'Erwerbsart',
+      filt_event: 'Signing-Event', filt_location: 'Standort',
+      filt_film: 'Detail 2', filt_signer: 'Unterzeichner', filt_empty: 'Keine Objekte zum Filtern.',
+      clear_all: 'Alle löschen', done: 'Fertig',
+      drop_title: 'Fotos zum Importieren ablegen', drop_sub: 'Für jedes Bild wird ein Objekt erstellt',
+      print_generated: 'Erstellt', print_items: 'Objekte',
+      print_total_paid: 'Gesamt gezahlt', print_est_val: 'Gesch. Wert', print_return: 'Rendite',
+      print_no_photo: 'Kein Foto',
+      lbl_local_currency: 'Lokale Währung', lbl_display_currency: 'Anzeigewährung',
+      lbl_exchange_rate: 'Wechselkurs',
+      rate_refresh: '↻ Aktualisieren',
+      rate_same_currency: 'Gleiche Währung — keine Umrechnung nötig',
+      rate_fetching: 'Wechselkurs wird abgerufen…',
+      rate_error: 'Wechselkurs konnte nicht abgerufen werden — Verbindung prüfen',
+      rate_just_now: 'gerade eben',
+      rate_min_ago: 'vor {n} Min.',
+      rate_updated: 'Aktualisiert {ago}',
+      tbl_signer: 'Unterzeichner', tbl_character: 'Detail 1', tbl_film: 'Detail 2',
+      fld_player: 'Spieler', fld_team: 'Mannschaft',
+      fld_artist: 'Künstler', fld_album: 'Album', fld_band: 'Band / Gruppe', fld_tour: 'Tournee / Show',
+      fld_author: 'Autor', fld_title: 'Titel',
+      fld_subject: 'Thema', fld_publication: 'Publikation',
+      fld_specific1: 'Detail 1', fld_specific2: 'Detail 2',
+      tip_language: 'Legt die Anzeigesprache der App fest.',
+      tip_appearance: 'Wechselt zwischen hellem und dunklem Farbschema. Deine Auswahl wird automatisch gespeichert.',
+      tip_photo_format: 'Legt das Seitenverhältnis der Bildkarten passend zu deinen Objekten fest — z. B. 8×10-Fotos, Karteikarten oder Sammelkarten.',
+      tip_image_fit: 'Steuert, wie Fotos angezeigt werden, wenn das hochgeladene Bild nicht dem gewählten Format entspricht.',
+      tip_info_links: 'Wähle, zu welcher Seite Namen der Unterzeichner und Film-/Serientitel in der Tabellenansicht und Objektdetails verlinken.',
+      tip_privacy: 'Blendet Geldwerte (bezahlte Beträge und Schätzungen) aus. Du kannst sie mit dem Augen-Symbol im Header einblenden.',
+      tip_export: 'Speichert eine vollständige Sicherung deiner Sammlung als JSON-Datei.',
+      tip_import: '⚠️ Lädt eine JSON-Datei und ersetzt deine gesamte aktuelle Sammlung. Exportiere vorher eine Sicherung, wenn du sie behalten möchtest.',
+      tip_merge: 'Fügt Objekte aus einer JSON-Datei zu deiner bestehenden Sammlung hinzu, ohne etwas zu löschen.',
+      tip_batch_import: 'Wähle mehrere Fotos aus, um für jedes Bild ein Entwurfsobjekt zu erstellen. Als Unterzeichner wird der Dateiname verwendet — fülle den Rest später aus. Du kannst Fotos auch an eine beliebige Stelle auf der Seite ziehen.',
+      tip_share: '⚠️ Lädt deine Sammlung öffentlich auf dpaste.com hoch und kopiert eine teilbare URL in die Zwischenablage.',
+      tip_csv: 'Lädt deine Sammlung als CSV-Tabelle herunter. Enthält alle Metadatenfelder, keine Fotos.',
+      tip_print: 'Druckt deine Sammlung im A4-Format sortiert nach Wert, entsprechend deinen aktuellen Fotoformateinstellungen.',
+      tip_reset: '⚠️ Löscht deine gesamte Sammlung dauerhaft. Exportiere vorher eine Sicherung, wenn du deine Daten behalten möchtest.',
+      tip_save_as_mine: 'Speichert die aktuell angezeigte Sammlung als deine eigene und ersetzt deine vorhandenen Daten.',
+      tip_local_currency: 'Die beim Erfassen von gezahlten Beträgen und Schätzwerten verwendete Währung.',
+      tip_display_currency: 'Die in der Galerie-Oberfläche angezeigte Währung. Falls sie von deiner lokalen Währung abweicht, werden Werte automatisch umgerechnet.',
+      tip_exchange_rate: 'Zeigt den aktuellen Umrechnungskurs zwischen deiner lokalen und der Anzeigewährung. Kurse werden 1 Stunde lang zwischengespeichert.',
+    },
   };
 
   const ITEM_TYPE_FIELDS = {
@@ -2879,13 +3006,14 @@
     if (inp2) inp2.placeholder = fields.ph2;
   }
 
-  const SUPPORTED_LANGS = ['en', 'es', 'zh-TW'];
+  const SUPPORTED_LANGS = ['en', 'de', 'es', 'zh-TW'];
 
   function detectBrowserLang(supported) {
     const langs = navigator.languages && navigator.languages.length ? navigator.languages : [navigator.language || 'en'];
     for (const lang of langs) {
       const l = lang.toLowerCase();
       if (l === 'zh-tw' || l === 'zh-hant' || l === 'zh-hk') { if (supported.includes('zh-TW')) return 'zh-TW'; }
+      if (l.startsWith('de') && supported.includes('de')) return 'de';
       if (l.startsWith('es') && supported.includes('es')) return 'es';
       if (l.startsWith('en') && supported.includes('en')) return 'en';
     }
