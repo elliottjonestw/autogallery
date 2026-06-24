@@ -1515,48 +1515,48 @@
         <label class="flabel" data-i18n="lbl_item_type">Item Type</label>
         <div class="fhint" data-i18n="hint_item_type">If you can't find a suitable Item Type, select "Other".</div>
         <select class="finput" id="fItemType" onchange="updateItemTypeFields()">
-          <option value="">— None —</option>
-          <optgroup label="Film &amp; TV">
-            <option value="Photo">Photo</option>
-            <option value="Poster">Poster</option>
-            <option value="Prop">Prop</option>
-            <option value="Script">Script</option>
-            <option value="Funko Pop">Funko Pop</option>
-            <option value="Lithograph">Lithograph</option>
-            <option value="Program">Program</option>
-            <option value="Film / TV Card">Trading Card</option>
+          <option value="" data-i18n="opt_none">— None —</option>
+          <optgroup data-i18n-label="grp_film_tv" label="Film &amp; TV">
+            <option value="Photo" data-i18n="type_photo">Photo</option>
+            <option value="Poster" data-i18n="type_poster">Poster</option>
+            <option value="Prop" data-i18n="type_prop">Prop</option>
+            <option value="Script" data-i18n="type_script">Script</option>
+            <option value="Funko Pop" data-i18n="type_funko_pop">Funko Pop</option>
+            <option value="Lithograph" data-i18n="type_lithograph">Lithograph</option>
+            <option value="Program" data-i18n="type_program">Program</option>
+            <option value="Film / TV Card" data-i18n="type_trading_card">Trading Card</option>
           </optgroup>
-          <optgroup label="Sports">
-            <option value="Sports Photo">Photo</option>
-            <option value="Sports Poster">Poster</option>
-            <option value="Jersey">Jersey</option>
-            <option value="Baseball">Baseball</option>
-            <option value="Bat">Bat</option>
-            <option value="Helmet">Helmet</option>
-            <option value="Mini Helmet">Mini Helmet</option>
-            <option value="Football">Football</option>
-            <option value="Basketball">Basketball</option>
-            <option value="Hockey Puck">Hockey Puck</option>
-            <option value="Trading Card">Trading Card</option>
-            <option value="Glove">Glove</option>
-            <option value="Shoe / Cleat">Shoe / Cleat</option>
+          <optgroup data-i18n-label="grp_sports" label="Sports">
+            <option value="Sports Photo" data-i18n="type_photo">Photo</option>
+            <option value="Sports Poster" data-i18n="type_poster">Poster</option>
+            <option value="Jersey" data-i18n="type_jersey">Jersey</option>
+            <option value="Baseball" data-i18n="type_baseball">Baseball</option>
+            <option value="Bat" data-i18n="type_bat">Bat</option>
+            <option value="Helmet" data-i18n="type_helmet">Helmet</option>
+            <option value="Mini Helmet" data-i18n="type_mini_helmet">Mini Helmet</option>
+            <option value="Football" data-i18n="type_football">Football</option>
+            <option value="Basketball" data-i18n="type_basketball">Basketball</option>
+            <option value="Hockey Puck" data-i18n="type_hockey_puck">Hockey Puck</option>
+            <option value="Trading Card" data-i18n="type_trading_card">Trading Card</option>
+            <option value="Glove" data-i18n="type_glove">Glove</option>
+            <option value="Shoe / Cleat" data-i18n="type_shoe_cleat">Shoe / Cleat</option>
           </optgroup>
-          <optgroup label="Music">
-            <option value="Music Photo">Photo</option>
-            <option value="Music Poster">Poster</option>
-            <option value="Album / Record">Album / Record</option>
-            <option value="CD">CD</option>
-            <option value="Vinyl">Vinyl</option>
-            <option value="Instrument">Instrument</option>
-            <option value="Setlist">Setlist</option>
+          <optgroup data-i18n-label="grp_music" label="Music">
+            <option value="Music Photo" data-i18n="type_photo">Photo</option>
+            <option value="Music Poster" data-i18n="type_poster">Poster</option>
+            <option value="Album / Record" data-i18n="type_album_record">Album / Record</option>
+            <option value="CD" data-i18n="type_cd">CD</option>
+            <option value="Vinyl" data-i18n="type_vinyl">Vinyl</option>
+            <option value="Instrument" data-i18n="type_instrument">Instrument</option>
+            <option value="Setlist" data-i18n="type_setlist">Setlist</option>
           </optgroup>
-          <optgroup label="Books &amp; Literature">
-            <option value="Book">Book</option>
-            <option value="Comic">Comic</option>
-            <option value="Magazine">Magazine</option>
+          <optgroup data-i18n-label="grp_books" label="Books &amp; Literature">
+            <option value="Book" data-i18n="type_book">Book</option>
+            <option value="Comic" data-i18n="type_comic">Comic</option>
+            <option value="Magazine" data-i18n="type_magazine">Magazine</option>
           </optgroup>
-          <optgroup label="Other">
-            <option value="Other">Other</option>
+          <optgroup data-i18n-label="grp_other" label="Other">
+            <option value="Other" data-i18n="type_other">Other</option>
           </optgroup>
         </select>
       </div>
@@ -1582,7 +1582,7 @@
         <div class="fg">
           <label class="flabel" data-i18n="lbl_cert_co">Cert Company</label>
           <select class="finput" id="fCertCompany">
-            <option value="">— None —</option>
+            <option value="" data-i18n="opt_none">— None —</option>
             <option value="beckett">Beckett</option>
             <option value="psa">PSA</option>
             <option value="jsa">JSA</option>
@@ -1636,30 +1636,30 @@
           <div class="fg">
             <label class="flabel" data-i18n="lbl_acquired">Acquisition Method</label>
             <select class="finput" id="fAcquiredHow">
-              <option value="">— None —</option>
-              <option value="In-Person">In-Person</option>
-              <option value="Mail-In / TTM">Mail-In / TTM</option>
-              <option value="Convention">Convention</option>
-              <option value="Purchased Online">Purchased Online</option>
-              <option value="Purchased at Show">Purchased at Show</option>
-              <option value="Auction">Auction</option>
-              <option value="Gift">Gift</option>
-              <option value="Trade">Trade</option>
-              <option value="Gallery / Dealer">Gallery / Dealer</option>
-              <option value="Other">Other</option>
+              <option value="" data-i18n="opt_none">— None —</option>
+              <option value="In-Person" data-i18n="acq_in_person">In-Person</option>
+              <option value="Mail-In / TTM" data-i18n="acq_mail_in">Mail-In / TTM</option>
+              <option value="Convention" data-i18n="acq_convention">Convention</option>
+              <option value="Purchased Online" data-i18n="acq_purchased_online">Purchased Online</option>
+              <option value="Purchased at Show" data-i18n="acq_purchased_show">Purchased at Show</option>
+              <option value="Auction" data-i18n="acq_auction">Auction</option>
+              <option value="Gift" data-i18n="acq_gift">Gift</option>
+              <option value="Trade" data-i18n="acq_trade">Trade</option>
+              <option value="Gallery / Dealer" data-i18n="acq_gallery">Gallery / Dealer</option>
+              <option value="Other" data-i18n="type_other">Other</option>
             </select>
           </div>
           <div class="fg">
             <label class="flabel" data-i18n="lbl_condition">Condition</label>
             <select class="finput" id="fCondition">
-              <option value="">— Select —</option>
-              <option value="Mint">Mint</option>
-              <option value="Near Mint">Near Mint</option>
-              <option value="Excellent">Excellent</option>
-              <option value="Very Good">Very Good</option>
-              <option value="Good">Good</option>
-              <option value="Fair">Fair</option>
-              <option value="Poor">Poor</option>
+              <option value="" data-i18n="opt_select">— Select —</option>
+              <option value="Mint" data-i18n="cond_mint">Mint</option>
+              <option value="Near Mint" data-i18n="cond_near_mint">Near Mint</option>
+              <option value="Excellent" data-i18n="cond_excellent">Excellent</option>
+              <option value="Very Good" data-i18n="cond_very_good">Very Good</option>
+              <option value="Good" data-i18n="cond_good">Good</option>
+              <option value="Fair" data-i18n="cond_fair">Fair</option>
+              <option value="Poor" data-i18n="cond_poor">Poor</option>
             </select>
           </div>
           <div class="fg">
@@ -2105,6 +2105,29 @@
       save_as_mine: 'Save as My Collection',
       det_signer: 'Signer', det_character: 'Character', det_film: 'Film / Show',
       type_film_tv_card: 'Trading Card',
+      // Item type display names
+      type_photo: 'Photo', type_poster: 'Poster', type_prop: 'Prop', type_script: 'Script',
+      type_funko_pop: 'Funko Pop', type_lithograph: 'Lithograph', type_program: 'Program',
+      type_trading_card: 'Trading Card',
+      type_jersey: 'Jersey', type_baseball: 'Baseball', type_bat: 'Bat',
+      type_helmet: 'Helmet', type_mini_helmet: 'Mini Helmet', type_football: 'Football',
+      type_basketball: 'Basketball', type_hockey_puck: 'Hockey Puck',
+      type_glove: 'Glove', type_shoe_cleat: 'Shoe / Cleat',
+      type_album_record: 'Album / Record', type_cd: 'CD', type_vinyl: 'Vinyl',
+      type_instrument: 'Instrument', type_setlist: 'Setlist',
+      type_book: 'Book', type_comic: 'Comic', type_magazine: 'Magazine', type_other: 'Other',
+      // Item type optgroup labels
+      grp_film_tv: 'Film & TV', grp_sports: 'Sports', grp_music: 'Music',
+      grp_books: 'Books & Literature', grp_other: 'Other',
+      // Condition grades
+      cond_mint: 'Mint', cond_near_mint: 'Near Mint', cond_excellent: 'Excellent',
+      cond_very_good: 'Very Good', cond_good: 'Good', cond_fair: 'Fair', cond_poor: 'Poor',
+      // Acquisition methods
+      opt_none: '— None —', opt_select: '— Select —',
+      acq_in_person: 'In-Person', acq_mail_in: 'Mail-In / TTM', acq_convention: 'Convention',
+      acq_purchased_online: 'Purchased Online', acq_purchased_show: 'Purchased at Show',
+      acq_auction: 'Auction', acq_gift: 'Gift', acq_trade: 'Trade',
+      acq_gallery: 'Gallery / Dealer', acq_other: 'Other',
       det_item_type: 'Item Type', det_condition: 'Condition', det_cert: 'Cert #',
       det_est_val: 'Estimated Value', det_signing_date: 'Signing Date',
       det_signing_event: 'Signing Event', det_acquired: 'Acquired',
@@ -2208,6 +2231,29 @@
       save_as_mine: '儲存為我的收藏',
       det_signer: '簽名者', det_character: '角色', det_film: '電影／影集',
       type_film_tv_card: '交換卡',
+      // Item type display names
+      type_photo: '照片', type_poster: '海報', type_prop: '道具', type_script: '劇本',
+      type_funko_pop: 'Funko Pop', type_lithograph: '版畫', type_program: '節目冊',
+      type_trading_card: '交換卡',
+      type_jersey: '球衣', type_baseball: '棒球', type_bat: '球棒',
+      type_helmet: '頭盔', type_mini_helmet: '迷你頭盔', type_football: '美式足球',
+      type_basketball: '籃球', type_hockey_puck: '冰球',
+      type_glove: '手套', type_shoe_cleat: '球鞋／釘鞋',
+      type_album_record: '專輯／唱片', type_cd: 'CD', type_vinyl: '黑膠唱片',
+      type_instrument: '樂器', type_setlist: '歌單',
+      type_book: '書籍', type_comic: '漫畫', type_magazine: '雜誌', type_other: '其他',
+      // Item type optgroup labels
+      grp_film_tv: '電影與電視', grp_sports: '運動', grp_music: '音樂',
+      grp_books: '書籍與文學', grp_other: '其他',
+      // Condition grades
+      cond_mint: '完美品相', cond_near_mint: '接近完美', cond_excellent: '優秀品相',
+      cond_very_good: '非常良好', cond_good: '良好品相', cond_fair: '普通品相', cond_poor: '差劣品相',
+      // Acquisition methods
+      opt_none: '— 無 —', opt_select: '— 請選擇 —',
+      acq_in_person: '親自取得', acq_mail_in: '郵寄索取', acq_convention: '展覽會',
+      acq_purchased_online: '線上購買', acq_purchased_show: '現場購買',
+      acq_auction: '拍賣', acq_gift: '禮品', acq_trade: '交換',
+      acq_gallery: '藝廊／經銷商', acq_other: '其他',
       det_item_type: '項目類型', det_condition: '品相', det_cert: '證書 #',
       det_est_val: '估計價值', det_signing_date: '簽名日期',
       det_signing_event: '簽名活動', det_acquired: '取得方式',
@@ -2317,12 +2363,41 @@
     return ITEM_TYPE_FIELDS[type] || { f1: 'lbl_character', f2: 'lbl_film', ph1: '', ph2: '' };
   }
 
+  const ITEM_TYPE_KEYS = {
+    'Photo': 'type_photo', 'Poster': 'type_poster', 'Prop': 'type_prop',
+    'Script': 'type_script', 'Funko Pop': 'type_funko_pop', 'Lithograph': 'type_lithograph',
+    'Program': 'type_program', 'Film / TV Card': 'type_trading_card',
+    'Sports Photo': 'type_photo', 'Sports Poster': 'type_poster',
+    'Jersey': 'type_jersey', 'Baseball': 'type_baseball', 'Bat': 'type_bat',
+    'Helmet': 'type_helmet', 'Mini Helmet': 'type_mini_helmet',
+    'Football': 'type_football', 'Basketball': 'type_basketball',
+    'Hockey Puck': 'type_hockey_puck', 'Trading Card': 'type_trading_card',
+    'Glove': 'type_glove', 'Shoe / Cleat': 'type_shoe_cleat',
+    'Music Photo': 'type_photo', 'Music Poster': 'type_poster',
+    'Album / Record': 'type_album_record', 'CD': 'type_cd', 'Vinyl': 'type_vinyl',
+    'Instrument': 'type_instrument', 'Setlist': 'type_setlist',
+    'Book': 'type_book', 'Comic': 'type_comic', 'Magazine': 'type_magazine',
+    'Other': 'type_other',
+  };
   function displayItemType(type) {
-    if (type === 'Film / TV Card')                           return t('type_film_tv_card');
-    if (type === 'Sports Photo' || type === 'Music Photo')   return 'Photo';
-    if (type === 'Sports Poster' || type === 'Music Poster') return 'Poster';
-    return type;
+    const key = ITEM_TYPE_KEYS[type];
+    return key ? t(key) : type;
   }
+
+  const CONDITION_KEYS = {
+    'Mint': 'cond_mint', 'Near Mint': 'cond_near_mint', 'Excellent': 'cond_excellent',
+    'Very Good': 'cond_very_good', 'Good': 'cond_good', 'Fair': 'cond_fair', 'Poor': 'cond_poor',
+  };
+  function displayCondition(val) { const k = CONDITION_KEYS[val]; return k ? t(k) : val; }
+
+  const ACQUIRED_KEYS = {
+    'In-Person': 'acq_in_person', 'Mail-In / TTM': 'acq_mail_in',
+    'Convention': 'acq_convention', 'Purchased Online': 'acq_purchased_online',
+    'Purchased at Show': 'acq_purchased_show', 'Auction': 'acq_auction',
+    'Gift': 'acq_gift', 'Trade': 'acq_trade', 'Gallery / Dealer': 'acq_gallery',
+    'Other': 'acq_other',
+  };
+  function displayAcquiredHow(val) { const k = ACQUIRED_KEYS[val]; return k ? t(k) : val; }
 
   function updateItemTypeFields() {
     const type   = (document.getElementById('fItemType') || {}).value;
@@ -2375,6 +2450,10 @@
     document.querySelectorAll('[data-i18n-placeholder]').forEach(el => {
       const text = t(el.dataset.i18nPlaceholder);
       if (text) el.placeholder = text;
+    });
+    document.querySelectorAll('[data-i18n-label]').forEach(el => {
+      const text = t(el.dataset.i18nLabel);
+      if (text) el.label = text;
     });
     const langSel = document.getElementById('settingsLang');
     if (langSel) langSel.value = getLang();
@@ -2843,9 +2922,9 @@
     items.forEach(i => {
       (i.tags || []).forEach(t => allTags.add(t));
       if (i.itemType)     allItemTypes.add(displayItemType(i.itemType));
-      if (i.condition)    allConditions.add(i.condition);
+      if (i.condition)    allConditions.add(displayCondition(i.condition));
       if (i.certCompany)  allCerts.add(i.certCompany);
-      if (i.acquiredHow)  allAcquired.add(i.acquiredHow);
+      if (i.acquiredHow)  allAcquired.add(displayAcquiredHow(i.acquiredHow));
       if (i.signingEvent) allEvents.add(i.signingEvent);
       if (i.location)     allLocations.add(i.location);
       if (i.detail2)      allFilms.add(i.detail2);
@@ -2856,7 +2935,7 @@
     const sections = [];
     if (allTags.size)       sections.push({ key: 'tags',         label: t('filt_tags'),        values: [...allTags].sort() });
     if (allItemTypes.size)  sections.push({ key: 'itemType',     label: t('filt_item_type'),   values: [...allItemTypes].sort() });
-    if (allConditions.size) sections.push({ key: 'condition',    label: t('filt_condition'),   values: CONDITION_ORDER.filter(c => allConditions.has(c)) });
+    if (allConditions.size) sections.push({ key: 'condition',    label: t('filt_condition'),   values: CONDITION_ORDER.map(c => displayCondition(c)).filter(c => allConditions.has(c)) });
     if (allCerts.size)      sections.push({ key: 'certCompany',  label: t('filt_cert_co'),     values: [...allCerts].sort(), display: CERT_LABELS });
     if (allAcquired.size)   sections.push({ key: 'acquiredHow',  label: t('filt_acquired'),    values: [...allAcquired].sort() });
     if (allEvents.size)     sections.push({ key: 'signingEvent', label: t('filt_event'),       values: [...allEvents].sort() });
@@ -2931,9 +3010,9 @@
       res = res.filter(i => {
         if (af.tags.size         && !(i.tags || []).some(t => af.tags.has(t)))                            return false;
         if (af.itemType.size     && !af.itemType.has(displayItemType(i.itemType) || ''))                  return false;
-        if (af.condition.size    && !af.condition.has(i.condition || ''))                                  return false;
+        if (af.condition.size    && !af.condition.has(displayCondition(i.condition) || ''))                return false;
         if (af.certCompany.size  && !af.certCompany.has(i.certCompany || ''))                             return false;
-        if (af.acquiredHow.size  && !af.acquiredHow.has(i.acquiredHow || ''))                             return false;
+        if (af.acquiredHow.size  && !af.acquiredHow.has(displayAcquiredHow(i.acquiredHow) || ''))         return false;
         if (af.signingEvent.size && !af.signingEvent.has(i.signingEvent || ''))                           return false;
         if (af.location.size     && !af.location.has(i.location || ''))                                   return false;
         if (af.detail2.size      && !af.detail2.has(i.detail2 || ''))                                     return false;
@@ -3361,7 +3440,7 @@
     if (item.detail1) html += detailRow(t(_tf.f1), escHtml(item.detail1));
     if (item.detail2) html += detailRow(t(_tf.f2), `<a class="card-link" href="${escHtml(filmUrl(item.detail2))}" target="_blank" rel="noopener">${escHtml(item.detail2)}</a>`);
     if (item.itemType)     html += detailRow(t('det_item_type'), escHtml(displayItemType(item.itemType)));
-    if (item.condition)    html += detailRow(t('det_condition'), escHtml(item.condition));
+    if (item.condition)    html += detailRow(t('det_condition'), escHtml(displayCondition(item.condition)));
     if (item.certNum) {
       const cUrl = getCertUrl(item);
       const v = cUrl
@@ -3387,7 +3466,7 @@
     }
     if (item.signingDate)  html += detailRow(t('det_signing_date'), new Date(item.signingDate + 'T12:00:00').toLocaleDateString(undefined, {year:'numeric',month:'long',day:'numeric'}));
     if (item.signingEvent) html += detailRow(t('det_signing_event'), escHtml(item.signingEvent));
-    if (item.acquiredHow)  html += detailRow(t('det_acquired'),      escHtml(item.acquiredHow));
+    if (item.acquiredHow)  html += detailRow(t('det_acquired'),      escHtml(displayAcquiredHow(item.acquiredHow)));
     if (item.location)     html += detailRow(t('det_location'),      escHtml(item.location));
     if (item.tags && item.tags.length) {
       const tagHtml = item.tags.map(tag => `<span class="tag" onclick="filterByTag(event,'${escHtml(tag)}');closeDetail()">${escHtml(tag)}</span>`).join('');
@@ -3437,7 +3516,7 @@
     }
 
     if (item.condition) {
-      paras.push(`The ${type} is in ${item.condition.toLowerCase()} condition.`);
+      paras.push(`The ${type} is in ${displayCondition(item.condition).toLowerCase()} condition.`);
     }
 
     if (item.signingEvent || item.signingDate) {

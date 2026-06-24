@@ -264,7 +264,7 @@ Below the Tags field is an **▶ Advanced Fields** expander (`<details>` element
 |---|---|---|
 | **Signing Event / Venue** | Text input | Optional. The event or venue where the item was signed (e.g. "Fan Expo 2024", "Private signing"). Filterable. |
 | **Signing Date** | Date picker | Optional. The date the item was signed. Shown in the detail modal as a formatted date (e.g. "June 15, 2024"). Not filterable. |
-| **Acquisition Method** | Text input | Optional. How you obtained the item (e.g. "In person", "Mail-in", "eBay"). Filterable. |
+| **Acquisition Method** | Dropdown | Optional. How the item was obtained. Options: In-Person, Mail-In / TTM, Convention, Purchased Online, Purchased at Show, Auction, Gift, Trade, Gallery / Dealer, Other. Filterable. |
 | **Condition** | Dropdown | Optional. Grades: *(none)*, Mint, Near Mint, Excellent, Very Good, Good, Fair, Poor. Filterable; conditions are displayed in grade order (best to worst) in the filter modal. |
 | **Physical Location** | Text input | Optional. Where the item is physically stored (e.g. "Display case", "Storage box #3"). Filterable. |
 
@@ -489,19 +489,19 @@ This priority means first-time visitors and shared-link viewers always see the a
 
 All translations live inside `index.html` in a `TRANSLATIONS` object. The `data-i18n` attribute on static HTML elements is updated by `applyI18n()` on startup and whenever the language changes. Dynamic content uses the `t(key)` helper function.
 
-Item type display names that differ from their stored value are resolved by the `displayItemType()` helper, which is called wherever item types are shown as text (detail modal, filter chips, eBay description builder). The filter set is built from display names rather than raw stored values, so types that share a name across categories merge into a single filter chip that matches all of them.
+**Dropdown option translation** — item types, condition grades, and acquisition methods are stored in English as raw values in the JSON data (`itemType`, `condition`, `acquiredHow`). This keeps exports and imports language-neutral. Display-only translation is layered on top via three lookup maps and corresponding helper functions:
 
-Current mappings in `displayItemType()`:
-
-| Stored value | Display name | Translation key |
+| Map | Helper function | Used for |
 |---|---|---|
-| `"Film / TV Card"` | Trading Card / 交換卡 | `type_film_tv_card` |
-| `"Sports Photo"` | Photo | *(hardcoded)* |
-| `"Sports Poster"` | Poster | *(hardcoded)* |
-| `"Music Photo"` | Photo | *(hardcoded)* |
-| `"Music Poster"` | Poster | *(hardcoded)* |
+| `ITEM_TYPE_KEYS` | `displayItemType(storedValue)` | Item type dropdown, filter chips, detail modal, eBay description |
+| `CONDITION_KEYS` | `displayCondition(storedValue)` | Condition dropdown, filter chips, detail modal, eBay description |
+| `ACQUIRED_KEYS` | `displayAcquiredHow(storedValue)` | Acquisition method dropdown, filter chips, detail modal |
 
-Photo and Poster are hardcoded rather than keyed because Film & TV Photo/Poster (stored as plain `"Photo"` / `"Poster"`) are already displayed as-is in all languages, so the mapped variants match that behaviour without requiring additional translation keys.
+Each map translates a stored English value to a `TRANSLATIONS` key (e.g. `"Near Mint"` → `"cond_near_mint"` → `"接近完美"` in Traditional Chinese). If a stored value has no entry in the map, the raw stored string is displayed as a fallback.
+
+**Filter chip deduplication** — the filter set for item types, conditions, and acquisition methods is built from display names (via the helper functions) rather than raw stored values. This means types that share a display name across categories — such as `"Film / TV Card"` and `"Trading Card"` both displaying as "Trading Card" — merge into a single filter chip that matches all of them. Filter matching likewise uses the display helpers so stored English values never need to change.
+
+**`applyI18n()` extension** — in addition to updating `textContent` (via `data-i18n`) and `innerHTML` (via `data-i18n-html`), `applyI18n()` also updates `<optgroup>` `label` attributes (via `data-i18n-label`) so grouped dropdown headers translate correctly alongside their option text.
 
 #### Appearance
 
