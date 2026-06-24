@@ -1072,23 +1072,22 @@ Cert type codes map to display labels and verification URLs as follows:
 |---|---|---|
 | `beckett` | Beckett Authenticated | `https://www.beckett-authentication.com/verify-certificate` |
 | `beckett-witnessed` | Beckett Witnessed | `https://www.beckett-authentication.com/verify-certificate` |
-| `psa` | PSA Authenticated | `https://www.psacard.com/cert` |
-| `psa-witnessed` | PSA Witnessed | `https://www.psacard.com/cert` |
+| `psa` | PSA/DNA Authenticated | `https://www.psacard.com/cert` |
+| `psa-witnessed` | PSA/DNA Witnessed | `https://www.psacard.com/cert` |
 | `jsa` | JSA Authenticated | `https://www.spenceloa.com/verify-authenticity` |
 | `jsa-witnessed` | JSA Witnessed | `https://www.spenceloa.com/verify-authenticity` |
 | `gai` | GAI Authenticated | *(no public cert lookup — cert # shown as plain text)* |
 | `gai-witnessed` | GAI Witnessed | *(no public cert lookup — cert # shown as plain text)* |
 | `sgc` | SGC Authenticated | *(no public cert lookup — cert # shown as plain text)* |
-| `sgc-witnessed` | SGC Witnessed | *(no public cert lookup — cert # shown as plain text)* |
 | `aga` | AGA Authenticated | *(no public cert lookup — cert # shown as plain text)* |
-| `swau` | SWAU | `https://auth.swau.com/pages/verify-hologram` |
+| `swau` | SWAU Witnessed | `https://auth.swau.com/pages/verify-hologram` |
 | `fanatics` | Fanatics Authentic | *(no public cert lookup — cert # shown as plain text)* |
 | `leaf` | Leaf Authentic | *(no public cert lookup — cert # shown as plain text)* |
 | `mlb` | MLB Authentication | `https://www.mlb.com/authentication` |
 | `panini` | Panini Authentic | *(no public cert lookup — cert # shown as plain text)* |
 | `steiner` | Steiner Sports | *(no public cert lookup — cert # shown as plain text)* |
-| `tristar` | Tristar | *(no public cert lookup — cert # shown as plain text)* |
-| `uda` | UDA | *(no public cert lookup — cert # shown as plain text)* |
+| `tristar` | TriStar | *(no public cert lookup — cert # shown as plain text)* |
+| `uda` | Upper Deck Authenticated | *(no public cert lookup — cert # shown as plain text)* |
 
 The URL and display label are derived at render time from `item.certCompany` via `CERT_URLS` and `CERT_LABELS`. No URL or label is stored in the item data — only the code. When no URL exists for a cert type, the cert number is displayed as plain text rather than a clickable link.
 
