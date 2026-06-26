@@ -202,7 +202,7 @@ Each card from top to bottom:
    - A thin horizontal divider
    - **Cert** label + a gold clickable link to the authentication company's verification page (if a cert type is selected). Clicking the link **also copies the cert number to the clipboard** and shows a toast. The link click does **not** open the detail modal.
    - **Paid** label + value (or `—` if not set)
-   - **Est. Value** label + value; if a value URL is set, the value is a clickable gold link that opens the source in a new tab. The link click does **not** open the detail modal.
+   - **Est. Value** label + value; if a Search Term is set, the value is a clickable gold link to matching eBay listings in a new tab. The link click does **not** open the detail modal.
    - **ROI** label + percentage value, green or red. Only shown when both Paid and Est. Value are set.
 
 3. **Clicking the card** (anywhere except the links) opens the **Item Detail Modal**.
@@ -222,7 +222,7 @@ An alternative view available on desktop. Items are shown as rows in a sortable 
 | **Detail 1** | First contextual field value (e.g. character name, player name, artist, author) — plain text |
 | **Detail 2** | Second contextual field value (e.g. film/show, team, album, title) — clickable link (Wikipedia or IMDb per the Info Links setting) |
 | **Paid** | Amount paid in display currency |
-| **Est. Value** | Estimated value in display currency, colored green (positive) or red (negative) relative to paid. If a value URL is set, the value is a clickable link that opens in a new tab. |
+| **Est. Value** | Estimated value in display currency, colored green (positive) or red (negative) relative to paid. If a Search Term is set, the value is a clickable link to matching eBay listings that opens in a new tab. |
 | **ROI** | Whole-number percentage, green or red pill |
 | **Cert** | Clickable gold link to the authentication company's verification page. Clicking also copies the cert number to the clipboard. |
 | **Added** | Date the item was added, formatted as `MMM D, YYYY` |
@@ -252,7 +252,7 @@ Opened by clicking **+ Add Item** (new item) or **Edit** inside the detail modal
 | **Cert Type** | Dropdown | Controls the verification URL linked from the cert number. See [Certification URL Derivation](#certification-url-derivation) for the full list of options and their URLs. |
 | **Paid** | Number input | Optional. What you paid, in your **local currency**. |
 | **Est. Value** | Number input | Optional. Current estimated market value, in your **local currency**. |
-| **Value Source URL** | Text input | Optional. A URL linking to a source for the estimated value (e.g. eBay sold listing). |
+| **Search Term** | Text input | Optional. A search term used to look up the item's value on eBay. When set, the Est. Value becomes a clickable link pointing to matching eBay listings (sold or active, depending on the **Est. Value Search** setting). See [Est. Value Search](#est-value-search). |
 | **Notes** | Textarea | Optional. Free-form notes. Resizable vertically. |
 | **Tags** | Tag input | Optional. Type a tag and press **Enter** or **,** to add it as a chip. Press **Backspace** on an empty input to remove the last tag. Click **×** on a chip to remove it. Multiple tags per item are supported. As you type, a dropdown suggests matching tags already used elsewhere in your collection — click a suggestion or navigate with **↑ ↓** and press **Enter** to select, **Escape** to dismiss. |
 
@@ -351,7 +351,7 @@ Clicking any card (grid) or row (table) opens a read-only detail view for that i
   - Condition — plain text (only shown if set)
   - Cert # — clickable link to the cert type's verification page. Clicking **also copies the cert number to the clipboard** and shows a toast confirmation.
   - Paid (in display currency)
-  - Est. Value (in display currency, with link if URL is set)
+  - Est. Value (in display currency, with eBay link if a Search Term is set)
   - ROI — percentage, colored green or red. Only shown when both Paid and Est. Value are set.
   - Signing Date — formatted as "Month D, YYYY" (only shown if set)
   - Signing Event / Venue — plain text (only shown if set)
@@ -377,7 +377,7 @@ Rules:
 - The signer name and Detail 1 / Detail 2 parenthetical open the description. For multi-signer items the parenthetical is omitted.
 - Item type is always lowercase (e.g. "photo", not "Photo").
 - The cert sentence is included only if a cert number is set. The condition sentence is included only if condition is set. The signing sentence is included only if a signing event or signing date is set — it uses whichever of the two are available.
-- If Notes are set **and** the **Include notes in auto-description** setting is enabled (Settings → Display → Auto-Description), they are appended at the end. Notes are excluded by default.
+- If Notes are set **and** the **Include notes in auto-description** setting is enabled (Settings → General → Auto-Description), they are appended at the end. Notes are excluded by default.
 - Paid, Est. Value, ROI, and tags are never included.
 
 The text is editable directly in the textarea before copying — changes are local to the open modal and not saved to the item. Click **Copy** to copy the current text to the clipboard; the button briefly reads "Copied!" to confirm.
@@ -456,11 +456,11 @@ Opened by clicking the **⚙️ gear icon** in the header. Settings are organize
 
 | Tab | Contents |
 |---|---|
-| **Display** | Language, Appearance, Photo Format, Image Fit, Info Links, Privacy Mode, Auto-Description, Grid View Visibility |
+| **General** | Language, Appearance, Photo Format, Image Fit, Info Links, Est. Value Search, Privacy Mode, Auto-Description, Grid View Visibility |
 | **Data** | Backup & Share (normal mode) or Save as My Collection (view mode) |
 | **Currency** | Local Currency, Display Currency, Exchange Rate (Local Currency hidden in view mode) |
 
-The modal always opens on the **Display** tab.
+The modal always opens on the **General** tab.
 
 ### Tooltip Buttons
 
@@ -468,7 +468,7 @@ Every setting has a small italic **i** circle button at the right end of its con
 
 ---
 
-### Display Tab
+### General Tab
 
 #### Language
 
@@ -567,6 +567,21 @@ A dropdown to choose which site signer names and Detail 2 values link to in the 
 - Saved to `localStorage` (`ag_info_link`). Takes effect immediately (gallery re-renders on change).
 - Links appear in **table view** (Signer column, Film / Show column) and **detail modal** (Signer row, Film / Show row). Grid card text is plain — no links.
 
+#### Est. Value Search
+
+A dropdown that controls which eBay listing type the Est. Value links to when an item has a **Search Term** set.
+
+| Option | Behaviour | URL pattern |
+|---|---|---|
+| **eBay Sold Listings** *(default)* | Links to completed sold listings — useful for checking real market prices | `ebay.com/sch/i.html?_nkw=TERM&LH_Sold=1` |
+| **eBay Active Listings** | Links to currently active listings | `ebay.com/sch/i.html?_nkw=TERM` |
+
+The Search Term is URL-encoded and inserted as the `_nkw` query parameter. It is recommended to append `(bgs,bas,beckett,psa,dna,jsa,swau)` to search terms so results are filtered to authenticated items only — e.g. `Hayden Christensen autograph (bgs,bas,beckett,psa,dna,jsa,swau)`.
+
+**Legacy compatibility** — if an item's `valueUrl` field already contains a full URL (starting with `http://` or `https://`), that URL is used as-is regardless of this setting. Only plain search terms (non-URL text) are passed through the eBay URL builder.
+
+- Saved to `localStorage` (`ag_value_search`). Takes effect immediately — no re-render needed.
+
 #### Auto-Description
 
 A checkbox that controls whether item notes are appended to the auto-generated description in the detail modal.
@@ -610,7 +625,7 @@ Eight row buttons plus one toggle, each with its own `(i)` tooltip on the right:
 - **Merge Import** — opens a file picker to load a `.json` file and **add** its items to the existing collection without replacing anything. Useful for combining collections. See [Import & Export](#import--export).
 - **Batch Import Photos** — opens a multi-file picker to select multiple images at once. Creates one stub item per image, using the filename (minus extension) as the signer name, with all other fields blank to fill in later. You can also drag image files directly onto the page anywhere outside the form to trigger the same flow. See [Import & Export](#import--export).
 - **Copy Share Link** — uploads the collection to dpaste.com and copies a short shareable URL to the clipboard. See [Sharing a Collection](#sharing-a-collection).
-- **Download CSV** — downloads all item metadata as a `.csv` spreadsheet (photos are not included). Columns cover every field: signers, **Detail 1**, **Detail 2**, item type, cert number, cert type, condition, paid, estimated value, value URL, tags, signing event, signing date, acquired how, location, notes, and date added. Paid and Est. Value column headers include the local currency code. Values containing commas or quotes are properly escaped.
+- **Download CSV** — downloads all item metadata as a `.csv` spreadsheet (photos are not included). Columns cover every field: signers, **Detail 1**, **Detail 2**, item type, cert number, cert type, condition, paid, estimated value, search term, tags, signing event, signing date, acquired how, location, notes, and date added. Paid and Est. Value column headers include the local currency code. Values containing commas or quotes are properly escaped.
 - **Print Collection** — generates and opens a print-ready A4 layout of the collection. See [Print Layout](#print-layout).
 - **Reset Collection** — permanently deletes your entire collection (items and photos) from both localStorage and IndexedDB, and returns the gallery to the empty state. A confirmation dialog is shown first. Separated from the other buttons by a divider and labelled in red to signal it is destructive. Export a backup first if you want to keep your data.
 
@@ -992,6 +1007,7 @@ autographed.app uses a **hybrid storage model**: lightweight item metadata and p
 | `ag_photo_format` | String | Saved photo format key (e.g. `"8x10L"`) |
 | `ag_img_fit` | String | Saved image fit mode: `"cover"`, `"contain"`, or `"blurbg"` |
 | `ag_info_link` | String | Saved info link target: `"wiki"` or `"imdb"` |
+| `ag_value_search` | String | Est. Value Search mode: `"ebay_sold"` (default) or `"ebay_active"` |
 | `ag_privacy` | String | Saved privacy mode: `"off"` or `"on"` |
 | `ag_sort` | String | Saved sort mode (e.g. `"date-desc"`, `"custom"`) |
 | `ag_custom_order` | JSON string | Array of item IDs representing the user-defined custom sort sequence |
@@ -1045,7 +1061,7 @@ Each item is a JavaScript object with the following fields:
 | `certCompany` | string | Stored code for the cert type (e.g. `"beckett"`, `"psa-witnessed"`, `"mlb"`). See [Certification URL Derivation](#certification-url-derivation) for all valid values. Empty string means none. |
 | `paid` | number \| null | Amount paid, in the local currency |
 | `value` | number \| null | Estimated current value, in the local currency |
-| `valueUrl` | string | URL to a value source (optional, may be empty string) |
+| `valueUrl` | string | eBay search term used to look up the item's estimated value (optional, may be empty string). Legacy items may contain a full URL — both forms are handled transparently by `buildValueUrl()`. |
 | `notes` | string | Free-form notes (optional, may be empty string) |
 | `tags` | string[] | Array of tag strings (optional, defaults to `[]`) |
 | `itemType` | string | Type of memorabilia (e.g. `"Photo"`, `"Jersey"`). Optional, may be empty string. |

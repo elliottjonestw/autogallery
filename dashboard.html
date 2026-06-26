@@ -1650,15 +1650,18 @@
         <input class="finput" id="fPaid" type="number" min="0" placeholder="5025">
       </div>
 
-      <div class="frow">
-        <div class="fg">
-          <label class="flabel" data-i18n="lbl_est_val">Est. Value</label>
-          <input class="finput" id="fValue" type="number" min="0" placeholder="9204">
+      <div class="fg">
+        <label class="flabel" data-i18n="lbl_est_val">Est. Value</label>
+        <input class="finput" id="fValue" type="number" min="0" placeholder="9204">
+      </div>
+
+      <div class="fg tip-container">
+        <div class="flabel-row">
+          <label class="flabel" data-i18n="lbl_value_url">Search Term</label>
+          <button class="tip-btn" onclick="toggleTip(this)">i</button>
         </div>
-        <div class="fg">
-          <label class="flabel" data-i18n="lbl_value_url">Value URL</label>
-          <input class="finput" id="fValueUrl" placeholder="https://…" type="url">
-        </div>
+        <input class="finput" id="fValueUrl" placeholder="e.g. Hayden Christensen autograph" type="text">
+        <div class="tip-box" data-i18n="hint_value_search">Enter a search term and the Est. Value will link to matching eBay sold listings. It is recommended to add "(bgs,bas,beckett,psa,dna,jsa,swau)" to your search term so that only authenticated items are returned.</div>
       </div>
 
       <div class="fg">
@@ -1755,7 +1758,7 @@
     <div class="modal-body" style="padding-top:0">
 
       <div class="settings-tabs">
-        <button class="settings-tab active" data-tab="display" onclick="switchSettingsTab('display')" data-i18n="tab_display">Display</button>
+        <button class="settings-tab active" data-tab="display" onclick="switchSettingsTab('display')" data-i18n="tab_display">General</button>
         <button class="settings-tab" data-tab="data" onclick="switchSettingsTab('data')" data-i18n="tab_data">Data</button>
         <button class="settings-tab" data-tab="currency" onclick="switchSettingsTab('currency')" data-i18n="tab_currency">Currency</button>
       </div>
@@ -1829,6 +1832,17 @@
             <button class="tip-btn" onclick="toggleTip(this)">i</button>
           </div>
           <div class="tip-box" data-i18n="tip_info_links">Choose which site signer names and film/show titles link to in table view and item detail.</div>
+        </div>
+        <div class="fg tip-container">
+          <label class="flabel" data-i18n="lbl_value_search">Est. Value Search</label>
+          <div class="ctrl-row">
+            <select class="finput" id="settingsValueSearch" onchange="setValueSearch(this.value)">
+              <option value="ebay_sold" data-i18n="vsearch_ebay_sold">eBay Sold Listings</option>
+              <option value="ebay_active" data-i18n="vsearch_ebay_active">eBay Active Listings</option>
+            </select>
+            <button class="tip-btn" onclick="toggleTip(this)">i</button>
+          </div>
+          <div class="tip-box" data-i18n="tip_value_search">Choose which site and listing type the Est. Value links to when a Search Term is set on an item.</div>
         </div>
         <div class="fg tip-container">
           <label class="flabel" data-i18n="lbl_privacy">Privacy Mode</label>
@@ -2482,7 +2496,7 @@
       add_item: '+ Add Item', load_demo: 'Load Demo Collection',
       viewing_shared: '👁 Viewing a shared collection — your own collection is untouched',
       back_to_mine: '← Back to my collection',
-      settings_title: 'Settings', tab_display: 'Display', tab_data: 'Data', tab_currency: 'Currency',
+      settings_title: 'Settings', tab_display: 'General', tab_data: 'Data', tab_currency: 'Currency',
       lbl_appearance: 'Appearance', switch_dark: 'Switch to Dark Mode', switch_light: 'Switch to Light Mode',
       lbl_photo_format: 'Photo Format',
       fmt_8x10L: '8×10 Landscape', fmt_8x10P: '8×10 Portrait',
@@ -2491,7 +2505,10 @@
       fmt_3x5: 'Index Card (3×5)', fmt_trading: 'Trading Card (2.5×3.5)', fmt_square: 'Square (1×1)',
       lbl_image_fit: 'Image Fit',
       fit_cover: 'Crop to fill', fit_contain: 'Fit with black bars', fit_blurbg: 'Fit with blurred background',
-      lbl_info_links: 'Info Links', lbl_privacy: 'Privacy Mode',
+      lbl_info_links: 'Info Links',
+      lbl_value_search: 'Est. Value Search', tip_value_search: 'Choose which site and listing type the Est. Value links to when a Search Term is set on an item.',
+      vsearch_ebay_sold: 'eBay Sold Listings', vsearch_ebay_active: 'eBay Active Listings',
+      lbl_privacy: 'Privacy Mode',
       privacy_off: 'Off', privacy_on: 'On — blur monetary values',
       lbl_desc_settings: 'Auto-Description', desc_notes_label: 'Include notes in auto-description',
       lbl_grid_visibility: 'Grid View Visibility',
@@ -2545,7 +2562,8 @@
       lbl_photos: 'Photos', lbl_character: 'Character', lbl_film: 'Film / Show',
       lbl_item_type: 'Item Type', hint_item_type: 'If you can\'t find a suitable Item Type, select "Other".',
       lbl_cert_num: 'Cert Number', lbl_cert_co: 'Cert Type',
-      lbl_amount_paid: 'Amount Paid', lbl_est_val: 'Est. Value', lbl_value_url: 'Value URL',
+      lbl_amount_paid: 'Amount Paid', lbl_est_val: 'Est. Value', lbl_value_url: 'Search Term',
+      hint_value_search: 'Enter a search term and the Est. Value will link to matching eBay sold listings. It is recommended to add "(bgs,bas,beckett,psa,dna,jsa,swau)" to your search term so that only authenticated items are returned.',
       lbl_notes: 'Notes', lbl_tags: 'Tags', lbl_advanced: 'Advanced Fields',
       lbl_signing_event: 'Signing Event / Venue', lbl_signing_date: 'Signing Date',
       lbl_acquired: 'Acquisition Method', lbl_condition: 'Condition', lbl_location: 'Physical Location',
@@ -2610,7 +2628,7 @@
       add_item: '+ Agregar artículo', load_demo: 'Cargar colección de ejemplo',
       viewing_shared: '👁 Viendo una colección compartida — tu colección no se ha modificado',
       back_to_mine: '← Volver a mi colección',
-      settings_title: 'Configuración', tab_display: 'Pantalla', tab_data: 'Datos', tab_currency: 'Moneda',
+      settings_title: 'Configuración', tab_display: 'General', tab_data: 'Datos', tab_currency: 'Moneda',
       lbl_appearance: 'Apariencia', switch_dark: 'Cambiar a modo oscuro', switch_light: 'Cambiar a modo claro',
       lbl_photo_format: 'Formato de foto',
       fmt_8x10L: '8×10 Horizontal', fmt_8x10P: '8×10 Vertical',
@@ -2619,7 +2637,10 @@
       fmt_3x5: 'Tarjeta índice (3×5)', fmt_trading: 'Tarjeta coleccionable (2.5×3.5)', fmt_square: 'Cuadrado (1×1)',
       lbl_image_fit: 'Ajuste de imagen',
       fit_cover: 'Recortar para llenar', fit_contain: 'Ajustar con barras negras', fit_blurbg: 'Ajustar con fondo difuminado',
-      lbl_info_links: 'Enlaces de información', lbl_privacy: 'Modo privacidad',
+      lbl_info_links: 'Enlaces de información',
+      lbl_value_search: 'Búsqueda de valor est.', tip_value_search: 'Elige el sitio y tipo de listado al que se vincula el Valor est. cuando hay un Término de búsqueda en un artículo.',
+      vsearch_ebay_sold: 'eBay vendidos', vsearch_ebay_active: 'eBay activos',
+      lbl_privacy: 'Modo privacidad',
       privacy_off: 'Desactivado', privacy_on: 'Activado — ocultar valores monetarios',
       lbl_desc_settings: 'Descripción automática', desc_notes_label: 'Incluir notas en la descripción automática',
       lbl_grid_visibility: 'Visibilidad en cuadrícula',
@@ -2673,7 +2694,8 @@
       lbl_photos: 'Fotos', lbl_character: 'Personaje', lbl_film: 'Película / Serie',
       lbl_item_type: 'Tipo de artículo', hint_item_type: 'Si no encuentras un tipo adecuado, selecciona "Otro".',
       lbl_cert_num: 'Número de certificado', lbl_cert_co: 'Tipo de certificación',
-      lbl_amount_paid: 'Monto pagado', lbl_est_val: 'Valor est.', lbl_value_url: 'URL del valor',
+      lbl_amount_paid: 'Monto pagado', lbl_est_val: 'Valor est.', lbl_value_url: 'Término de búsqueda',
+      hint_value_search: 'Introduce un término de búsqueda y el Valor est. se vinculará a los listados vendidos en eBay. Se recomienda añadir "(bgs,bas,beckett,psa,dna,jsa,swau)" para que solo aparezcan artículos autenticados.',
       lbl_notes: 'Notas', lbl_tags: 'Etiquetas', lbl_advanced: 'Campos avanzados',
       lbl_signing_event: 'Evento / Lugar de firma', lbl_signing_date: 'Fecha de firma',
       lbl_acquired: 'Método de adquisición', lbl_condition: 'Estado', lbl_location: 'Ubicación física',
@@ -2738,7 +2760,7 @@
       add_item: '+ 新增項目', load_demo: '載入範例收藏',
       viewing_shared: '👁 正在瀏覽共享收藏 — 您的收藏未受影響',
       back_to_mine: '← 返回我的收藏',
-      settings_title: '設定', tab_display: '顯示', tab_data: '資料', tab_currency: '貨幣',
+      settings_title: '設定', tab_display: '一般', tab_data: '資料', tab_currency: '貨幣',
       lbl_appearance: '外觀', switch_dark: '切換至深色模式', switch_light: '切換至淺色模式',
       lbl_photo_format: '相片格式',
       fmt_8x10L: '8×10 橫向', fmt_8x10P: '8×10 縱向',
@@ -2747,7 +2769,10 @@
       fmt_3x5: '索引卡 (3×5)', fmt_trading: '球員卡 (2.5×3.5)', fmt_square: '正方形 (1×1)',
       lbl_image_fit: '圖片填充',
       fit_cover: '裁切填滿', fit_contain: '完整顯示（黑邊）', fit_blurbg: '完整顯示（模糊背景）',
-      lbl_info_links: '資訊連結', lbl_privacy: '隱私模式',
+      lbl_info_links: '資訊連結',
+      lbl_value_search: '估值搜尋', tip_value_search: '選擇當項目設有搜尋關鍵字時，「估計價值」所連結的網站與商品類型。',
+      vsearch_ebay_sold: 'eBay 已售商品', vsearch_ebay_active: 'eBay 在售商品',
+      lbl_privacy: '隱私模式',
       privacy_off: '關閉', privacy_on: '開啟 — 模糊金額顯示',
       lbl_desc_settings: '自動描述', desc_notes_label: '在自動描述中包含備註',
       lbl_grid_visibility: '格狀視圖顯示設定',
@@ -2801,7 +2826,8 @@
       lbl_photos: '相片', lbl_character: '角色', lbl_film: '電影／影集',
       lbl_item_type: '項目類型', hint_item_type: '若找不到合適的項目類型，請選擇「其他」。',
       lbl_cert_num: '證書編號', lbl_cert_co: '認證類型',
-      lbl_amount_paid: '購入金額', lbl_est_val: '估計價值', lbl_value_url: '價值來源網址',
+      lbl_amount_paid: '購入金額', lbl_est_val: '估計價值', lbl_value_url: '搜尋關鍵字',
+      hint_value_search: '輸入搜尋關鍵字後，「估計價值」將連結至 eBay 已售出的相關商品。建議在關鍵字中加入「(bgs,bas,beckett,psa,dna,jsa,swau)」，以便只顯示已鑑定的商品。',
       lbl_notes: '備註', lbl_tags: '標籤', lbl_advanced: '進階欄位',
       lbl_signing_event: '簽名活動／場地', lbl_signing_date: '簽名日期',
       lbl_acquired: '取得方式', lbl_condition: '品相', lbl_location: '實體位置',
@@ -2866,7 +2892,7 @@
       add_item: '+ Objekt hinzufügen', load_demo: 'Beispielsammlung laden',
       viewing_shared: '👁 Geteilte Sammlung wird angezeigt — deine Sammlung ist unverändert',
       back_to_mine: '← Zurück zu meiner Sammlung',
-      settings_title: 'Einstellungen', tab_display: 'Anzeige', tab_data: 'Daten', tab_currency: 'Währung',
+      settings_title: 'Einstellungen', tab_display: 'Allgemein', tab_data: 'Daten', tab_currency: 'Währung',
       lbl_appearance: 'Erscheinungsbild', switch_dark: 'Zum Dunkelmodus wechseln', switch_light: 'Zum Hellmodus wechseln',
       lbl_photo_format: 'Fotoformat',
       fmt_8x10L: '8×10 Querformat', fmt_8x10P: '8×10 Hochformat',
@@ -2875,7 +2901,10 @@
       fmt_3x5: 'Karteikarte (3×5)', fmt_trading: 'Sammelkarte (2,5×3,5)', fmt_square: 'Quadratisch (1×1)',
       lbl_image_fit: 'Bildanpassung',
       fit_cover: 'Zuschneiden', fit_contain: 'Anpassen (Balken)', fit_blurbg: 'Anpassen (unscharfer Hintergrund)',
-      lbl_info_links: 'Infolinks', lbl_privacy: 'Datenschutzmodus',
+      lbl_info_links: 'Infolinks',
+      lbl_value_search: 'Schätzwert-Suche', tip_value_search: 'Wähle, welche Seite und welcher Listungstyp beim Gesch. Wert verlinkt wird, wenn ein Suchbegriff am Artikel gesetzt ist.',
+      vsearch_ebay_sold: 'eBay Verkaufte Artikel', vsearch_ebay_active: 'eBay Aktive Artikel',
+      lbl_privacy: 'Datenschutzmodus',
       privacy_off: 'Aus', privacy_on: 'Ein — Geldwerte ausblenden',
       lbl_desc_settings: 'Automatische Beschreibung', desc_notes_label: 'Notizen in automatische Beschreibung einbeziehen',
       lbl_grid_visibility: 'Rasteransicht Sichtbarkeit',
@@ -2929,7 +2958,8 @@
       lbl_photos: 'Fotos', lbl_character: 'Charakter', lbl_film: 'Film / Serie',
       lbl_item_type: 'Objekttyp', hint_item_type: 'Falls kein passender Typ vorhanden ist, wähle „Sonstiges".',
       lbl_cert_num: 'Zertifikatsnummer', lbl_cert_co: 'Zertifizierungstyp',
-      lbl_amount_paid: 'Bezahlter Betrag', lbl_est_val: 'Gesch. Wert', lbl_value_url: 'Wert-URL',
+      lbl_amount_paid: 'Bezahlter Betrag', lbl_est_val: 'Gesch. Wert', lbl_value_url: 'Suchbegriff',
+      hint_value_search: 'Gib einen Suchbegriff ein und der Gesch. Wert wird mit passenden eBay-Verkäufen verlinkt. Es wird empfohlen, "(bgs,bas,beckett,psa,dna,jsa,swau)" hinzuzufügen, damit nur authentifizierte Artikel angezeigt werden.',
       lbl_notes: 'Notizen', lbl_tags: 'Schlagwörter', lbl_advanced: 'Erweiterte Felder',
       lbl_signing_event: 'Signing-Event / Ort', lbl_signing_date: 'Datum der Unterschrift',
       lbl_acquired: 'Erwerbsart', lbl_condition: 'Zustand', lbl_location: 'Physischer Standort',
@@ -3314,6 +3344,7 @@
     document.getElementById('settingsPhotoFormat').value = getPhotoFormat();
     document.getElementById('settingsImgFit').value      = getImgFit();
     document.getElementById('settingsInfoLink').value    = getInfoLinkMode();
+    document.getElementById('settingsValueSearch').value = getValueSearch();
     document.getElementById('settingsPrivacy').value     = getPrivacyMode();
     ['image','signer','detail1','detail2','cert','paid','value','roi'].forEach(k => {
       const el = document.getElementById('gv_' + k);
@@ -3795,7 +3826,7 @@
       if (gv.value && item.value) {
         const cls = r !== null ? (r >= 0 ? 'text-green' : 'text-red') : '';
         let vStr = escHtml(fmt(item.value));
-        if (item.valueUrl) vStr = `<a class="card-link ${cls}" href="${escHtml(item.valueUrl)}" target="_blank" rel="noopener" onclick="event.stopPropagation()" style="color:inherit">${vStr}</a>`;
+        if (item.valueUrl) vStr = `<a class="card-link ${cls}" href="${escHtml(buildValueUrl(item))}" target="_blank" rel="noopener" onclick="event.stopPropagation()" style="color:inherit">${vStr}</a>`;
         rows += cardRow(t('est_val_lbl'), `<span class="priv-val"><span class="${cls}">${vStr}</span></span>`);
       }
       if (gv.roi && rStr) rows += cardRow(t('roi_lbl'), `<span class="${r >= 0 ? 'text-green' : 'text-red'}">${rStr}</span>`);
@@ -3824,6 +3855,15 @@
   function escHtml(s) {
     if (!s && s !== 0) return '';
     return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+  }
+
+  function buildValueUrl(item) {
+    if (!item.valueUrl) return '';
+    if (/^https?:\/\//i.test(item.valueUrl)) return item.valueUrl;
+    const q = encodeURIComponent(item.valueUrl);
+    const mode = getValueSearch();
+    if (mode === 'ebay_active') return 'https://www.ebay.com/sch/i.html?_nkw=' + q;
+    return 'https://www.ebay.com/sch/i.html?_nkw=' + q + '&LH_Sold=1';
   }
 
   /* ── Form ── */
@@ -4182,7 +4222,7 @@
     if (item.value) {
       const cls = r !== null ? (r >= 0 ? 'text-green' : 'text-red') : '';
       let v = `<span class="${cls}">${escHtml(fmt(item.value))}</span>`;
-      if (item.valueUrl) v = `<a class="card-link ${cls}" href="${escHtml(item.valueUrl)}" target="_blank" rel="noopener" style="color:inherit">${escHtml(fmt(item.value))}</a>`;
+      if (item.valueUrl) v = `<a class="card-link ${cls}" href="${escHtml(buildValueUrl(item))}" target="_blank" rel="noopener" style="color:inherit">${escHtml(fmt(item.value))}</a>`;
       html += detailRow(t('det_est_val'), `<span class="priv-val">${v}</span>`);
     }
     if (rStr) {
@@ -4388,7 +4428,7 @@
     const headers = [
       'Signer(s)', 'Detail 1', 'Detail 2', 'Item Type',
       'Cert #', 'Cert Type', 'Condition',
-      `Paid (${currency})`, `Est. Value (${currency})`, 'Value URL',
+      `Paid (${currency})`, `Est. Value (${currency})`, 'Search Term',
       'Tags', 'Signing Event', 'Signing Date', 'Acquired How',
       'Location', 'Notes', 'Date Added',
     ];
@@ -4561,7 +4601,7 @@
         : '—';
       const valueCell = item.value
         ? (item.valueUrl
-            ? `<span class="priv-val ${cls}"><a class="card-link" href="${escHtml(item.valueUrl)}" target="_blank" rel="noopener" onclick="event.stopPropagation()" style="color:inherit">${escHtml(fmt(item.value))}</a></span>`
+            ? `<span class="priv-val ${cls}"><a class="card-link" href="${escHtml(buildValueUrl(item))}" target="_blank" rel="noopener" onclick="event.stopPropagation()" style="color:inherit">${escHtml(fmt(item.value))}</a></span>`
             : `<span class="priv-val ${cls}">${escHtml(fmt(item.value))}</span>`)
         : '—';
       const roiCell = rStr
@@ -4832,6 +4872,9 @@
     localStorage.setItem('ag_info_link', mode);
     render();
   }
+
+  function getValueSearch() { return localStorage.getItem('ag_value_search') || 'ebay_sold'; }
+  function setValueSearch(mode) { localStorage.setItem('ag_value_search', mode); }
 
   (async () => {
     // Visual prefs need no item data — apply them synchronously first so the
