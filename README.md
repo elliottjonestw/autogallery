@@ -217,7 +217,7 @@ An alternative view available on desktop. Items are shown as rows in a sortable 
 
 | Column | Content |
 |---|---|
-| (thumbnail) | 52×40px cropped thumbnail of the photo, or a placeholder icon |
+| (thumbnail) | 40px-tall thumbnail of the photo (width scales with the Photo Format aspect ratio), or a placeholder icon |
 | **Signer** | Signer name as a clickable link (Wikipedia or IMDb per the Info Links setting), or **"Multiple Signers"** for multi-signer items |
 | **Detail 1** | First contextual field value (e.g. character name, player name, artist, author) — plain text |
 | **Detail 2** | Second contextual field value (e.g. film/show, team, album, title) — clickable link (Wikipedia or IMDb per the Info Links setting) |
@@ -358,8 +358,7 @@ Clicking any card (grid) or row (table) opens a read-only detail view for that i
   - Acquisition Method — plain text (only shown if set)
   - Physical Location — plain text (only shown if set)
   - Tags — clickable chips. Clicking a tag closes the modal and filters the gallery to items with that tag.
-  - **Notes** — displayed under a "NOTES" section label, in a lightly styled box. Only shown if notes are set.
-  - Date Added
+- **Notes** — displayed under a "NOTES" section label, in a lightly styled box, after the table. Only shown if notes are set.
 - **Description** — an auto-generated text block, separated by a divider. See [Description](#description) below.
 - **Date Added** — shown below the Description section.
 
@@ -679,7 +678,7 @@ This is a free, public API that requires no authentication.
 | Loaded | "1 $USD = 31.6335 NT$TWD" with a timestamp ("Updated just now" / "Updated Xm ago") |
 | Error | "Could not fetch rate — check your connection" |
 
-A **Refresh** button allows manually re-fetching the rate at any time (bypasses the 1-hour cache). All status strings and the Refresh button label are fully translated (currently English and Traditional Chinese).
+A **Refresh** button allows manually re-fetching the rate at any time (bypasses the 1-hour cache). All status strings and the Refresh button label are fully translated (English, Spanish, German, and Traditional Chinese).
 
 **Behavior when currencies match:** If local and display currencies are set to the same value, no exchange rate is fetched, and `exchangeRate` is set to `1` internally. All displayed values are identical to stored values.
 
@@ -704,7 +703,7 @@ The page is formatted for **A4 paper** (`@page { size: A4; margin: 12mm 14mm }`)
 **Header** (top of the page):
 
 - **autographed.app** logo (left) with the same gold/dark two-tone styling as the app header
-- Summary statistics (right): total item count, total paid, estimated value, and overall ROI — in the display currency. Monetary stats are omitted if Privacy Mode is on.
+- Summary statistics (right): total item count, total paid, estimated value, and overall Return — in the display currency. Monetary stats are omitted if Privacy Mode is on.
 - **Generated [date]** — a timestamp line below the header rule, right-aligned.
 
 **Card grid:**
@@ -809,14 +808,14 @@ The banner contains a **← Back to my collection** button on the right side.
 | Grid / Table view toggle | ✅ Fully functional |
 | Columns per row selector | ✅ Fully functional |
 | Item detail modal (read-only) | ✅ Opens, no edit/delete |
-| **Settings → This Collection → Save as My Collection** | ✅ See below |
+| **Settings → Data → Save as My Collection** | ✅ See below |
 | **Settings → Display Currency** | ✅ Change how values are shown |
 | **Settings → Appearance** (theme toggle) | ✅ Light/dark mode still works |
 | Exchange rate conversion | ✅ Works against the shared collection's local currency |
 
 ### Saving a Shared Collection as Your Own
 
-While in view mode, the Settings modal shows a **This Collection** section with a **Save as My Collection** button. This lets you adopt the shared collection as your own, replacing whatever you currently have saved.
+While in view mode, the Settings modal's **Data** tab shows a **Save as My Collection** button instead of the normal export/import/share buttons. This lets you adopt the shared collection as your own, replacing whatever you currently have saved.
 
 **What happens when you click it:**
 
@@ -857,7 +856,7 @@ The theme toggle lives inside the **Settings Modal** under the Appearance sectio
 
 **Default:** Light mode.
 
-**How it works:** A `data-theme="light"` attribute is set on the `<html>` element for light mode. When dark mode is active, the attribute is removed. CSS custom properties (variables) defined in `:root` apply the dark theme, and a `[data-theme="light"]` block overrides them for light mode.
+**How it works:** A `data-theme` attribute is always set on the `<html>` element — `data-theme="light"` for light mode and `data-theme="dark"` for dark mode. CSS custom properties (variables) defined in `:root` apply the dark theme, and a `[data-theme="light"]` block overrides them for light mode.
 
 **Persistence:** The chosen theme is saved as `ag_theme` in `localStorage` and restored on next visit.
 
@@ -868,7 +867,7 @@ The theme toggle lives inside the **Settings Modal** under the Appearance sectio
 | `--bg` | `#0c0c10` | `#f0f0f5` |
 | `--surface` | `#16161e` | `#ffffff` |
 | `--card` | `#1d1d27` | `#ffffff` |
-| `--gold` | `#c9a435` | `#a07810` |
+| `--gold` | `#c9a435` | `#c9a435` |
 | `--text` | `#e6e6f0` | `#18182a` |
 | `--sub` | `#9090a8` | `#70708a` |
 | `--green` | `#4caf84` | `#1e7a52` |
@@ -912,12 +911,12 @@ Click **Export Collection** in the Settings Modal (⚙️ → Data). The browser
       "certCompany": "beckett",
       "paid": 15000,
       "value": 22000,
-      "valueUrl": "https://www.ebay.com/...",
+      "valueUrl": "Harrison Ford autograph (bgs,bas,beckett,psa,dna,jsa,swau)",
       "notes": "Signed at Fan Expo 2023",
       "tags": ["sci-fi"],
       "signingEvent": "Fan Expo 2023",
       "signingDate": "2023-08-26",
-      "acquiredHow": "In person",
+      "acquiredHow": "In-Person",
       "condition": "Near Mint",
       "location": "Display case",
       "imgs": ["data:image/jpeg;base64,/9j/...", "data:image/jpeg;base64,/9j/..."]
