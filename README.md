@@ -23,14 +23,15 @@ A single-file browser app for managing an autograph and memorabilia collection. 
 13. [Import & Export](#import--export)
 14. [Print Layout](#print-layout)
 15. [Public Collections](#public-collections)
-16. [View Mode](#view-mode)
-17. [Accounts & Cloud Sync](#accounts--cloud-sync)
-18. [Light & Dark Mode](#light--dark-mode)
-19. [Footer](#footer)
-20. [Mobile Behavior](#mobile-behavior)
-21. [Data Storage](#data-storage)
-22. [Item Schema](#item-schema)
-23. [Technical Notes](#technical-notes)
+16. [Publicly Shared Collections Page](#publicly-shared-collections-page)
+17. [View Mode](#view-mode)
+18. [Accounts & Cloud Sync](#accounts--cloud-sync)
+19. [Light & Dark Mode](#light--dark-mode)
+20. [Footer](#footer)
+21. [Mobile Behavior](#mobile-behavior)
+22. [Data Storage](#data-storage)
+23. [Item Schema](#item-schema)
+24. [Technical Notes](#technical-notes)
 
 ---
 
@@ -745,13 +746,23 @@ On first enable, a random 10-character username (e.g. `k7m2xp9qr4`) is generated
 
 ### Your Public URL
 
-Once enabled, your public URL is displayed in the Account modal:
+Once enabled, the Account modal shows:
+
+> *Anyone with the following URL can see your collection:*
 
 ```
 https://autographed.app/dashboard.html?shared=<username>
 ```
 
 Click **Copy link** to copy it to your clipboard. Send it to anyone — they open it in a browser and see your collection immediately.
+
+### Listing Your Collection in the Public Directory
+
+When your public URL is enabled, a checkbox appears in the Account modal:
+
+> ☐ **List my collection on [Publicly Shared Collections](shared.html)**
+
+When checked, your collection is added to the public directory at `shared.html` (see [Publicly Shared Collections Page](#publicly-shared-collections-page)). Unchecking it removes your collection from the directory immediately — your public URL stays active, but it is no longer discoverable via the listing. This setting defaults to unchecked and is stored in `public_profiles.listed`.
 
 ### What Visitors See
 
@@ -761,11 +772,64 @@ The collection served is always the **most recent cloud sync** — whatever you 
 
 ### Disabling Public Access
 
-Click **Disable** in the Account modal. Your collection immediately becomes inaccessible at the public URL — the sharing flag is set to `false` in the database and the storage access policy denies reads instantly. Your username is preserved, so re-enabling restores the same URL.
+Click **Disable** in the Account modal. Your collection immediately becomes inaccessible at the public URL — the sharing flag is set to `false` in the database and the storage access policy denies reads instantly. Your username is preserved, so re-enabling restores the same URL. Disabling also removes your collection from the public directory if it was listed.
 
 ### Privacy Warning
 
 > ⚠️ Your **entire** cloud-synced collection is publicly accessible — all item details, photos, paid amounts, estimated values, and certificate numbers. Anyone who knows the URL can read all of this data. Do not enable public access if your collection contains sensitive financial or personal information.
+
+---
+
+## Publicly Shared Collections Page
+
+`shared.html` is a separate static page (same visual style as the rest of the site) that lists all collections where the owner has both enabled public access **and** checked the "List my collection" option.
+
+### What It Shows
+
+A table with one row per listed collection:
+
+| Column | Content |
+|---|---|
+| **Collection** | The collection's random username (e.g. `k7m2xp9qr4`) |
+| **Items** | Number of items in the collection, from `collection_meta.item_count` |
+| **Last updated** | Date of the owner's most recent cloud sync, from `collection_meta.last_modified` |
+| **View →** | Link to open the collection in [View Mode](#view-mode) |
+
+Rows are sorted by most recently updated first. On mobile, the **Last updated** column is hidden.
+
+### Empty & Error States
+
+- **No collections listed yet** — shown left-aligned below the heading when no collections have `listed = true`
+- **Error** — shown with a warning icon if the Supabase query fails (e.g. network issue)
+- **Loading** — a spinner is shown while the data is being fetched
+
+### How It Works
+
+On page load, `shared.html` lazy-loads the Supabase SDK and runs two queries using the public anon key:
+
+1. `SELECT username, user_id FROM public_profiles WHERE enabled = true AND listed = true`
+2. `SELECT user_id, item_count, last_modified FROM collection_meta WHERE user_id IN (...)`
+
+The second query is permitted by an RLS policy that allows anonymous reads of `collection_meta` rows where the owner has `enabled = true AND listed = true` in `public_profiles`. Results are joined client-side and sorted by `last_modified` descending.
+
+### Required Supabase SQL
+
+The following SQL must be run once in the Supabase SQL editor to add the `listed` column and the `collection_meta` read policy:
+
+```sql
+ALTER TABLE public_profiles ADD COLUMN IF NOT EXISTS listed boolean NOT NULL DEFAULT false;
+
+CREATE POLICY "Anyone can read meta of listed collections"
+ON collection_meta FOR SELECT TO public
+USING (EXISTS (
+  SELECT 1 FROM public_profiles
+  WHERE public_profiles.user_id = collection_meta.user_id
+    AND public_profiles.enabled = true
+    AND public_profiles.listed = true
+));
+```
+
+Until this migration is run, the listing checkbox has no effect (the column doesn't exist, so `listed` is treated as `false` everywhere). The dashboard falls back gracefully — if the `listed` column is missing from the query response, it retries without that column so the rest of public sharing continues to work.
 
 ---
 
@@ -916,7 +980,7 @@ The **Sync to cloud** and **Restore from cloud** buttons also appear in the **Se
 | **Supabase Auth** | Email/password authentication. Session tokens are managed by the Supabase JS SDK and stored in the browser. |
 | **Storage bucket: `collections`** | Private bucket. Each user's collection is stored at `{uid}/collection.json`. The file format is identical to the local export format: `{ currency, settings, items }` including base64-encoded photos. Normally private; an additional RLS policy allows anonymous reads for users who have enabled public sharing. |
 | **Table: `collection_meta`** | Stores `{ user_id, last_modified, item_count, app_version }`. Used for the conflict dialog without downloading the full file. `user_id` has `ON DELETE CASCADE` to `auth.users`. |
-| **Table: `public_profiles`** | Stores `{ user_id, username, enabled }`. `username` is a randomly generated 10-character alphanumeric string assigned on first enable. Authenticated users can manage their own row; the `enabled = true` rows are publicly readable (by both authenticated and anonymous clients) so the public URL can resolve `username → user_id`. |
+| **Table: `public_profiles`** | Stores `{ user_id, username, enabled, listed }`. `username` is a randomly generated 10-character alphanumeric string assigned on first enable. `listed` is a boolean (default `false`) controlling whether the collection appears on `shared.html`. Authenticated users can manage their own row; the `enabled = true` rows are publicly readable (by both authenticated and anonymous clients) so the public URL can resolve `username → user_id`. |
 
 ### Security
 
@@ -924,7 +988,8 @@ The Supabase **publishable key** (prefixed `sb_publishable_`) is embedded client
 
 - **Storage (private reads)**: `auth.uid()::text = (storage.foldername(name))[1]` — users can only read and write files under their own UID path.
 - **Storage (public reads)**: an additional policy allows any client (including unauthenticated) to read `collections/{uid}/collection.json` when the owner's `public_profiles.enabled = true`.
-- **collection_meta**: `auth.uid() = user_id` — users can only read and write their own metadata row.
+- **collection_meta (own row)**: `auth.uid() = user_id` — users can only read and write their own metadata row.
+- **collection_meta (public read for listed profiles)**: any client can SELECT rows where the owner has `public_profiles.enabled = true AND public_profiles.listed = true` — this powers the item count and last-updated columns on `shared.html`. SQL: `CREATE POLICY "Anyone can read meta of listed collections" ON collection_meta FOR SELECT TO public USING (EXISTS (SELECT 1 FROM public_profiles WHERE public_profiles.user_id = collection_meta.user_id AND public_profiles.enabled = true AND public_profiles.listed = true));`
 - **public_profiles (own row)**: `auth.uid() = user_id` — users can INSERT/UPDATE/SELECT their own profile, including when `enabled = false`.
 - **public_profiles (public read)**: any client can SELECT rows where `enabled = true` — this is how the public URL resolves `username → user_id`.
 
@@ -944,7 +1009,7 @@ Click **Change password** in the signed-in panel of the Account modal. This reve
 See [Public Collections](#public-collections) for full details. The toggle in the signed-in panel of the Account modal controls whether your collection is accessible at a public URL.
 
 - **Off (default)** — collection is private; only you can read it via cloud sync
-- **On** — collection is readable by anyone who knows your URL; the URL and a **Copy link** button are displayed in the modal
+- **On** — collection is readable by anyone who knows your URL; the Account modal shows the URL, a **Copy link** button, a **Disable** button, and a checkbox to opt into the [Publicly Shared Collections](#publicly-shared-collections-page) directory
 
 The public URL is tied to a randomly generated username, not your email address.
 

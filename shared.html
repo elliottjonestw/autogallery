@@ -1,0 +1,274 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Publicly Shared Collections · autographed.app</title>
+  <meta name="description" content="Browse publicly shared autograph and memorabilia collections on autographed.app.">
+  <meta name="robots" content="index, follow">
+
+  <style>
+    :root {
+      --bg: #f0f0f5;
+      --surface: #ffffff;
+      --card: #ffffff;
+      --card-hover: #f8f8fc;
+      --border: #dcdce8;
+      --border-light: #c8c8da;
+      --gold: #c9a435;
+      --gold-dim: #a07810;
+      --text: #18182a;
+      --sub: #70708a;
+      --green: #1e7a52;
+      --r: 12px;
+      --font: -apple-system, BlinkMacSystemFont, 'Segoe UI', system-ui, sans-serif;
+    }
+
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    html { scroll-behavior: smooth; }
+    body {
+      background: var(--bg);
+      color: var(--text);
+      font-family: var(--font);
+      -webkit-font-smoothing: antialiased;
+      line-height: 1.6;
+      display: flex;
+      flex-direction: column;
+      min-height: 100vh;
+    }
+
+    nav {
+      background: var(--surface);
+      border-bottom: 1px solid var(--border);
+      padding: 0 24px;
+      height: 60px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      position: sticky;
+      top: 0;
+      z-index: 100;
+    }
+    .logo { font-size: 19px; font-weight: 800; letter-spacing: -0.6px; color: var(--gold); text-decoration: none; }
+    .logo span { color: var(--text); font-weight: 400; }
+    .nav-links { display: flex; gap: 24px; }
+    .nav-link { color: var(--sub); font-size: 14px; font-weight: 500; text-decoration: none; transition: color .15s; }
+    .nav-link:hover { color: var(--text); }
+    .nav-cta {
+      background: var(--gold); color: #000; font-weight: 700; font-size: 14px;
+      padding: 8px 18px; border-radius: 8px; text-decoration: none; transition: opacity .15s;
+    }
+    .nav-cta:hover { opacity: .85; }
+
+    main { flex: 1; padding: 56px 24px; }
+    .container { max-width: 900px; margin: 0 auto; }
+
+    .page-header { margin-bottom: 32px; }
+    .page-header h1 { font-size: clamp(24px, 4vw, 36px); font-weight: 800; letter-spacing: -0.6px; margin-bottom: 8px; }
+    .page-header p { color: var(--sub); font-size: 15px; }
+
+    /* Table */
+    .table-wrap {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--r);
+      overflow: hidden;
+    }
+    table { width: 100%; border-collapse: collapse; }
+    thead th {
+      background: var(--bg);
+      padding: 12px 16px;
+      text-align: left;
+      font-size: 11px;
+      font-weight: 700;
+      letter-spacing: .06em;
+      text-transform: uppercase;
+      color: var(--sub);
+      border-bottom: 1px solid var(--border);
+    }
+    tbody tr { border-bottom: 1px solid var(--border); transition: background .12s; }
+    tbody tr:last-child { border-bottom: none; }
+    tbody tr:hover { background: var(--card-hover); }
+    tbody td { padding: 14px 16px; font-size: 14px; vertical-align: middle; }
+    td.col-items { color: var(--sub); font-size: 13px; white-space: nowrap; }
+    td.col-date { color: var(--sub); font-size: 13px; white-space: nowrap; }
+    td.col-link { text-align: right; }
+    .view-link {
+      color: var(--gold); font-weight: 600; font-size: 13px;
+      text-decoration: none; white-space: nowrap;
+    }
+    .view-link:hover { text-decoration: underline; }
+
+    /* States */
+    .state-box {
+      text-align: center;
+      padding: 64px 24px;
+      color: var(--sub);
+    }
+    .state-box p { font-size: 15px; margin-top: 8px; }
+    .state-box .icon { font-size: 36px; margin-bottom: 12px; }
+    .spinner {
+      width: 28px; height: 28px;
+      border: 3px solid var(--border);
+      border-top-color: var(--gold);
+      border-radius: 50%;
+      animation: spin .7s linear infinite;
+      margin: 0 auto 12px;
+    }
+    @keyframes spin { to { transform: rotate(360deg); } }
+
+    footer {
+      background: var(--surface);
+      border-top: 1px solid var(--border);
+      padding: 24px;
+      text-align: center;
+      font-size: 13px;
+      color: var(--sub);
+      margin-top: auto;
+    }
+    footer a { color: var(--gold); text-decoration: none; }
+    footer a:hover { text-decoration: underline; }
+
+    @media (max-width: 600px) {
+      .nav-links { display: none; }
+      td.col-date { display: none; }
+      thead th.col-date { display: none; }
+    }
+  </style>
+</head>
+<body>
+
+  <nav>
+    <a class="logo" href="index.html">autographed<span>.app</span></a>
+    <div class="nav-links"></div>
+    <a class="nav-cta" href="dashboard.html">My Collection →</a>
+  </nav>
+
+  <main>
+    <div class="container">
+      <div class="page-header">
+        <h1>Publicly Shared Collections</h1>
+        <p>Browse autograph and memorabilia collections shared by the community.</p>
+      </div>
+
+      <div id="stateLoading" class="state-box">
+        <div class="spinner"></div>
+        <p>Loading collections…</p>
+      </div>
+
+      <div id="stateEmpty" style="display:none;padding: 8px 0">
+        <p style="font-size:15px;color:var(--sub)">No collections have been listed yet.</p>
+      </div>
+
+      <div id="stateError" class="state-box" style="display:none">
+        <div class="icon">⚠️</div>
+        <p id="errorMsg">Could not load collections.</p>
+      </div>
+
+      <div id="tableWrap" class="table-wrap" style="display:none">
+        <table>
+          <thead>
+            <tr>
+              <th>Collection</th>
+              <th class="col-items">Items</th>
+              <th class="col-date">Last updated</th>
+              <th></th>
+            </tr>
+          </thead>
+          <tbody id="tableBody"></tbody>
+        </table>
+      </div>
+    </div>
+  </main>
+
+  <footer>
+    <a href="index.html">Home</a> · <a href="dashboard.html">Dashboard</a> · <a href="shared.html">Publicly Shared Collections</a> · <a href="blog/">Blog</a>
+  </footer>
+
+  <script>
+    const SB_URL = 'https://wmaxvywvlomsqyswentv.supabase.co';
+    const SB_KEY = 'sb_publishable_vjQEPBXuDp46KT9pzbvViQ_vmdgxoNb';
+
+    function showState(id) {
+      ['stateLoading','stateEmpty','stateError','tableWrap'].forEach(s => {
+        document.getElementById(s).style.display = s === id ? '' : 'none';
+      });
+    }
+
+    function formatDate(iso) {
+      if (!iso) return '—';
+      const d = new Date(iso);
+      if (isNaN(d)) return '—';
+      return d.toLocaleDateString(undefined, { month: 'short', day: 'numeric', year: 'numeric' });
+    }
+
+    function renderTable(rows) {
+      if (!rows.length) { showState('stateEmpty'); return; }
+      const tbody = document.getElementById('tableBody');
+      const base = location.href.replace(/shared\.html.*$/, '') + 'dashboard.html';
+      tbody.innerHTML = rows.map(r => `
+        <tr>
+          <td style="font-weight:600">${escHtml(r.username)}</td>
+          <td class="col-items">${r.item_count != null ? r.item_count + ' item' + (r.item_count === 1 ? '' : 's') : '—'}</td>
+          <td class="col-date">${formatDate(r.last_modified)}</td>
+          <td class="col-link"><a class="view-link" href="${base}?shared=${escHtml(r.username)}">View →</a></td>
+        </tr>
+      `).join('');
+      showState('tableWrap');
+    }
+
+    function escHtml(s) {
+      return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+    }
+
+    async function loadCollections() {
+      try {
+        await new Promise((resolve, reject) => {
+          const s = document.createElement('script');
+          s.src = 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2';
+          s.onload = resolve; s.onerror = reject;
+          document.head.appendChild(s);
+        });
+
+        const sb = window.supabase.createClient(SB_URL, SB_KEY);
+
+        const { data: profiles, error: profErr } = await sb
+          .from('public_profiles')
+          .select('username, user_id')
+          .eq('enabled', true)
+          .eq('listed', true);
+
+        if (profErr) throw new Error(profErr.message);
+        if (!profiles || !profiles.length) { showState('stateEmpty'); return; }
+
+        const userIds = profiles.map(p => p.user_id);
+
+        const { data: metas } = await sb
+          .from('collection_meta')
+          .select('user_id, item_count, last_modified')
+          .in('user_id', userIds);
+
+        const metaMap = {};
+        if (metas) metas.forEach(m => { metaMap[m.user_id] = m; });
+
+        const rows = profiles.map(p => ({
+          username: p.username,
+          item_count: metaMap[p.user_id]?.item_count ?? null,
+          last_modified: metaMap[p.user_id]?.last_modified ?? null,
+        })).sort((a, b) => {
+          if (!a.last_modified) return 1;
+          if (!b.last_modified) return -1;
+          return new Date(b.last_modified) - new Date(a.last_modified);
+        });
+
+        renderTable(rows);
+      } catch (err) {
+        document.getElementById('errorMsg').textContent = err.message || 'Could not load collections.';
+        showState('stateError');
+      }
+    }
+
+    loadCollections();
+  </script>
+</body>
+</html>
