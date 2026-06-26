@@ -22,7 +22,7 @@ A single-file browser app for managing an autograph and memorabilia collection. 
 12. [Settings Modal](#settings-modal)
 13. [Import & Export](#import--export)
 14. [Print Layout](#print-layout)
-15. [Sharing a Collection](#sharing-a-collection)
+15. [Public Collections](#public-collections)
 16. [View Mode](#view-mode)
 17. [Accounts & Cloud Sync](#accounts--cloud-sync)
 18. [Light & Dark Mode](#light--dark-mode)
@@ -68,9 +68,8 @@ The header is sticky — it stays at the top of the viewport while you scroll. I
 | Control | Description |
 |---|---|
 | 👁 Eye (privacy) | Visible only when Privacy Mode is enabled. Clicking it turns Privacy Mode off and hides the button. |
-| 👤 Account | Opens the **Account Modal** for sign-in, account creation, and cloud sync. When signed in, the person icon is replaced by the first letter of your email in gold. |
-| ▶ Play | Opens **Presentation Mode** — a full-screen photo slideshow for displaying the collection on a TV or monitor |
-| ⚙️ Settings | Opens the **Settings Modal** for theme, import/export, and currency options |
+| 👤 Account | Opens the **Account Modal** for sign-in, account creation, cloud sync, and password management. When signed in, the person icon is replaced by the first letter of your email in gold. |
+| ⚙️ Settings | Opens the **Settings Modal** for theme, presentation mode, import/export, and currency options |
 | **+ Add Item** | Opens the Add Item modal |
 
 The Settings button is a 36×36px square icon button with rounded corners. On hover it brightens slightly.
@@ -416,7 +415,7 @@ If the item has multiple photos, **‹** and **›** buttons appear on the left 
 
 ## Presentation Mode
 
-Clicking the **▶ play button** in the header launches a full-screen photo slideshow — designed to display the collection on a TV or monitor.
+Click **Start Slideshow** in **Settings → General → Presentation Mode** to launch a full-screen photo slideshow — designed to display the collection on a TV or monitor.
 
 ### What it shows
 
@@ -455,8 +454,8 @@ Opened by clicking the **⚙️ gear icon** in the header. Settings are organize
 
 | Tab | Contents |
 |---|---|
-| **General** | Language, Appearance, Photo Format, Image Fit, Info Links, Est. Value Search, Privacy Mode, Auto-Description, Grid View Visibility |
-| **Data** | Backup, Share, and Cloud Sync (normal mode) or Save as My Collection (view mode) |
+| **General** | Language, Appearance, Presentation Mode, Photo Format, Image Fit, Info Links, Est. Value Search, Privacy Mode, Auto-Description, Grid View Visibility |
+| **Data** | Backup, Cloud Sync, and Public Collection (normal mode) or Save as My Collection (view mode) |
 | **Currency** | Local Currency, Display Currency, Exchange Rate (Local Currency hidden in view mode) |
 
 The modal always opens on the **General** tab.
@@ -508,6 +507,10 @@ Each map translates a stored English value to a `TRANSLATIONS` key (e.g. `"Near 
 #### Appearance
 
 A row button that toggles between light and dark mode. The label updates to reflect the opposite of the current theme ("Switch to Dark Mode" / "Switch to Light Mode"), and the icon switches between a sun and moon accordingly. See [Light & Dark Mode](#light--dark-mode) for full details.
+
+#### Presentation Mode
+
+A row button labelled **Start Slideshow**. Clicking it closes the Settings modal and immediately launches the full-screen photo slideshow. See [Presentation Mode](#presentation-mode) for full details.
 
 #### Photo Format
 
@@ -624,7 +627,6 @@ Row buttons, each with its own `(i)` tooltip on the right:
 - **Import Collection** — opens a file picker to load a previously exported `.json` file, **replacing** the current collection. See [Import & Export](#import--export).
 - **Merge Import** — opens a file picker to load a `.json` file and **add** its items to the existing collection without replacing anything. Useful for combining collections. See [Import & Export](#import--export).
 - **Batch Import Photos** — opens a multi-file picker to select multiple images at once. Creates one stub item per image, using the filename (minus extension) as the signer name, with all other fields blank to fill in later. You can also drag image files directly onto the page anywhere outside the form to trigger the same flow. See [Import & Export](#import--export).
-- **Copy Share Link** — uploads the collection to dpaste.com and copies a short shareable URL to the clipboard. See [Sharing a Collection](#sharing-a-collection).
 - **Download CSV** — downloads all item metadata as a `.csv` spreadsheet (photos are not included). Columns cover every field: signers, **Detail 1**, **Detail 2**, item type, cert number, cert type, condition, paid, estimated value, search term, tags, signing event, signing date, acquired how, location, notes, and date added. Paid and Est. Value column headers include the local currency code. Values containing commas or quotes are properly escaped.
 - **Print Collection** — generates and opens a print-ready A4 layout of the collection. See [Print Layout](#print-layout).
 - **Sync to cloud** — uploads your collection to your account's cloud storage. Disabled (greyed out) when not signed in. See [Accounts & Cloud Sync](#accounts--cloud-sync).
@@ -728,48 +730,52 @@ The page is formatted for **A4 paper** (`@page { size: A4; margin: 12mm 14mm }`)
 
 ---
 
-## Sharing a Collection
+## Public Collections
 
-autographed.app can generate a short URL that lets anyone view your collection in their own browser — no account, no app install required.
+Signed-in users can make their collection publicly accessible via a permanent URL. Anyone who visits the URL sees the collection in read-only [View Mode](#view-mode) — no account required.
 
-### How to Share
+### Enabling Public Access
 
-1. Open the **Settings Modal** (⚙️ in the header)
-2. Under **Data**, click **Copy Share Link**
-3. A warning dialog appears explaining that your collection will be uploaded publicly. Read it carefully — if your gallery contains financial details or personal information you wouldn't want others to see, click **Cancel** and use **Export Collection** to share the file privately instead.
-4. Click **Share publicly** to proceed. The button label changes to "Uploading…" while the collection is sent to dpaste.com.
-5. Once uploaded, a short URL is copied to your clipboard automatically.
-6. Send that URL to anyone. When they open it, autographed.app loads and immediately displays your collection in read-only [View Mode](#view-mode).
+1. Open the **Account modal** (person icon in the header)
+2. Under the sync buttons, click **Make collection public**
+3. A warning panel expands explaining that your entire collection — including photos, paid amounts, and certificate numbers — will be publicly accessible
+4. Click **Enable** to confirm
 
-### What Gets Uploaded
+On first enable, a random 10-character username (e.g. `k7m2xp9qr4`) is generated and stored in the `public_profiles` database table. This username never changes, so your public URL remains stable even if you disable and re-enable sharing.
 
-The **entire collection** is included — all item fields, all photos, and all user preferences (`settings`). The JSON is uploaded as a single paste to [dpaste.com](https://dpaste.com), a free public paste service.
+### Your Public URL
 
-> ⚠️ **Your collection data is publicly accessible.** Anyone who has or guesses the URL can read all item data including photos, values, cert numbers, and notes. Do not share if your collection data is sensitive.
+Once enabled, your public URL is displayed in the Account modal:
 
-### How the URL Works
+```
+https://autographed.app/dashboard.html?shared=<username>
+```
 
-The URL contains only a short blob ID in the hash fragment (`#blob=<id>`). The hash is never sent to the server hosting autographed.app — it is processed entirely in the browser. When someone opens the URL:
+Click **Copy link** to copy it to your clipboard. Send it to anyone — they open it in a browser and see your collection immediately.
 
-1. The app detects `#blob=<id>` in the URL hash on page load
-2. It immediately shows a full-page loading spinner ("Loading shared collection…")
-3. It fetches the paste from `https://dpaste.com/<id>.txt`
-4. The JSON is parsed and the collection is displayed in [View Mode](#view-mode)
-5. The hash is stripped from the URL (`history.replaceState`) so refreshing the page does not re-trigger the load
+### What Visitors See
 
-### Paste Expiry
+The URL triggers [View Mode](#view-mode): the visitor sees your full collection (all items, photos, and values) in read-only mode with the same gallery UI, search, sort, and filters. No account or login is required to view it.
 
-dpaste.com pastes created by autographed.app are set to expire after **365 days**. After that, the share URL will stop working. There is no way to renew a paste — generate a new share link if needed.
+The collection served is always the **most recent cloud sync** — whatever you last uploaded via **↑ Sync to cloud**. If you have never synced, the public URL will not load successfully.
+
+### Disabling Public Access
+
+Click **Disable** in the Account modal. Your collection immediately becomes inaccessible at the public URL — the sharing flag is set to `false` in the database and the storage access policy denies reads instantly. Your username is preserved, so re-enabling restores the same URL.
+
+### Privacy Warning
+
+> ⚠️ Your **entire** cloud-synced collection is publicly accessible — all item details, photos, paid amounts, estimated values, and certificate numbers. Anyone who knows the URL can read all of this data. Do not enable public access if your collection contains sensitive financial or personal information.
 
 ---
 
 ## View Mode
 
-View mode is a read-only state that activates when opening a share link. It lets you browse someone else's collection without affecting your own data.
+View mode is a read-only state that activates when opening a public collection URL. It lets you browse someone else's collection without affecting your own data.
 
 ### Entering View Mode
 
-View mode is entered automatically when a `#blob=<id>` URL hash is detected — either on page load or when the hash changes in the current tab. It is never entered manually.
+View mode is entered automatically when a `?shared=<username>` query parameter is detected on page load. It is never entered manually. See [Public Collections](#public-collections) for how a public URL is created.
 
 ### Visual Indicator
 
@@ -786,7 +792,7 @@ The banner contains a **← Back to my collection** button on the right side.
 | **+ Add Item** button | Hidden |
 | **Edit** button in detail modal | Hidden |
 | **Delete** button in detail modal | Hidden |
-| **Settings → Data** section (Export, Import, Share) | Hidden |
+| **Settings → Data** section (Export, Import) | Hidden |
 | **Settings → Local Currency** | Hidden |
 | Saving items to localStorage | Never happens |
 | Shared settings applied to localStorage | Temporarily (restored on exit) |
@@ -828,7 +834,7 @@ The shared collection was recorded in the sharer's local currency (stored in the
 
 ### Your Own Data is Untouched
 
-Your own **collection** (items) is never touched in view mode — it remains in storage exactly as it was. View mode never calls `persist()`, so neither your `localStorage` metadata nor your IndexedDB photos are modified while viewing. The shared settings (theme, sort, columns, etc.) are applied temporarily to `localStorage` while viewing so you see the collection as the sharer had it configured. When you click **← Back to my collection**, your original preferences are restored from the snapshot taken at the moment you opened the share link, and your own items are reloaded.
+Your own **collection** (items) is never touched in view mode — it remains in storage exactly as it was. View mode never calls `persist()`, so neither your `localStorage` metadata nor your IndexedDB photos are modified while viewing. The owner's settings (theme, sort, columns, etc.) are applied temporarily to `localStorage` while viewing so you see the collection as they had it configured. When you click **← Back to my collection**, your original preferences are restored from the snapshot taken at the moment you opened the public URL, and your own items are reloaded.
 
 ### Exiting View Mode
 
@@ -856,7 +862,7 @@ The modal has three states:
 | State | Contents |
 |---|---|
 | **Signed out** | Sign-in and Create account tabs with email + password forms |
-| **Signed in** | Your email address, last sync status, Sync to cloud and Restore from cloud buttons, and a Sign out button |
+| **Signed in** | Your email address, last sync status, Sync to cloud / Restore from cloud buttons, public collection toggle (with URL when enabled), and Change password / Sign out buttons |
 | **Loading** | Shown briefly while connecting to Supabase |
 
 ### Creating an Account
@@ -908,17 +914,39 @@ The **Sync to cloud** and **Restore from cloud** buttons also appear in the **Se
 | Resource | Details |
 |---|---|
 | **Supabase Auth** | Email/password authentication. Session tokens are managed by the Supabase JS SDK and stored in the browser. |
-| **Storage bucket: `collections`** | Private bucket. Each user's collection is stored at `{uid}/collection.json`. The file format is identical to the local export format: `{ currency, settings, items }` including base64-encoded photos. |
-| **Table: `collection_meta`** | Stores `{ user_id, last_modified, item_count, app_version }`. Used for the conflict dialog without downloading the full file. `user_id` has `ON DELETE CASCADE` to `auth.users`, so the metadata row is automatically deleted when the account is deleted. |
+| **Storage bucket: `collections`** | Private bucket. Each user's collection is stored at `{uid}/collection.json`. The file format is identical to the local export format: `{ currency, settings, items }` including base64-encoded photos. Normally private; an additional RLS policy allows anonymous reads for users who have enabled public sharing. |
+| **Table: `collection_meta`** | Stores `{ user_id, last_modified, item_count, app_version }`. Used for the conflict dialog without downloading the full file. `user_id` has `ON DELETE CASCADE` to `auth.users`. |
+| **Table: `public_profiles`** | Stores `{ user_id, username, enabled }`. `username` is a randomly generated 10-character alphanumeric string assigned on first enable. Authenticated users can manage their own row; the `enabled = true` rows are publicly readable (by both authenticated and anonymous clients) so the public URL can resolve `username → user_id`. |
 
 ### Security
 
 The Supabase **publishable key** (prefixed `sb_publishable_`) is embedded client-side in `dashboard.html`. This key is safe to expose — it is scoped to the project and cannot bypass Row Level Security (RLS) policies. Security is enforced entirely by RLS:
 
-- **Storage**: `auth.uid()::text = (storage.foldername(name))[1]` — users can only read and write files under their own UID path.
+- **Storage (private reads)**: `auth.uid()::text = (storage.foldername(name))[1]` — users can only read and write files under their own UID path.
+- **Storage (public reads)**: an additional policy allows any client (including unauthenticated) to read `collections/{uid}/collection.json` when the owner's `public_profiles.enabled = true`.
 - **collection_meta**: `auth.uid() = user_id` — users can only read and write their own metadata row.
+- **public_profiles (own row)**: `auth.uid() = user_id` — users can INSERT/UPDATE/SELECT their own profile, including when `enabled = false`.
+- **public_profiles (public read)**: any client can SELECT rows where `enabled = true` — this is how the public URL resolves `username → user_id`.
 
 Never use the Supabase `service_role` key in client-side code — it bypasses all RLS policies.
+
+### Changing Your Password
+
+Click **Change password** in the signed-in panel of the Account modal. This reveals an inline form with two fields — **New password** and **Confirm new password** (both require a minimum of 8 characters). The Change password and Sign out buttons are hidden while the form is open.
+
+- Click **Update password** to submit. The new password is applied immediately via Supabase Auth.
+- If the two fields do not match, a red error message is shown and no request is sent.
+- On success, a green confirmation message is shown and both fields are cleared.
+- Click **Cancel** to discard the form and return to the normal signed-in view.
+
+### Public Collection Sharing
+
+See [Public Collections](#public-collections) for full details. The toggle in the signed-in panel of the Account modal controls whether your collection is accessible at a public URL.
+
+- **Off (default)** — collection is private; only you can read it via cloud sync
+- **On** — collection is readable by anyone who knows your URL; the URL and a **Copy link** button are displayed in the modal
+
+The public URL is tied to a randomly generated username, not your email address.
 
 ### Signing Out
 
@@ -1262,43 +1290,25 @@ Sort is applied after search filtering. Items without a value (`null`) are sorte
 
 Links inside cards and table rows (Est. Value link, Cert link) call `event.stopPropagation()` so that clicking them does not bubble up to the card/row click handler that would otherwise open the detail modal.
 
-### Share Link Upload (dpaste.com)
+### Public Collection URL Detection
 
-Sharing uses the dpaste.com API:
+On page load, `checkPublicURL()` checks for a `?shared=<username>` query parameter. If found:
 
-```
-POST https://dpaste.com/api/v2/
-Content-Type: multipart/form-data
-Body: content=<JSON>, syntax=text, expiry_days=365
+1. The query parameter is stripped from the URL immediately via `history.replaceState`
+2. A full-page loading spinner appears ("Loading shared collection…")
+3. The Supabase anon client queries `public_profiles WHERE username = ? AND enabled = true` to resolve the username to a `user_id`
+4. The collection is downloaded from `collections/{user_id}/collection.json` in Supabase Storage (permitted by the public-read RLS policy for enabled profiles)
+5. The JSON is parsed and the gallery enters [View Mode](#view-mode)
 
-Response 201: https://dpaste.com/<id>\n  (plain text)
-```
-
-The ID is extracted from the response URL (`url.trim().split('/').pop()`). The share URL is then built as `<page-url>#blob=<id>`.
-
-When loading a share URL, the raw content is fetched via:
-
-```
-GET https://dpaste.com/<id>.txt
-```
-
-The `.txt` suffix returns raw plain text (the original JSON), bypassing dpaste's HTML wrapper page. dpaste.com sets `Access-Control-Allow-Origin: *` on both endpoints, making both POST and GET work from any browser origin without a CORS proxy.
+The Supabase SDK is initialized lazily if not already loaded (same `sbInit()` path as the Account modal). No authentication is required for the visitor.
 
 ### View Mode State
 
 View mode is controlled by two module-level variables:
 
 ```javascript
-let viewMode = false;          // true when viewing a shared collection
-let viewLocalCurrency = null;  // the sharer's local currency, used for conversion
+let viewMode = false;          // true when viewing a public collection
+let viewLocalCurrency = null;  // the collection owner's local currency, used for conversion
 ```
 
-`getLocalCurrency()` returns `viewLocalCurrency` when `viewMode` is true, transparently making the exchange rate system use the sharer's currency without touching `localStorage`. When `exitViewMode()` is called, both variables are reset and the now-async `load()` is awaited to restore your own items (metadata from `localStorage`, photos from IndexedDB).
-
-### hashchange Listener
-
-```javascript
-window.addEventListener('hashchange', checkShareURL);
-```
-
-This single listener means share URLs work whether the page is freshly loaded or already open. When the user pastes a share URL into the address bar while autographed.app is already running, the browser fires `hashchange` and `checkShareURL` handles it identically to the initial page load case. The hash is immediately cleared via `history.replaceState` so the loaded state is not tied to the URL.
+`getLocalCurrency()` returns `viewLocalCurrency` when `viewMode` is true, transparently making the exchange rate system use the owner's currency without touching `localStorage`. When `exitViewMode()` is called, both variables are reset and the now-async `load()` is awaited to restore your own items (metadata from `localStorage`, photos from IndexedDB).

@@ -1985,18 +1985,6 @@
           </div>
           <div class="tip-container" style="margin-top:6px">
             <div class="ctrl-row">
-              <button class="settings-row-btn" id="sharePhotosBtn" onclick="showShareWarn()">
-                <span class="settings-row-icon">
-                  <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><line x1="8.59" y1="13.51" x2="15.42" y2="17.49"/><line x1="15.41" y1="6.51" x2="8.59" y2="10.49"/></svg>
-                </span>
-                <span data-i18n="copy_share">Copy Share Link</span>
-              </button>
-              <button class="tip-btn" onclick="toggleTip(this)">i</button>
-            </div>
-            <div class="tip-box" data-i18n="tip_share">⚠️ Uploads your collection publicly to dpaste.com and copies a shareable URL to the clipboard.</div>
-          </div>
-          <div class="tip-container" style="margin-top:6px">
-            <div class="ctrl-row">
               <button class="settings-row-btn" onclick="exportCSV()">
                 <span class="settings-row-icon">
                   <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2"/><line x1="3" y1="9" x2="21" y2="9"/><line x1="3" y1="15" x2="21" y2="15"/><line x1="9" y1="3" x2="9" y2="21"/></svg>
@@ -2436,27 +2424,6 @@
   </div>
 </div>
 
-<!-- ── Share warning ── -->
-<div class="overlay" id="shareWarnOverlay" onclick="if(event.target===this)closeShareWarn()">
-  <div class="modal" style="max-width:420px">
-    <div class="modal-head">
-      <span style="display:flex;align-items:center;gap:8px;font-size:16px;font-weight:700">
-        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="var(--red)" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M10.29 3.86L1.82 18a2 2 0 001.71 3h16.94a2 2 0 001.71-3L13.71 3.86a2 2 0 00-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
-        <span data-i18n="share_warn_title">Your data will be public</span>
-      </span>
-    </div>
-    <div class="modal-body">
-      <p style="margin:0 0 12px;line-height:1.6;font-size:14px" data-i18n-html="share_warn_p1">Generating a share link uploads your <strong>entire collection</strong> — item details, photos, paid amounts, estimated values, and certificate numbers — to <strong>dpaste.com</strong>, a public paste service. Anyone who obtains the link can view all of this information.</p>
-      <p style="margin:0 0 12px;line-height:1.6;font-size:14px;color:var(--sub)" data-i18n-html="share_warn_p2">If your gallery contains financial details or personal information you wouldn't want others to see, do not proceed. Instead, consider using <strong>Export Collection</strong> to save a <code>.json</code> file and share it privately.</p>
-      <p style="margin:0;line-height:1.6;font-size:13px;color:var(--sub)" data-i18n="share_warn_p3">Share links expire after 365 days.</p>
-    </div>
-    <div class="modal-foot">
-      <button class="btn-secondary" onclick="closeShareWarn()" data-i18n="cancel">Cancel</button>
-      <button class="btn-primary" onclick="confirmShare()" data-i18n="share_publicly">Share publicly</button>
-    </div>
-  </div>
-</div>
-
 <!-- ── Toast ── -->
 <div class="toast" id="toast"></div>
 
@@ -2581,12 +2548,7 @@
       lbl_language: 'Language', lang_tip: 'Sets the display language for the app.',
       export_collection: 'Export Collection', import_collection: 'Import Collection',
       merge_import: 'Merge Import', batch_import: 'Batch Import Photos',
-      copy_share: 'Copy Share Link', download_csv: 'Download CSV',
-      share_warn_title: 'Your data will be public',
-      share_warn_p1: 'Generating a share link uploads your <strong>entire collection</strong> — item details, photos, paid amounts, estimated values, and certificate numbers — to <strong>dpaste.com</strong>, a public paste service. Anyone who obtains the link can view all of this information.',
-      share_warn_p2: 'If your gallery contains financial details or personal information you wouldn\'t want others to see, do not proceed. Instead, consider using <strong>Export Collection</strong> to save a <code>.json</code> file and share it privately.',
-      share_warn_p3: 'Share links expire after 365 days.',
-      share_publicly: 'Share publicly',
+      download_csv: 'Download CSV',
       print_collection: 'Print Collection', reset_collection: 'Reset Collection',
       save_as_mine: 'Save as My Collection',
       det_signer: 'Signer', det_character: 'Character', det_film: 'Film / Show',
@@ -2668,7 +2630,6 @@
       tip_import: '⚠️ Loads a JSON file and replaces your entire current collection. Export a backup first if you want to keep it.',
       tip_merge: 'Adds items from a JSON file to your existing collection without removing anything.',
       tip_batch_import: 'Select multiple photos to create one stub item per image. Each stub uses the filename as the signer name — fill in the rest later. You can also drag photos anywhere onto the page.',
-      tip_share: '⚠️ Uploads your collection publicly to dpaste.com and copies a shareable URL to the clipboard.',
       tip_csv: 'Downloads your collection as a CSV spreadsheet. Includes all metadata fields. Photos are not included.',
       tip_print: 'Prints an A4 layout of your collection sorted by value, matching your current photo format settings.',
       tip_reset: '⚠️ Permanently deletes your entire collection. Export a backup first if you want to keep your data.',
@@ -2686,6 +2647,14 @@
       acct_no_backup: 'No cloud backup yet — click Sync to cloud to create one.',
       acct_last_synced: 'Last synced:', acct_status_err: 'Could not check sync status.',
       acct_sync: '↑ Sync to cloud', acct_restore_btn: '↓ Restore from cloud', acct_signout: 'Sign out',
+      acct_change_pw: 'Change password', acct_new_pw: 'New password', acct_confirm_pw: 'Confirm new password',
+      acct_update_pw: 'Update password', acct_updating: 'Updating…',
+      acct_pw_mismatch: 'Passwords do not match', acct_pw_updated: 'Password updated successfully',
+      public_enable_btn: 'Make collection public', public_enable_confirm: 'Enable', public_disable_btn: 'Disable',
+      public_warn: 'Your entire collection — including photos, paid amounts, and certificate numbers — will be publicly accessible to anyone who knows the URL.',
+      public_copy_link: 'Copy link', public_url_label: 'Public URL:',
+      public_enabled_toast: 'Public access enabled', public_disabled_toast: 'Public access disabled',
+      public_link_copied: 'Public link copied to clipboard',
       sync_to_cloud: 'Sync to cloud', restore_from_cloud: 'Restore from cloud',
       tip_sync_cloud: 'Uploads your collection to your account so it can be restored on any device. Requires signing in. Previous cloud backup is overwritten.',
       tip_restore_cloud: '⚠️ Downloads your last cloud backup and replaces your current local collection. Export a local backup first if you want to keep it.',
@@ -2731,12 +2700,7 @@
       lbl_language: 'Idioma', lang_tip: 'Establece el idioma de visualización de la aplicación.',
       export_collection: 'Exportar colección', import_collection: 'Importar colección',
       merge_import: 'Importar y combinar', batch_import: 'Importación por lotes de fotos',
-      copy_share: 'Copiar enlace para compartir', download_csv: 'Descargar CSV',
-      share_warn_title: 'Tus datos serán públicos',
-      share_warn_p1: 'Generar un enlace para compartir sube tu <strong>colección completa</strong> — detalles de artículos, fotos, montos pagados, valores estimados y números de certificado — a <strong>dpaste.com</strong>, un servicio público de pegado de texto. Cualquier persona que obtenga el enlace puede ver toda esta información.',
-      share_warn_p2: 'Si tu galería contiene información financiera o personal que no deseas que otros vean, no continúes. Considera usar <strong>Exportar colección</strong> para guardar un archivo <code>.json</code> y compartirlo de forma privada.',
-      share_warn_p3: 'Los enlaces para compartir expiran después de 365 días.',
-      share_publicly: 'Compartir públicamente',
+      download_csv: 'Descargar CSV',
       print_collection: 'Imprimir colección', reset_collection: 'Reiniciar colección',
       save_as_mine: 'Guardar como mi colección',
       det_signer: 'Firmante', det_character: 'Personaje', det_film: 'Película / Serie',
@@ -2818,7 +2782,6 @@
       tip_import: '⚠️ Carga un archivo JSON y reemplaza tu colección actual completa. Exporta una copia de seguridad primero si deseas conservarla.',
       tip_merge: 'Agrega artículos de un archivo JSON a tu colección existente sin eliminar nada.',
       tip_batch_import: 'Selecciona varias fotos para crear un artículo borrador por imagen. Cada uno usa el nombre del archivo como firmante — completa el resto más tarde. También puedes arrastrar fotos a cualquier parte de la página.',
-      tip_share: '⚠️ Sube tu colección públicamente a dpaste.com y copia un enlace para compartir al portapapeles.',
       tip_csv: 'Descarga tu colección como hoja de cálculo CSV. Incluye todos los campos de metadatos. Las fotos no se incluyen.',
       tip_print: 'Imprime un diseño A4 de tu colección ordenado por valor, según tu configuración actual de formato de foto.',
       tip_reset: '⚠️ Elimina permanentemente toda tu colección. Exporta una copia de seguridad primero si deseas conservar tus datos.',
@@ -2836,6 +2799,14 @@
       acct_no_backup: 'Sin copia de seguridad en la nube — haz clic en Sincronizar para crear una.',
       acct_last_synced: 'Última sincronización:', acct_status_err: 'No se pudo verificar el estado de sincronización.',
       acct_sync: '↑ Sincronizar con la nube', acct_restore_btn: '↓ Restaurar desde la nube', acct_signout: 'Cerrar sesión',
+      acct_change_pw: 'Cambiar contraseña', acct_new_pw: 'Nueva contraseña', acct_confirm_pw: 'Confirmar nueva contraseña',
+      acct_update_pw: 'Actualizar contraseña', acct_updating: 'Actualizando…',
+      acct_pw_mismatch: 'Las contraseñas no coinciden', acct_pw_updated: 'Contraseña actualizada correctamente',
+      public_enable_btn: 'Hacer la colección pública', public_enable_confirm: 'Activar', public_disable_btn: 'Desactivar',
+      public_warn: 'Toda tu colección — incluyendo fotos, montos pagados y números de certificado — será accesible públicamente para cualquiera que conozca la URL.',
+      public_copy_link: 'Copiar enlace', public_url_label: 'URL pública:',
+      public_enabled_toast: 'Acceso público activado', public_disabled_toast: 'Acceso público desactivado',
+      public_link_copied: 'Enlace público copiado al portapapeles',
       sync_to_cloud: 'Sincronizar con la nube', restore_from_cloud: 'Restaurar desde la nube',
       tip_sync_cloud: 'Sube tu colección a tu cuenta para poder restaurarla en cualquier dispositivo. Requiere iniciar sesión. La copia de seguridad anterior se sobreescribirá.',
       tip_restore_cloud: '⚠️ Descarga tu última copia de seguridad en la nube y reemplaza tu colección local actual. Exporta una copia de seguridad local primero si quieres conservarla.',
@@ -2881,12 +2852,7 @@
       lbl_language: '語言', lang_tip: '設定應用程式的顯示語言。',
       export_collection: '匯出收藏', import_collection: '匯入收藏',
       merge_import: '合併匯入', batch_import: '批次匯入相片',
-      copy_share: '複製分享連結', download_csv: '下載 CSV',
-      share_warn_title: '您的資料將公開',
-      share_warn_p1: '產生分享連結會將您的<strong>完整收藏</strong>——項目詳情、相片、購入金額、估計價值及證書編號——上傳至 <strong>dpaste.com</strong>，一個公開的貼文服務。任何取得連結的人均可查看所有資訊。',
-      share_warn_p2: '若您的收藏含有您不希望他人看到的財務細節或個人資訊，請勿繼續。請改用<strong>匯出收藏</strong>將 <code>.json</code> 檔案儲存並私下分享。',
-      share_warn_p3: '分享連結將於 365 天後過期。',
-      share_publicly: '公開分享',
+      download_csv: '下載 CSV',
       print_collection: '列印收藏', reset_collection: '重置收藏',
       save_as_mine: '儲存為我的收藏',
       det_signer: '簽名者', det_character: '角色', det_film: '電影／影集',
@@ -2968,7 +2934,6 @@
       tip_import: '⚠️ 從 JSON 檔案載入並取代您目前的完整收藏。若要保留現有資料，請先匯出備份。',
       tip_merge: '從 JSON 檔案新增項目至您的現有收藏，不會刪除任何內容。',
       tip_batch_import: '選取多張相片，每張圖片將建立一個項目。每個項目預設使用檔名作為簽名者名稱，稍後再填寫詳細資料。您也可以將相片拖曳至頁面任意位置。',
-      tip_share: '⚠️ 將您的收藏公開上傳至 dpaste.com，並複製可分享的網址至剪貼簿。',
       tip_csv: '將您的收藏下載為 CSV 試算表。包含所有中繼資料欄位，不含相片。',
       tip_print: '以 A4 格式列印您的收藏，依價值排序，並符合您目前的相片格式設定。',
       tip_reset: '⚠️ 永久刪除您的整個收藏。若要保留資料，請先匯出備份。',
@@ -2986,6 +2951,14 @@
       acct_no_backup: '尚無雲端備份——點擊「同步至雲端」以建立備份。',
       acct_last_synced: '上次同步：', acct_status_err: '無法檢查同步狀態。',
       acct_sync: '↑ 同步至雲端', acct_restore_btn: '↓ 從雲端還原', acct_signout: '登出',
+      acct_change_pw: '變更密碼', acct_new_pw: '新密碼', acct_confirm_pw: '確認新密碼',
+      acct_update_pw: '更新密碼', acct_updating: '更新中…',
+      acct_pw_mismatch: '密碼不相符', acct_pw_updated: '密碼已成功更新',
+      public_enable_btn: '公開收藏', public_enable_confirm: '啟用', public_disable_btn: '停用',
+      public_warn: '您的整個收藏——包括照片、購入金額和證書編號——將可供任何知道網址的人公開存取。',
+      public_copy_link: '複製連結', public_url_label: '公開網址：',
+      public_enabled_toast: '已啟用公開存取', public_disabled_toast: '已停用公開存取',
+      public_link_copied: '公開連結已複製到剪貼簿',
       sync_to_cloud: '同步至雲端', restore_from_cloud: '從雲端還原',
       tip_sync_cloud: '將您的收藏上傳至帳號，以便在任何裝置上還原。需要登入。之前的雲端備份將被覆蓋。',
       tip_restore_cloud: '⚠️ 下載您最後的雲端備份並取代目前的本地收藏。如需保留本地收藏，請先匯出備份。',
@@ -3031,12 +3004,7 @@
       lbl_language: 'Sprache', lang_tip: 'Legt die Anzeigesprache der App fest.',
       export_collection: 'Sammlung exportieren', import_collection: 'Sammlung importieren',
       merge_import: 'Importieren und zusammenführen', batch_import: 'Fotos stapelweise importieren',
-      copy_share: 'Link zum Teilen kopieren', download_csv: 'CSV herunterladen',
-      share_warn_title: 'Deine Daten werden öffentlich',
-      share_warn_p1: 'Das Erstellen eines Teilungslinks lädt deine <strong>gesamte Sammlung</strong> — Objektdetails, Fotos, gezahlte Beträge, geschätzte Werte und Zertifikatsnummern — auf <strong>dpaste.com</strong>, einen öffentlichen Einfügedienst, hoch. Jeder, der den Link erhält, kann alle diese Informationen einsehen.',
-      share_warn_p2: 'Wenn deine Sammlung finanzielle oder persönliche Informationen enthält, die du nicht teilen möchtest, fahre nicht fort. Verwende stattdessen <strong>Sammlung exportieren</strong>, um eine <code>.json</code>-Datei zu speichern und sie privat zu teilen.',
-      share_warn_p3: 'Links zum Teilen laufen nach 365 Tagen ab.',
-      share_publicly: 'Öffentlich teilen',
+      download_csv: 'CSV herunterladen',
       print_collection: 'Sammlung drucken', reset_collection: 'Sammlung zurücksetzen',
       save_as_mine: 'Als meine Sammlung speichern',
       det_signer: 'Unterzeichner', det_character: 'Charakter', det_film: 'Film / Serie',
@@ -3118,7 +3086,6 @@
       tip_import: '⚠️ Lädt eine JSON-Datei und ersetzt deine gesamte aktuelle Sammlung. Exportiere vorher eine Sicherung, wenn du sie behalten möchtest.',
       tip_merge: 'Fügt Objekte aus einer JSON-Datei zu deiner bestehenden Sammlung hinzu, ohne etwas zu löschen.',
       tip_batch_import: 'Wähle mehrere Fotos aus, um für jedes Bild ein Entwurfsobjekt zu erstellen. Als Unterzeichner wird der Dateiname verwendet — fülle den Rest später aus. Du kannst Fotos auch an eine beliebige Stelle auf der Seite ziehen.',
-      tip_share: '⚠️ Lädt deine Sammlung öffentlich auf dpaste.com hoch und kopiert eine teilbare URL in die Zwischenablage.',
       tip_csv: 'Lädt deine Sammlung als CSV-Tabelle herunter. Enthält alle Metadatenfelder, keine Fotos.',
       tip_print: 'Druckt deine Sammlung im A4-Format sortiert nach Wert, entsprechend deinen aktuellen Fotoformateinstellungen.',
       tip_reset: '⚠️ Löscht deine gesamte Sammlung dauerhaft. Exportiere vorher eine Sicherung, wenn du deine Daten behalten möchtest.',
@@ -3136,6 +3103,14 @@
       acct_no_backup: 'Noch kein Cloud-Backup — klicke auf „Mit Cloud synchronisieren", um eines zu erstellen.',
       acct_last_synced: 'Zuletzt synchronisiert:', acct_status_err: 'Synchronisierungsstatus konnte nicht geprüft werden.',
       acct_sync: '↑ Mit Cloud synchronisieren', acct_restore_btn: '↓ Aus Cloud wiederherstellen', acct_signout: 'Abmelden',
+      acct_change_pw: 'Passwort ändern', acct_new_pw: 'Neues Passwort', acct_confirm_pw: 'Neues Passwort bestätigen',
+      acct_update_pw: 'Passwort aktualisieren', acct_updating: 'Aktualisieren…',
+      acct_pw_mismatch: 'Passwörter stimmen nicht überein', acct_pw_updated: 'Passwort erfolgreich aktualisiert',
+      public_enable_btn: 'Sammlung öffentlich machen', public_enable_confirm: 'Aktivieren', public_disable_btn: 'Deaktivieren',
+      public_warn: 'Deine gesamte Sammlung — einschließlich Fotos, gezahlter Beträge und Zertifikatsnummern — wird für jeden öffentlich zugänglich sein, der die URL kennt.',
+      public_copy_link: 'Link kopieren', public_url_label: 'Öffentliche URL:',
+      public_enabled_toast: 'Öffentlicher Zugang aktiviert', public_disabled_toast: 'Öffentlicher Zugang deaktiviert',
+      public_link_copied: 'Öffentlicher Link in die Zwischenablage kopiert',
       sync_to_cloud: 'Mit Cloud synchronisieren', restore_from_cloud: 'Aus Cloud wiederherstellen',
       tip_sync_cloud: 'Lädt deine Sammlung in dein Konto hoch, damit sie auf jedem Gerät wiederhergestellt werden kann. Erfordert Anmeldung. Das vorherige Cloud-Backup wird überschrieben.',
       tip_restore_cloud: '⚠️ Lädt dein letztes Cloud-Backup herunter und ersetzt deine aktuelle lokale Sammlung. Exportiere zuerst ein lokales Backup, wenn du es behalten möchtest.',
@@ -3181,12 +3156,7 @@
       lbl_language: 'Langue', lang_tip: 'Définit la langue d\'affichage de l\'application.',
       export_collection: 'Exporter la collection', import_collection: 'Importer une collection',
       merge_import: 'Import fusionné', batch_import: 'Import de photos en lot',
-      copy_share: 'Copier le lien de partage', download_csv: 'Télécharger en CSV',
-      share_warn_title: 'Vos données seront publiques',
-      share_warn_p1: 'Générer un lien de partage téléverse l\'intégralité de votre <strong>collection</strong> — détails des articles, photos, montants payés, valeurs estimées et numéros de certificat — sur <strong>dpaste.com</strong>, un service de collage public. Toute personne disposant du lien peut consulter ces informations.',
-      share_warn_p2: 'Si votre galerie contient des informations financières ou personnelles que vous ne souhaitez pas divulguer, n\'allez pas plus loin. Utilisez plutôt <strong>Exporter la collection</strong> pour sauvegarder un fichier <code>.json</code> et le partager en privé.',
-      share_warn_p3: 'Les liens de partage expirent après 365 jours.',
-      share_publicly: 'Partager publiquement',
+      download_csv: 'Télécharger en CSV',
       print_collection: 'Imprimer la collection', reset_collection: 'Réinitialiser la collection',
       save_as_mine: 'Enregistrer comme ma collection',
       det_signer: 'Signataire', det_character: 'Personnage', det_film: 'Film / Série',
@@ -3264,7 +3234,6 @@
       tip_import: '⚠️ Charge un fichier JSON et remplace toute votre collection actuelle. Exportez une sauvegarde au préalable si vous souhaitez la conserver.',
       tip_merge: 'Ajoute des articles d\'un fichier JSON à votre collection existante sans rien supprimer.',
       tip_batch_import: 'Sélectionnez plusieurs photos pour créer un article provisoire par image. Le nom du fichier est utilisé comme signataire — complétez les détails plus tard. Vous pouvez aussi faire glisser des photos n\'importe où sur la page.',
-      tip_share: '⚠️ Téléverse votre collection publiquement sur dpaste.com et copie un lien partageable dans le presse-papiers.',
       tip_csv: 'Télécharge votre collection sous forme de tableur CSV. Inclut tous les champs de métadonnées. Les photos ne sont pas incluses.',
       tip_print: 'Imprime votre collection au format A4 triée par valeur, selon vos paramètres de format de photo actuels.',
       tip_reset: '⚠️ Supprime définitivement toute votre collection. Exportez une sauvegarde au préalable si vous souhaitez conserver vos données.',
@@ -3282,6 +3251,14 @@
       acct_no_backup: 'Aucune sauvegarde cloud — cliquez sur « Synchroniser » pour en créer une.',
       acct_last_synced: 'Dernière sync :', acct_status_err: 'Impossible de vérifier le statut de synchronisation.',
       acct_sync: '↑ Synchroniser avec le cloud', acct_restore_btn: '↓ Restaurer depuis le cloud', acct_signout: 'Se déconnecter',
+      acct_change_pw: 'Changer le mot de passe', acct_new_pw: 'Nouveau mot de passe', acct_confirm_pw: 'Confirmer le nouveau mot de passe',
+      acct_update_pw: 'Mettre à jour le mot de passe', acct_updating: 'Mise à jour…',
+      acct_pw_mismatch: 'Les mots de passe ne correspondent pas', acct_pw_updated: 'Mot de passe mis à jour avec succès',
+      public_enable_btn: 'Rendre la collection publique', public_enable_confirm: 'Activer', public_disable_btn: 'Désactiver',
+      public_warn: "Toute votre collection — y compris les photos, les montants payés et les numéros de certificat — sera publiquement accessible à toute personne connaissant l'URL.",
+      public_copy_link: 'Copier le lien', public_url_label: 'URL publique :',
+      public_enabled_toast: 'Accès public activé', public_disabled_toast: 'Accès public désactivé',
+      public_link_copied: 'Lien public copié dans le presse-papiers',
       sync_to_cloud: 'Synchroniser avec le cloud', restore_from_cloud: 'Restaurer depuis le cloud',
       tip_sync_cloud: 'Téléverse votre collection vers votre compte pour la restaurer sur n\'importe quel appareil. Nécessite une connexion. La sauvegarde cloud précédente sera écrasée.',
       tip_restore_cloud: '⚠️ Télécharge votre dernière sauvegarde cloud et remplace votre collection locale actuelle. Exportez d\'abord une sauvegarde locale si vous souhaitez la conserver.',
@@ -4628,7 +4605,6 @@
     if (e.key === 'Escape') {
       close('formOverlay');
       close('detailOverlay');
-      close('shareWarnOverlay');
       close('filterOverlay');
       close('settingsOverlay');
     }
@@ -4902,94 +4878,35 @@
     }).join('');
   }
 
-  /* ── Share via URL ── */
-  async function compressToURL(obj) {
-    const json = JSON.stringify(obj);
-    const stream = new CompressionStream('deflate-raw');
-    const writer = stream.writable.getWriter();
-    writer.write(new TextEncoder().encode(json));
-    writer.close();
-    const buf = await new Response(stream.readable).arrayBuffer();
-    return btoa(String.fromCharCode(...new Uint8Array(buf)))
-      .replace(/\+/g, '-').replace(/\//g, '_').replace(/=/g, '');
-  }
-
-  async function decompressFromURL(b64) {
-    const std = b64.replace(/-/g, '+').replace(/_/g, '/');
-    const bytes = Uint8Array.from(atob(std), c => c.charCodeAt(0));
-    const stream = new DecompressionStream('deflate-raw');
-    const writer = stream.writable.getWriter();
-    writer.write(bytes);
-    writer.close();
-    return new Response(stream.readable).text();
-  }
-
-  function showShareWarn() {
-    if (!items.length) { toast('Nothing to share'); return; }
-    open('shareWarnOverlay');
-  }
-  function closeShareWarn() { close('shareWarnOverlay'); }
-  function confirmShare() {
-    close('shareWarnOverlay');
-    shareCollectionWithPhotos();
-  }
-
-  async function shareCollectionWithPhotos() {
-    if (!items.length) { toast('Nothing to share'); return; }
-    const btn = document.getElementById('sharePhotosBtn');
-    const txtSpan = btn.querySelector('[data-i18n]');
-    const originalText = txtSpan.textContent;
-    btn.disabled = true;
-    txtSpan.textContent = ' Uploading…';
-    const payload = { currency: getLocalCurrency(), settings: collectSettings(), items };
-    try {
-      const fd = new FormData();
-      fd.append('content', JSON.stringify(payload));
-      fd.append('syntax', 'text');
-      fd.append('expiry_days', '365');
-      const res = await fetch('https://dpaste.com/api/v2/', { method: 'POST', body: fd });
-      if (!res.ok) throw new Error();
-      const id = (await res.text()).trim().split('/').pop();
-      const url = `${location.href.split('#')[0]}#blob=${id}`;
-      await navigator.clipboard.writeText(url);
-      toast('Share link (with photos) copied to clipboard');
-    } catch {
-      toast('⚠️ Upload failed — check your connection');
-    } finally {
-      btn.disabled = false;
-      txtSpan.textContent = originalText;
-    }
-  }
-
-  async function checkShareURL() {
-    const hash = location.hash;
-    if (!hash.startsWith('#share=') && !hash.startsWith('#blob=')) return;
-    history.replaceState(null, '', location.pathname + location.search);
-
-    async function applyShared(parsed) {
-      const data = Array.isArray(parsed) ? parsed : parsed.items;
-      const currency = Array.isArray(parsed) ? null : parsed.currency;
-      const settings = Array.isArray(parsed) ? null : (parsed.settings || null);
-      if (!Array.isArray(data)) throw new Error('bad format');
-      const s = data.length === 1 ? '' : 's';
-      enterViewMode(data, currency, settings);
-      toast(`Viewing shared collection — ${data.length} item${s}`);
-    }
-
+  async function checkPublicURL() {
+    const params = new URLSearchParams(location.search);
+    const sharedUser = params.get('shared');
+    if (!sharedUser) return;
+    history.replaceState(null, '', location.pathname + location.hash);
     const loader = document.getElementById('shareLoader');
     loader.classList.add('visible');
     try {
-      if (hash.startsWith('#share=')) {
-        const json = await decompressFromURL(hash.slice(7));
-        await applyShared(JSON.parse(json));
-      } else {
-        const id = hash.slice(6);
-        const res = await fetch(`https://dpaste.com/${id}.txt`);
-        if (!res.ok) throw new Error('fetch failed');
-        await applyShared(await res.json());
-      }
-    } catch {
-      toast('⚠️ Could not load shared collection — link may be invalid');
+      const sb = await sbInit();
+      const { data: profile, error: profErr } = await sb
+        .from('public_profiles')
+        .select('user_id')
+        .eq('username', sharedUser)
+        .single();
+      if (profErr || !profile) throw new Error('Collection not found or public access is not enabled');
+      const { data: blob, error: dlErr } = await sb.storage
+        .from('collections')
+        .download(`${profile.user_id}/collection.json`);
+      if (dlErr || !blob) throw new Error('Could not download collection');
+      const json = JSON.parse(await blob.text());
+      const data = Array.isArray(json) ? json : json.items;
+      const currency = Array.isArray(json) ? null : json.currency;
+      const settings = Array.isArray(json) ? null : (json.settings || null);
+      if (!Array.isArray(data)) throw new Error('Unrecognised format');
+      enterViewMode(data, currency, settings);
+      const s = data.length === 1 ? '' : 's';
+      toast(`Viewing shared collection — ${data.length} item${s}`);
+    } catch (err) {
+      toast('⚠️ ' + (err.message || 'Could not load collection'));
     } finally {
       loader.classList.remove('visible');
     }
@@ -5178,9 +5095,8 @@
     setView(savedView);  // first render, now that items are ready
     fetchExchangeRate(); // re-renders once the rate is ready (uses cache if fresh)
     sbInit().catch(() => {}); // restore persisted auth session and update header
-    checkShareURL();
+    checkPublicURL();
   })();
-  window.addEventListener('hashchange', checkShareURL);
 
   /* photo viewer interactions (attached once after DOM ready) */
   const pv    = document.getElementById('photoViewer');
@@ -5405,6 +5321,8 @@
   const SB_KEY = 'sb_publishable_vjQEPBXuDp46KT9pzbvViQ_vmdgxoNb';
   let _sbClient = null;
   let _sbSdkPromise = null;
+  let _sbPublicEnabled = false;
+  let _sbPublicUsername = null;
 
   function sbLoadSdk() {
     if (_sbSdkPromise) return _sbSdkPromise;
@@ -5461,6 +5379,7 @@
       document.getElementById('sbEmail').textContent = user.email;
       sbPanel('sbIn');
       sbLoadSyncStatus(user.id);
+      sbLoadPublicStatus(user.id);
     } else {
       sbPanel('sbOut');
     }
@@ -5479,7 +5398,7 @@
     }
   }
 
-  function closeAccount() { close('accountOverlay'); }
+  function closeAccount() { close('accountOverlay'); sbShowChangePw(false); sbPublicEnableWarn(false); }
 
   function sbTab(which) {
     const isIn = which === 'in';
@@ -5540,7 +5459,112 @@
   async function sbSignOut() {
     if (!_sbClient) return;
     await _sbClient.auth.signOut();
+    sbShowChangePw(false);
     sbUpdateModal(null);
+  }
+
+  function sbShowChangePw(show) {
+    const panel = document.getElementById('sbChangePwPanel');
+    if (!panel) return;
+    panel.style.display = show ? '' : 'none';
+    document.getElementById('sbAccountActions').style.display = show ? 'none' : 'flex';
+    if (!show) {
+      document.getElementById('sbChangePwForm').reset();
+      document.getElementById('sbMsgPw').style.display = 'none';
+    }
+  }
+
+  async function sbChangePw(e) {
+    e.preventDefault();
+    const pw1 = document.getElementById('sbNewPw').value;
+    const pw2 = document.getElementById('sbConfirmPw').value;
+    if (pw1 !== pw2) { sbMsg('sbMsgPw', t('acct_pw_mismatch'), 'err'); return; }
+    const btn = document.getElementById('sbBtnPw');
+    btn.disabled = true; btn.textContent = t('acct_updating');
+    try {
+      const { error } = await _sbClient.auth.updateUser({ password: pw1 });
+      if (error) throw error;
+      sbMsg('sbMsgPw', t('acct_pw_updated'), 'ok');
+      document.getElementById('sbNewPw').value = '';
+      document.getElementById('sbConfirmPw').value = '';
+    } catch (err) {
+      sbMsg('sbMsgPw', err.message || 'Update failed.', 'err');
+    } finally {
+      btn.disabled = false; btn.textContent = t('acct_update_pw');
+    }
+  }
+
+  function generateUsername() {
+    const chars = 'abcdefghijklmnopqrstuvwxyz0123456789';
+    let r = '';
+    for (let i = 0; i < 10; i++) r += chars[Math.floor(Math.random() * chars.length)];
+    return r;
+  }
+
+  async function sbLoadPublicStatus(uid) {
+    try {
+      const { data } = await _sbClient
+        .from('public_profiles')
+        .select('enabled, username')
+        .eq('user_id', uid)
+        .maybeSingle();
+      _sbPublicEnabled = data?.enabled ?? false;
+      _sbPublicUsername = data?.username ?? null;
+    } catch {
+      _sbPublicEnabled = false;
+      _sbPublicUsername = null;
+    }
+    sbUpdatePublicUI();
+  }
+
+  function sbUpdatePublicUI() {
+    const offDiv = document.getElementById('sbPublicOff');
+    const onDiv  = document.getElementById('sbPublicOn');
+    if (!offDiv) return;
+    offDiv.style.display = _sbPublicEnabled ? 'none' : '';
+    onDiv.style.display  = _sbPublicEnabled ? '' : 'none';
+    if (_sbPublicEnabled && _sbPublicUsername) {
+      const base = location.href.split('?')[0].split('#')[0];
+      document.getElementById('sbPublicUrl').textContent =
+        `${base}?shared=${_sbPublicUsername}`;
+    }
+  }
+
+  function sbPublicEnableWarn(show) {
+    const warn = document.getElementById('sbPublicEnableWarn');
+    const btn  = document.getElementById('sbPublicEnableBtn');
+    if (!warn) return;
+    warn.style.display = show ? '' : 'none';
+    btn.style.display  = show ? 'none' : '';
+  }
+
+  async function sbDoEnablePublic() {
+    const { data: { user } } = await _sbClient.auth.getUser();
+    const username = _sbPublicUsername || generateUsername();
+    const { error } = await _sbClient.from('public_profiles')
+      .upsert({ user_id: user.id, username, enabled: true });
+    if (error) { toast('⚠️ Could not enable public access'); return; }
+    _sbPublicEnabled = true;
+    _sbPublicUsername = username;
+    sbPublicEnableWarn(false);
+    sbUpdatePublicUI();
+    toast(t('public_enabled_toast'));
+  }
+
+  async function sbDisablePublic() {
+    const { data: { user } } = await _sbClient.auth.getUser();
+    const { error } = await _sbClient.from('public_profiles')
+      .upsert({ user_id: user.id, username: _sbPublicUsername, enabled: false });
+    if (error) { toast('⚠️ Could not disable public access'); return; }
+    _sbPublicEnabled = false;
+    sbUpdatePublicUI();
+    toast(t('public_disabled_toast'));
+  }
+
+  function sbCopyPublicUrl() {
+    const base = location.href.split('?')[0].split('#')[0];
+    navigator.clipboard.writeText(`${base}?shared=${_sbPublicUsername}`)
+      .then(() => toast(t('public_link_copied')));
   }
 
   function sbFormatDate(d) {
@@ -5753,12 +5777,55 @@
       <div id="sbIn" style="display:none">
         <p class="auth-email" id="sbEmail"></p>
         <p class="auth-hint" id="sbSyncHint"></p>
-        <div style="display:flex;gap:8px;margin-bottom:16px">
+        <div style="display:flex;gap:8px;margin-bottom:14px">
           <button class="btn-add" id="sbPushBtn" onclick="sbPush()" style="flex:1;justify-content:center;height:36px;font-size:13px" data-i18n="acct_sync">↑ Sync to cloud</button>
           <button class="btn-secondary" id="sbPullBtn" onclick="sbPull()" style="flex:1;height:36px;font-size:13px" data-i18n="acct_restore_btn">↓ Restore from cloud</button>
         </div>
+        <!-- Public collection sharing -->
+        <div id="sbPublicSection" style="margin-bottom:14px">
+          <div id="sbPublicOff">
+            <div id="sbPublicEnableWarn" style="display:none;background:var(--surface);border:1px solid var(--border);border-radius:8px;padding:12px;margin-bottom:8px">
+              <p style="font-size:12px;color:var(--sub);line-height:1.5;margin-bottom:10px" data-i18n="public_warn">Your entire collection — including photos, paid amounts, and certificate numbers — will be publicly accessible to anyone who knows the URL.</p>
+              <div style="display:flex;gap:8px">
+                <button type="button" class="btn-secondary" onclick="sbPublicEnableWarn(false)" style="flex:1;height:34px;font-size:13px" data-i18n="cancel">Cancel</button>
+                <button type="button" class="btn-add" onclick="sbDoEnablePublic()" style="flex:1;justify-content:center;height:34px;font-size:13px" data-i18n="public_enable_confirm">Enable</button>
+              </div>
+            </div>
+            <button type="button" class="btn-secondary" id="sbPublicEnableBtn" onclick="sbPublicEnableWarn(true)" style="width:100%;height:34px;font-size:13px" data-i18n="public_enable_btn">Make collection public</button>
+          </div>
+          <div id="sbPublicOn" style="display:none">
+            <p style="font-size:12px;color:var(--sub);margin-bottom:4px" data-i18n="public_url_label">Public URL:</p>
+            <p id="sbPublicUrl" style="font-size:12px;font-weight:600;word-break:break-all;margin-bottom:10px;color:var(--gold)"></p>
+            <div style="display:flex;gap:8px">
+              <button type="button" class="btn-secondary" onclick="sbCopyPublicUrl()" style="flex:1;height:34px;font-size:13px" data-i18n="public_copy_link">Copy link</button>
+              <button type="button" class="btn-secondary" onclick="sbDisablePublic()" style="flex:1;height:34px;font-size:13px;color:var(--sub)" data-i18n="public_disable_btn">Disable</button>
+            </div>
+          </div>
+        </div>
         <hr style="border:none;border-top:1px solid var(--border);margin:0 0 14px">
-        <button class="btn-secondary" onclick="sbSignOut()" style="width:100%;height:34px;font-size:13px" data-i18n="acct_signout">Sign out</button>
+        <!-- Change password panel -->
+        <div id="sbChangePwPanel" style="display:none;margin-bottom:14px">
+          <form id="sbChangePwForm" onsubmit="sbChangePw(event)">
+            <div class="fg">
+              <label class="flabel" data-i18n="acct_new_pw">New password</label>
+              <input class="finput" type="password" id="sbNewPw" autocomplete="new-password" required minlength="8">
+            </div>
+            <div class="fg">
+              <label class="flabel" data-i18n="acct_confirm_pw">Confirm new password</label>
+              <input class="finput" type="password" id="sbConfirmPw" autocomplete="new-password" required minlength="8">
+              <div class="fhint" data-i18n="acct_pw_hint">Minimum 8 characters</div>
+            </div>
+            <div id="sbMsgPw" class="auth-msg err" style="display:none"></div>
+            <div style="display:flex;gap:8px">
+              <button type="button" class="btn-secondary" onclick="sbShowChangePw(false)" style="flex:1;height:36px;font-size:13px" data-i18n="cancel">Cancel</button>
+              <button class="btn-add" type="submit" id="sbBtnPw" style="flex:1;justify-content:center;height:36px;font-size:13px" data-i18n="acct_update_pw">Update password</button>
+            </div>
+          </form>
+        </div>
+        <div id="sbAccountActions" style="display:flex;gap:8px">
+          <button class="btn-secondary" onclick="sbShowChangePw(true)" style="flex:1;height:34px;font-size:13px" data-i18n="acct_change_pw">Change password</button>
+          <button class="btn-secondary" onclick="sbSignOut()" style="flex:1;height:34px;font-size:13px" data-i18n="acct_signout">Sign out</button>
+        </div>
       </div>
 
     </div>
