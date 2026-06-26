@@ -1,6 +1,6 @@
 # autographed.app
 
-A single-file, no-backend browser app for managing an autograph and memorabilia collection. All data is stored locally in the browser — nothing is ever sent to a server.
+A single-file browser app for managing an autograph and memorabilia collection. Data is stored locally in the browser by default, with optional cloud backup via a free account.
 
 > **Note:** This README documents `dashboard.html` (the app) only. It does not cover `index.html` (the marketing page) or the `/blog/` section.
 
@@ -24,12 +24,13 @@ A single-file, no-backend browser app for managing an autograph and memorabilia 
 14. [Print Layout](#print-layout)
 15. [Sharing a Collection](#sharing-a-collection)
 16. [View Mode](#view-mode)
-17. [Light & Dark Mode](#light--dark-mode)
-18. [Footer](#footer)
-19. [Mobile Behavior](#mobile-behavior)
-20. [Data Storage](#data-storage)
-21. [Item Schema](#item-schema)
-22. [Technical Notes](#technical-notes)
+17. [Accounts & Cloud Sync](#accounts--cloud-sync)
+18. [Light & Dark Mode](#light--dark-mode)
+19. [Footer](#footer)
+20. [Mobile Behavior](#mobile-behavior)
+21. [Data Storage](#data-storage)
+22. [Item Schema](#item-schema)
+23. [Technical Notes](#technical-notes)
 
 ---
 
@@ -39,21 +40,16 @@ autographed.app is a **single HTML file** (`dashboard.html`). There is no server
 
 Key characteristics:
 
-- **Zero dependencies** — runs directly from the filesystem or any static file server (e.g. `python3 -m http.server 4200`).
-- **Persistent storage** — item metadata, preferences, and cached exchange rates are stored in the browser's `localStorage`; photos are stored in **IndexedDB** so large collections aren't capped by the small `localStorage` quota.
-- **No account required** — open the file, start adding items.
+- **Persistent local storage** — item metadata, preferences, and cached exchange rates are stored in the browser's `localStorage`; photos are stored in **IndexedDB** so large collections aren't capped by the small `localStorage` quota.
+- **No account required** — open the page and start adding items immediately.
+- **Optional cloud backup** — create a free account to sync your collection to the cloud and restore it on any device. Without an account, your data lives only in your browser and will be lost if you clear browser data.
 - **Designed for 8×10 autographed photos and similar memorabilia**, but works for any signed collectible.
 
 ---
 
 ## Getting Started
 
-Open `dashboard.html` in any modern browser. If you need URL-based navigation or want to load images from disk, serve it locally:
-
-```bash
-python3 -m http.server 4200
-# then open http://localhost:4200
-```
+Open `dashboard.html` in any modern browser, or visit the hosted version at [autographed.app](https://autographed.app).
 
 The app is blank on first launch. The empty state shows two buttons: **+ Add Item** to begin building your own collection, and **Load Demo Collection** to instantly populate the gallery with a sample set of items so you can explore the app before adding your own data.
 
@@ -72,13 +68,14 @@ The header is sticky — it stays at the top of the viewport while you scroll. I
 | Control | Description |
 |---|---|
 | 👁 Eye (privacy) | Visible only when Privacy Mode is enabled. Clicking it turns Privacy Mode off and hides the button. |
+| 👤 Account | Opens the **Account Modal** for sign-in, account creation, and cloud sync. When signed in, the person icon is replaced by the first letter of your email in gold. |
 | ▶ Play | Opens **Presentation Mode** — a full-screen photo slideshow for displaying the collection on a TV or monitor |
 | ⚙️ Settings | Opens the **Settings Modal** for theme, import/export, and currency options |
 | **+ Add Item** | Opens the Add Item modal |
 
 The Settings button is a 36×36px square icon button with rounded corners. On hover it brightens slightly.
 
-The **+ Add Item** button is styled in gold with black text to make it the primary call to action. On mobile (≤640px), the text label is hidden and only the **+** icon is shown to save header space.
+The **+ Add Item** button is styled in gold with black text to make it the primary call to action. On mobile (≤480px), the text label is hidden and only the **+** icon is shown to save header space.
 
 ---
 
@@ -459,7 +456,7 @@ Opened by clicking the **⚙️ gear icon** in the header. Settings are organize
 | Tab | Contents |
 |---|---|
 | **General** | Language, Appearance, Photo Format, Image Fit, Info Links, Est. Value Search, Privacy Mode, Auto-Description, Grid View Visibility |
-| **Data** | Backup & Share (normal mode) or Save as My Collection (view mode) |
+| **Data** | Backup, Share, and Cloud Sync (normal mode) or Save as My Collection (view mode) |
 | **Currency** | Local Currency, Display Currency, Exchange Rate (Local Currency hidden in view mode) |
 
 The modal always opens on the **General** tab.
@@ -620,7 +617,7 @@ A set of checkboxes that control which elements are shown on each card in the gr
 
 ### Data Tab
 
-Eight row buttons plus one toggle, each with its own `(i)` tooltip on the right:
+Row buttons, each with its own `(i)` tooltip on the right:
 
 - **Export Collection** — downloads the full collection as a `.json` file. See [Import & Export](#import--export).
 - **Export reminder** — a toggle switch (off by default). When enabled, the browser shows a confirmation dialog if you try to leave or close the page after making changes to your collection since the last export. The reminder is automatically cleared after each successful export, so it only fires when there are genuinely unsaved changes.
@@ -630,6 +627,8 @@ Eight row buttons plus one toggle, each with its own `(i)` tooltip on the right:
 - **Copy Share Link** — uploads the collection to dpaste.com and copies a short shareable URL to the clipboard. See [Sharing a Collection](#sharing-a-collection).
 - **Download CSV** — downloads all item metadata as a `.csv` spreadsheet (photos are not included). Columns cover every field: signers, **Detail 1**, **Detail 2**, item type, cert number, cert type, condition, paid, estimated value, search term, tags, signing event, signing date, acquired how, location, notes, and date added. Paid and Est. Value column headers include the local currency code. Values containing commas or quotes are properly escaped.
 - **Print Collection** — generates and opens a print-ready A4 layout of the collection. See [Print Layout](#print-layout).
+- **Sync to cloud** — uploads your collection to your account's cloud storage. Disabled (greyed out) when not signed in. See [Accounts & Cloud Sync](#accounts--cloud-sync).
+- **Restore from cloud** — downloads your last cloud backup and replaces your local collection. Disabled (greyed out) when not signed in. Shows a confirmation dialog before overwriting. See [Accounts & Cloud Sync](#accounts--cloud-sync).
 - **Reset Collection** — permanently deletes your entire collection (items and photos) from both localStorage and IndexedDB, and returns the gallery to the empty state. A confirmation dialog is shown first. Separated from the other buttons by a divider and labelled in red to signal it is destructive. Export a backup first if you want to keep your data.
 
 > ⚠️ In [View Mode](#view-mode) the Data tab shows a single **Save as My Collection** button instead of the backup and share buttons.
@@ -739,11 +738,8 @@ autographed.app can generate a short URL that lets anyone view your collection i
 2. Under **Data**, click **Copy Share Link**
 3. A warning dialog appears explaining that your collection will be uploaded publicly. Read it carefully — if your gallery contains financial details or personal information you wouldn't want others to see, click **Cancel** and use **Export Collection** to share the file privately instead.
 4. Click **Share publicly** to proceed. The button label changes to "Uploading…" while the collection is sent to dpaste.com.
-5. Once uploaded, a short URL is copied to your clipboard automatically — e.g.:
-   ```
-   http://localhost:4200/dashboard.html#blob=G9GW3KB53
-   ```
-5. Send that URL to anyone. When they open it, autographed.app loads and immediately displays your collection in read-only [View Mode](#view-mode)
+5. Once uploaded, a short URL is copied to your clipboard automatically.
+6. Send that URL to anyone. When they open it, autographed.app loads and immediately displays your collection in read-only [View Mode](#view-mode).
 
 ### What Gets Uploaded
 
@@ -761,18 +757,9 @@ The URL contains only a short blob ID in the hash fragment (`#blob=<id>`). The h
 4. The JSON is parsed and the collection is displayed in [View Mode](#view-mode)
 5. The hash is stripped from the URL (`history.replaceState`) so refreshing the page does not re-trigger the load
 
-### Loading in the Same Tab
-
-If autographed.app is already open and you paste a share URL into the browser's address bar (changing only the hash), the app detects the `hashchange` event and loads the shared collection without a full page reload.
-
 ### Paste Expiry
 
 dpaste.com pastes created by autographed.app are set to expire after **365 days**. After that, the share URL will stop working. There is no way to renew a paste — generate a new share link if needed.
-
-### Error Handling
-
-- If the upload fails (e.g. no internet connection), a toast appears: "⚠️ Upload failed — check your connection". The button returns to its normal state and nothing is copied to the clipboard.
-- If a share URL is opened but the paste has expired or the ID is invalid, a toast appears: "⚠️ Could not load shared collection — link may be invalid".
 
 ---
 
@@ -851,6 +838,91 @@ Click **← Back to my collection** in the gold banner. This:
 3. Restores the Add Item button and all edit/delete controls
 4. Hides the banner
 5. Re-fetches the exchange rate for your own currency pair
+
+---
+
+## Accounts & Cloud Sync
+
+An account is **optional** but recommended. Without one, your collection lives only in your browser — if you clear browser data or switch devices, it is gone. With an account, you can back up your collection to the cloud and restore it on any device.
+
+Cloud sync is powered by **[Supabase](https://supabase.com)** (authentication + object storage + database).
+
+### Account Modal
+
+Click the **person icon** in the header to open the Account modal. Once signed in, the icon is replaced by the first letter of your email address in gold.
+
+The modal has three states:
+
+| State | Contents |
+|---|---|
+| **Signed out** | Sign-in and Create account tabs with email + password forms |
+| **Signed in** | Your email address, last sync status, Sync to cloud and Restore from cloud buttons, and a Sign out button |
+| **Loading** | Shown briefly while connecting to Supabase |
+
+### Creating an Account
+
+1. Open the Account modal (person icon in the header)
+2. Click **Create account**
+3. Enter your email address and a password (minimum 8 characters)
+4. Click **Create account** — Supabase sends a confirmation email
+5. Click the link in the email to verify your address
+6. Return to the app and sign in
+
+### Signing In
+
+1. Open the Account modal
+2. Enter your email and password
+3. Click **Sign in**
+
+Your session is persisted by Supabase's SDK — you remain signed in across page reloads and browser restarts until you explicitly sign out.
+
+### Syncing to the Cloud
+
+Click **↑ Sync to cloud** in the Account modal (or **Sync to cloud** in Settings → Data).
+
+This uploads a complete snapshot of your collection — all item metadata, all photos, and current settings — to your private Supabase Storage bucket as `{uid}/collection.json`. A lightweight metadata record (`last_modified` timestamp and `item_count`) is also written to the `collection_meta` database table for fast conflict checking.
+
+- Only the signed-in user can read or write their own storage path (enforced by Row Level Security policies).
+- Each sync **overwrites** the previous cloud backup — there is no version history.
+- The sync hint in the Account modal updates to show the last synced time and item count after a successful push.
+
+### Restoring from the Cloud
+
+Click **↓ Restore from cloud** in the Account modal (or **Restore from cloud** in Settings → Data).
+
+Before downloading, the app checks `collection_meta` for your cloud backup's metadata and shows a **conflict dialog** comparing:
+
+- **Cloud**: how many items are in the cloud backup and when it was last saved
+- **Local**: how many items are in your current local collection and when it was last changed
+
+You can then choose to **Restore** (replacing your local collection with the cloud version) or **Cancel** (keeping your local collection). Restore downloads the full collection JSON from Supabase Storage and applies it exactly as if you had imported a `.json` file — all items, photos, and settings are replaced.
+
+> ⚠️ Restoring overwrites your current local collection. Export a local backup first if you want to keep it.
+
+### Sync Buttons in Settings
+
+The **Sync to cloud** and **Restore from cloud** buttons also appear in the **Settings → Data** tab. They behave identically to the buttons in the Account modal but are greyed out and non-interactive when no user is signed in.
+
+### Data Model
+
+| Resource | Details |
+|---|---|
+| **Supabase Auth** | Email/password authentication. Session tokens are managed by the Supabase JS SDK and stored in the browser. |
+| **Storage bucket: `collections`** | Private bucket. Each user's collection is stored at `{uid}/collection.json`. The file format is identical to the local export format: `{ currency, settings, items }` including base64-encoded photos. |
+| **Table: `collection_meta`** | Stores `{ user_id, last_modified, item_count, app_version }`. Used for the conflict dialog without downloading the full file. `user_id` has `ON DELETE CASCADE` to `auth.users`, so the metadata row is automatically deleted when the account is deleted. |
+
+### Security
+
+The Supabase **publishable key** (prefixed `sb_publishable_`) is embedded client-side in `dashboard.html`. This key is safe to expose — it is scoped to the project and cannot bypass Row Level Security (RLS) policies. Security is enforced entirely by RLS:
+
+- **Storage**: `auth.uid()::text = (storage.foldername(name))[1]` — users can only read and write files under their own UID path.
+- **collection_meta**: `auth.uid() = user_id` — users can only read and write their own metadata row.
+
+Never use the Supabase `service_role` key in client-side code — it bypasses all RLS policies.
+
+### Signing Out
+
+Click **Sign out** in the Account modal. The session is cleared from the browser and the header icon reverts to the default person icon. Your local collection is not affected.
 
 ---
 
@@ -934,6 +1006,8 @@ Click **Export Collection** in the Settings Modal (⚙️ → Data). The browser
 - `settings` contains all user preferences at time of export (only keys that were explicitly set are included).
 - `imgs` is an array of base64-encoded JPEG strings. An empty array `[]` means no photos. The first element is the cover image shown on cards and in the table view.
 
+This is also the format used by cloud sync — the file uploaded to Supabase Storage is identical to a local export.
+
 ### Import
 
 Click **Import Collection** in the Settings Modal (⚙️ → Data). A file picker opens. Select a previously exported `.json` file.
@@ -995,12 +1069,13 @@ The app is designed to work on small screens. On viewports **640px wide or narro
 - **Cards go full width** — the text (signer name, Detail 1, Detail 2) spans the full card width rather than being cramped next to a fixed-width image column.
 - **Horizontal scroll is prevented** — all layout uses `box-sizing: border-box` and the gallery padding is reduced to `12px` on mobile to prevent content from overflowing the viewport.
 - **Sort and Filter share a row** — the Sort dropdown and Filter button appear side by side on a second row below the search bar, each taking half the available width.
+- **Header buttons are smaller** — on viewports ≤480px, icon buttons shrink to 32×32px with a 4px gap to accommodate the added Account button without overflowing.
 
 ---
 
 ## Data Storage
 
-autographed.app uses a **hybrid storage model**: lightweight item metadata and preferences live in `localStorage`, while the bulky photo data lives in **IndexedDB**. This keeps the collection from being capped by the small `localStorage` quota once you add lots of images.
+autographed.app uses a **hybrid storage model**: lightweight item metadata and preferences live in `localStorage`, while the bulky photo data lives in **IndexedDB**. This keeps the collection from being capped by the small `localStorage` quota once you add lots of images. An optional third layer — **Supabase cloud storage** — provides cross-device backup.
 
 ### localStorage (metadata & preferences)
 
@@ -1010,6 +1085,7 @@ autographed.app uses a **hybrid storage model**: lightweight item metadata and p
 | `ag_currency` | String | Local currency code (e.g. `"TWD"`) |
 | `ag_display_currency` | String | Display currency code (e.g. `"USD"`) |
 | `ag_rate_cache` | JSON string | Cached exchange rate: `{from, to, rate, ts}` |
+| `ag_last_modified` | String | Unix timestamp (ms) of the last time `persist()` was called. Used by cloud sync to show "last changed" in the restore conflict dialog. |
 | `ag_cols` | String | Saved columns per row (e.g. `"5"`) |
 | `ag_view` | String | Saved view mode: `"grid"` or `"table"` |
 | `ag_theme` | String | Saved theme: `"light"` or `"dark"` |
@@ -1040,6 +1116,12 @@ autographed.app uses a **hybrid storage model**: lightweight item metadata and p
 
 At runtime, each item still carries its `imgs` array in memory, so all rendering, export, import, and share logic is unchanged. Photos only cross the storage boundary in two places: `load()` reads them from IndexedDB and reattaches them to each item, and `persist()` writes metadata to `localStorage` and syncs photos to IndexedDB (deleting records for items that no longer exist).
 
+### Supabase Cloud (optional)
+
+When the user is signed in and clicks **Sync to cloud**, the full in-memory collection (metadata + photos) is serialized and uploaded as `{uid}/collection.json` to a private Supabase Storage bucket. A row in the `collection_meta` table records the `last_modified` timestamp and `item_count` for fast conflict checking without downloading the full file.
+
+The cloud JSON format is identical to the local export format, so a cloud backup can also be downloaded and imported manually if needed.
+
 ### Automatic migration
 
 On first load after upgrading from a localStorage-only version, autographed.app detects photos stored inline in `localStorage`, moves them into IndexedDB, and rewrites the `localStorage` item array without the image data. This happens transparently — no user action is needed, and nothing is lost.
@@ -1050,6 +1132,7 @@ autographed.app also automatically migrates items that used the older `character
 
 - **IndexedDB** typically allows hundreds of MB up to several GB per origin (browsers permit roughly 50–60% of free disk space), so photo-heavy collections are no longer constrained the way they were under `localStorage`.
 - Item photos are still stored as base64-encoded JPEGs (compressed to max 900px at 0.82 quality), roughly 100–400 KB each.
+- **Supabase Storage** (free tier / Spark plan) includes 1 GB of storage — sufficient for large collections. Each sync overwrites the previous backup so storage usage is bounded by the size of one collection snapshot.
 - **Fallback:** if IndexedDB is unavailable (e.g. some private-browsing modes or very old browsers), autographed.app automatically falls back to the original behavior of storing photos inline in `localStorage`, and shows a notice. In that mode the older 5–10 MB `localStorage` limit applies.
 
 ---
@@ -1091,6 +1174,7 @@ The app uses only:
 - Native browser APIs (`localStorage`, `IndexedDB`, `fetch`, `FileReader`, `HTMLCanvasElement`)
 - Vanilla JavaScript (ES2017+, using `async/await`)
 - Inline CSS with custom properties
+- Supabase JS SDK (loaded lazily from CDN only when the Account modal is first opened — zero cost for anonymous users)
 
 ### Certification URL Derivation
 
@@ -1152,6 +1236,12 @@ User picks file(s)
 
 Multiple files selected in one picker dialog are processed in parallel and appended in the order they finish compressing. Old data exported with a single `img` field is automatically migrated to `imgs: [img]` on load. Old data with `character`/`film` fields is automatically migrated to `detail1`/`detail2` (see [Automatic migration](#automatic-migration)).
 
+### Supabase SDK Loading
+
+The Supabase JS SDK (`@supabase/supabase-js`) is **not bundled** — it is loaded lazily from the jsDelivr CDN via a dynamically inserted `<script>` tag the first time the Account modal is opened. The load promise is cached in `_sbSdkPromise` so subsequent modal opens reuse the already-loaded script. Users who never open the Account modal incur zero SDK overhead.
+
+On page load, `sbInit()` is called silently after the collection loads. This initializes the Supabase client and fires `onAuthStateChange`, which updates the header icon to show the user's initial if a session is already stored in the browser — without requiring the user to open the Account modal.
+
 ### Modal Behavior
 
 Modals use a two-class system:
@@ -1159,6 +1249,8 @@ Modals use a two-class system:
 - `.overlay.open` — adds `opacity: 1` and `pointer-events: all`, animates the inner `.modal` from a slightly translated/scaled state to its natural position
 
 Closing can happen via: the ✕ button, a Cancel button, a backdrop click (on the overlay itself, not the modal), or Delete confirmation.
+
+> **Note:** The account modal and conflict dialog are placed in the HTML after the main `<script>` block. `applyI18n()` is therefore called a second time after `await load()` — at which point the full DOM is parsed — to ensure their `data-i18n` elements are translated correctly on page load.
 
 ### Sorting Implementation
 

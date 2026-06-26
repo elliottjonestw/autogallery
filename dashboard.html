@@ -247,6 +247,7 @@
       transition: background .15s, border-color .15s;
     }
     .settings-row-btn:hover { background: var(--border); border-color: var(--border-light); }
+    .settings-row-btn:disabled { opacity: 0.4; cursor: default; pointer-events: none; }
     .settings-row-icon {
       color: var(--sub);
       display: flex;
@@ -1348,7 +1349,10 @@
       .search-wrap { flex-basis: 100%; }
       .sort-select { flex: 1; }
       .btn-filter { flex: 1; justify-content: center; }
-      header { padding: 0 16px; }
+      header { padding: 0 12px; }
+      .header-right { gap: 4px; }
+      .btn-icon { width: 32px; height: 32px; }
+      #btnAdd { width: 32px; height: 32px; padding: 0; justify-content: center; }
       .stats-bar { padding: 0 16px; }
       .frow { grid-template-columns: 1fr; }
       .btn-add span { display: none; }
@@ -1430,6 +1434,19 @@
     .site-footer { background: var(--surface); border-top: 1px solid var(--border); padding: 24px; text-align: center; font-size: 13px; color: var(--sub); margin-top: auto; }
     .site-footer a { color: var(--gold); text-decoration: none; }
     .site-footer a:hover { text-decoration: underline; }
+
+    /* ── Account / Auth ── */
+    #accountBtn.sb-authed { color: var(--gold); border-color: rgba(201,164,53,.5); }
+    #acctInitial { font-size: 13px; font-weight: 700; line-height: 1; }
+    .auth-tabs { display: flex; border-bottom: 1px solid var(--border); margin: -20px -20px 20px; }
+    .auth-tab { flex: 1; background: none; border: none; padding: 12px; font-size: 13px; font-weight: 600; color: var(--sub); cursor: pointer; border-bottom: 2px solid transparent; margin-bottom: -1px; transition: color .15s; }
+    .auth-tab.active { color: var(--gold); border-bottom-color: var(--gold); }
+    .auth-tab:hover:not(.active) { color: var(--text); }
+    .auth-msg { font-size: 13px; padding: 9px 12px; border-radius: 8px; margin-bottom: 14px; }
+    .auth-msg.err { background: rgba(200,50,50,.08); border: 1px solid rgba(200,50,50,.2); color: #b91c1c; }
+    .auth-msg.ok  { background: rgba(30,122,82,.08);  border: 1px solid rgba(30,122,82,.2);  color: var(--green); }
+    .auth-email { font-size: 14px; font-weight: 600; word-break: break-all; margin-bottom: 6px; }
+    .auth-hint  { font-size: 13px; color: var(--sub); margin-bottom: 20px; }
   </style>
 </head>
 <body>
@@ -1440,8 +1457,9 @@
     <button class="btn-icon" id="privacyRevealBtn" title="Reveal values" style="display:none" onclick="setPrivacyMode('off')">
       <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
     </button>
-    <button class="btn-icon" id="presentBtn" title="Presentation mode" onclick="openPresentation()">
-      <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><polygon points="5,3 19,12 5,21"/></svg>
+    <button class="btn-icon" id="accountBtn" title="Account" onclick="openAccount()">
+      <svg id="acctIcon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+      <span id="acctInitial" style="display:none"></span>
     </button>
     <button class="btn-icon" id="settingsBtn" title="Settings" onclick="openSettings()">
       <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 00.33 1.82l.06.06a2 2 0 010 2.83 2 2 0 01-2.83 0l-.06-.06a1.65 1.65 0 00-1.82-.33 1.65 1.65 0 00-1 1.51V21a2 2 0 01-2 2 2 2 0 01-2-2v-.09A1.65 1.65 0 009 19.4a1.65 1.65 0 00-1.82.33l-.06.06a2 2 0 01-2.83 0 2 2 0 010-2.83l.06-.06A1.65 1.65 0 004.68 15a1.65 1.65 0 00-1.51-1H3a2 2 0 01-2-2 2 2 0 012-2h.09A1.65 1.65 0 004.6 9a1.65 1.65 0 00-.33-1.82l-.06-.06a2 2 0 010-2.83 2 2 0 012.83 0l.06.06A1.65 1.65 0 009 4.68a1.65 1.65 0 001-1.51V3a2 2 0 012-2 2 2 0 012 2v.09a1.65 1.65 0 001 1.51 1.65 1.65 0 001.82-.33l.06-.06a2 2 0 012.83 0 2 2 0 010 2.83l-.06.06A1.65 1.65 0 0019.4 9a1.65 1.65 0 001.51 1H21a2 2 0 012 2 2 2 0 01-2 2h-.09a1.65 1.65 0 00-1.51 1z"/></svg>
@@ -1800,6 +1818,19 @@
           <div class="tip-box" data-i18n="tip_appearance">Switches between light and dark color schemes. Your choice is saved automatically.</div>
         </div>
         <div class="fg tip-container">
+          <label class="flabel" data-i18n="lbl_presentation">Presentation Mode</label>
+          <div class="ctrl-row">
+            <button class="settings-row-btn" onclick="closeSettings();openPresentation()">
+              <span class="settings-row-icon">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><polygon points="5,3 19,12 5,21"/></svg>
+              </span>
+              <span data-i18n="btn_presentation">Start Slideshow</span>
+            </button>
+            <button class="tip-btn" onclick="toggleTip(this)">i</button>
+          </div>
+          <div class="tip-box" data-i18n="tip_presentation">Plays a full-screen photo slideshow of your collection. Click anywhere or press Escape to exit.</div>
+        </div>
+        <div class="fg tip-container">
           <label class="flabel" data-i18n="lbl_photo_format">Photo Format</label>
           <div class="ctrl-row">
             <select class="finput" id="settingsPhotoFormat" onchange="setPhotoFormat(this.value)">
@@ -1987,6 +2018,30 @@
               <button class="tip-btn" onclick="toggleTip(this)">i</button>
             </div>
             <div class="tip-box" data-i18n="tip_print">Prints an A4 layout of your collection sorted by value, matching your current photo format settings.</div>
+          </div>
+          <div class="tip-container" style="margin-top:6px">
+            <div class="ctrl-row">
+              <button class="settings-row-btn" id="settingsSyncBtn" disabled onclick="closeSettings();sbPush()">
+                <span class="settings-row-icon">
+                  <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="16 16 12 12 8 16"/><line x1="12" y1="12" x2="12" y2="21"/><path d="M20.39 18.39A5 5 0 0018 9h-1.26A8 8 0 103 16.3"/></svg>
+                </span>
+                <span data-i18n="sync_to_cloud">Sync to cloud</span>
+              </button>
+              <button class="tip-btn" onclick="toggleTip(this)">i</button>
+            </div>
+            <div class="tip-box" data-i18n="tip_sync_cloud">Uploads your collection to your account so it can be restored on any device. Requires signing in. Previous cloud backup is overwritten.</div>
+          </div>
+          <div class="tip-container" style="margin-top:6px">
+            <div class="ctrl-row">
+              <button class="settings-row-btn" id="settingsRestoreBtn" disabled onclick="closeSettings();sbPull()">
+                <span class="settings-row-icon">
+                  <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="8 8 12 12 16 8"/><line x1="12" y1="12" x2="12" y2="3"/><path d="M20.39 18.39A5 5 0 0018 9h-1.26A8 8 0 103 16.3"/></svg>
+                </span>
+                <span data-i18n="restore_from_cloud">Restore from cloud</span>
+              </button>
+              <button class="tip-btn" onclick="toggleTip(this)">i</button>
+            </div>
+            <div class="tip-box" data-i18n="tip_restore_cloud">⚠️ Downloads your last cloud backup and replaces your current local collection. Export a local backup first if you want to keep it.</div>
           </div>
           <div class="tip-container" style="margin-top:6px;border-top:1px solid var(--border);padding-top:10px">
             <div class="ctrl-row">
@@ -2601,6 +2656,8 @@
       fld_specific1: 'Detail 1', fld_specific2: 'Detail 2',
       tip_language: 'Sets the display language for the app.',
       tip_appearance: 'Switches between light and dark color schemes. Your choice is saved automatically.',
+      lbl_presentation: 'Presentation Mode', btn_presentation: 'Start Slideshow',
+      tip_presentation: 'Plays a full-screen photo slideshow of your collection. Click anywhere or press Escape to exit.',
       tip_photo_format: 'Sets the aspect ratio of image cards to match your memorabilia — e.g. 8×10 photos, index cards, or trading cards.',
       tip_image_fit: "Controls how photos are shown when the uploaded image doesn't match the selected format.",
       tip_info_links: 'Choose which site signer names and film/show titles link to in table view and item detail.',
@@ -2619,6 +2676,22 @@
       tip_local_currency: 'The currency used when recording Paid and Est. Value amounts on your items.',
       tip_display_currency: 'The currency shown in the gallery UI. If different from your local currency, values are converted automatically.',
       tip_exchange_rate: 'Shows the current conversion rate between your local and display currencies. Rates are cached for 1 hour.',
+      acct_title: 'Account',
+      acct_warning: 'An account is optional, but recommended — without one your collection is stored only in this browser and will be permanently lost if you clear your browser data.',
+      acct_tab_signin: 'Sign in', acct_tab_create: 'Create account',
+      acct_lbl_email: 'Email', acct_lbl_password: 'Password',
+      acct_pw_hint: 'Minimum 8 characters',
+      acct_btn_signin: 'Sign in', acct_btn_create: 'Create account',
+      acct_checking: 'Checking cloud…', acct_checking_op: 'Checking…', acct_syncing: 'Syncing…',
+      acct_no_backup: 'No cloud backup yet — click Sync to cloud to create one.',
+      acct_last_synced: 'Last synced:', acct_status_err: 'Could not check sync status.',
+      acct_sync: '↑ Sync to cloud', acct_restore_btn: '↓ Restore from cloud', acct_signout: 'Sign out',
+      sync_to_cloud: 'Sync to cloud', restore_from_cloud: 'Restore from cloud',
+      tip_sync_cloud: 'Uploads your collection to your account so it can be restored on any device. Requires signing in. Previous cloud backup is overwritten.',
+      tip_restore_cloud: '⚠️ Downloads your last cloud backup and replaces your current local collection. Export a local backup first if you want to keep it.',
+      conflict_title: 'Restore from cloud?',
+      conflict_warn: 'Your local collection will be replaced. Export a backup first if you want to keep it.',
+      conflict_restore_btn: 'Restore',
     },
     es: {
       lbl_items: 'Artículos', lbl_total_paid: 'Total pagado', lbl_est_value: 'Valor est.', lbl_return: 'Retorno',
@@ -2733,6 +2806,8 @@
       fld_specific1: 'Detalle 1', fld_specific2: 'Detalle 2',
       tip_language: 'Establece el idioma de visualización de la aplicación.',
       tip_appearance: 'Cambia entre esquemas de color claro y oscuro. Tu elección se guarda automáticamente.',
+      lbl_presentation: 'Modo presentación', btn_presentation: 'Iniciar presentación',
+      tip_presentation: 'Reproduce una presentación de fotos en pantalla completa. Haz clic en cualquier lugar o presiona Escape para salir.',
       tip_photo_format: 'Establece la relación de aspecto de las tarjetas de imagen para que coincida con tus artículos — p. ej., fotos 8×10, tarjetas índice o tarjetas coleccionables.',
       tip_image_fit: 'Controla cómo se muestran las fotos cuando la imagen subida no coincide con el formato seleccionado.',
       tip_info_links: 'Elige a qué sitio enlazan los nombres de los firmantes y los títulos de películas/series en la vista de tabla y en el detalle del artículo.',
@@ -2751,6 +2826,22 @@
       tip_local_currency: 'La moneda utilizada al registrar los montos de Pagado y Valor estimado en tus artículos.',
       tip_display_currency: 'La moneda mostrada en la interfaz de la galería. Si es diferente de tu moneda local, los valores se convierten automáticamente.',
       tip_exchange_rate: 'Muestra el tipo de cambio actual entre tu moneda local y la moneda de visualización. Los tipos de cambio se almacenan en caché por 1 hora.',
+      acct_title: 'Cuenta',
+      acct_warning: 'La cuenta es opcional, pero recomendada — sin ella tu colección se almacena solo en este navegador y se perderá permanentemente si limpias los datos del navegador.',
+      acct_tab_signin: 'Iniciar sesión', acct_tab_create: 'Crear cuenta',
+      acct_lbl_email: 'Correo electrónico', acct_lbl_password: 'Contraseña',
+      acct_pw_hint: 'Mínimo 8 caracteres',
+      acct_btn_signin: 'Iniciar sesión', acct_btn_create: 'Crear cuenta',
+      acct_checking: 'Verificando nube…', acct_checking_op: 'Verificando…', acct_syncing: 'Sincronizando…',
+      acct_no_backup: 'Sin copia de seguridad en la nube — haz clic en Sincronizar para crear una.',
+      acct_last_synced: 'Última sincronización:', acct_status_err: 'No se pudo verificar el estado de sincronización.',
+      acct_sync: '↑ Sincronizar con la nube', acct_restore_btn: '↓ Restaurar desde la nube', acct_signout: 'Cerrar sesión',
+      sync_to_cloud: 'Sincronizar con la nube', restore_from_cloud: 'Restaurar desde la nube',
+      tip_sync_cloud: 'Sube tu colección a tu cuenta para poder restaurarla en cualquier dispositivo. Requiere iniciar sesión. La copia de seguridad anterior se sobreescribirá.',
+      tip_restore_cloud: '⚠️ Descarga tu última copia de seguridad en la nube y reemplaza tu colección local actual. Exporta una copia de seguridad local primero si quieres conservarla.',
+      conflict_title: '¿Restaurar desde la nube?',
+      conflict_warn: 'Tu colección local será reemplazada. Exporta una copia de seguridad primero si quieres conservarla.',
+      conflict_restore_btn: 'Restaurar',
     },
     'zh-TW': {
       lbl_items: '項目', lbl_total_paid: '總購入', lbl_est_value: '估計價值', lbl_return: '回報率',
@@ -2865,6 +2956,8 @@
       fld_specific1: '詳細 1', fld_specific2: '詳細 2',
       tip_language: '設定應用程式的顯示語言。',
       tip_appearance: '在淺色與深色配色之間切換。您的選擇將自動儲存。',
+      lbl_presentation: '簡報模式', btn_presentation: '開始幻燈片',
+      tip_presentation: '以全螢幕播放您的收藏相片幻燈片。點擊任何地方或按 Escape 鍵退出。',
       tip_photo_format: '設定圖片卡的比例以符合您的收藏品，例如 8×10 相片、索引卡或球員卡。',
       tip_image_fit: '控制上傳圖片與所選格式不符時的顯示方式。',
       tip_info_links: '選擇簽名者名稱與電影／影集標題在表格檢視與項目詳情中的連結網站。',
@@ -2883,6 +2976,22 @@
       tip_local_currency: '錄入購入金額與估計價值時使用的貨幣。',
       tip_display_currency: '在收藏介面中顯示的貨幣。若與本地貨幣不同，價值將自動換算。',
       tip_exchange_rate: '顯示本地貨幣與顯示貨幣之間的目前匯率。匯率快取有效期為 1 小時。',
+      acct_title: '帳號',
+      acct_warning: '帳號為選用，但建議使用——若未使用帳號，您的收藏僅存於此瀏覽器，清除瀏覽器資料後將永久遺失。',
+      acct_tab_signin: '登入', acct_tab_create: '建立帳號',
+      acct_lbl_email: '電子郵件', acct_lbl_password: '密碼',
+      acct_pw_hint: '最少 8 個字元',
+      acct_btn_signin: '登入', acct_btn_create: '建立帳號',
+      acct_checking: '正在檢查雲端…', acct_checking_op: '檢查中…', acct_syncing: '同步中…',
+      acct_no_backup: '尚無雲端備份——點擊「同步至雲端」以建立備份。',
+      acct_last_synced: '上次同步：', acct_status_err: '無法檢查同步狀態。',
+      acct_sync: '↑ 同步至雲端', acct_restore_btn: '↓ 從雲端還原', acct_signout: '登出',
+      sync_to_cloud: '同步至雲端', restore_from_cloud: '從雲端還原',
+      tip_sync_cloud: '將您的收藏上傳至帳號，以便在任何裝置上還原。需要登入。之前的雲端備份將被覆蓋。',
+      tip_restore_cloud: '⚠️ 下載您最後的雲端備份並取代目前的本地收藏。如需保留本地收藏，請先匯出備份。',
+      conflict_title: '從雲端還原？',
+      conflict_warn: '您的本地收藏將被取代。如需保留，請先匯出備份。',
+      conflict_restore_btn: '還原',
     },
     de: {
       lbl_items: 'Objekte', lbl_total_paid: 'Gesamt gezahlt', lbl_est_value: 'Gesch. Wert', lbl_return: 'Rendite',
@@ -2997,6 +3106,8 @@
       fld_specific1: 'Detail 1', fld_specific2: 'Detail 2',
       tip_language: 'Legt die Anzeigesprache der App fest.',
       tip_appearance: 'Wechselt zwischen hellem und dunklem Farbschema. Deine Auswahl wird automatisch gespeichert.',
+      lbl_presentation: 'Präsentationsmodus', btn_presentation: 'Diashow starten',
+      tip_presentation: 'Spielt eine Vollbild-Diashow deiner Sammlung ab. Klicke irgendwo oder drücke Escape zum Beenden.',
       tip_photo_format: 'Legt das Seitenverhältnis der Bildkarten passend zu deinen Objekten fest — z. B. 8×10-Fotos, Karteikarten oder Sammelkarten.',
       tip_image_fit: 'Steuert, wie Fotos angezeigt werden, wenn das hochgeladene Bild nicht dem gewählten Format entspricht.',
       tip_info_links: 'Wähle, zu welcher Seite Namen der Unterzeichner und Film-/Serientitel in der Tabellenansicht und Objektdetails verlinken.',
@@ -3015,6 +3126,22 @@
       tip_local_currency: 'Die beim Erfassen von gezahlten Beträgen und Schätzwerten verwendete Währung.',
       tip_display_currency: 'Die in der Galerie-Oberfläche angezeigte Währung. Falls sie von deiner lokalen Währung abweicht, werden Werte automatisch umgerechnet.',
       tip_exchange_rate: 'Zeigt den aktuellen Umrechnungskurs zwischen deiner lokalen und der Anzeigewährung. Kurse werden 1 Stunde lang zwischengespeichert.',
+      acct_title: 'Konto',
+      acct_warning: 'Ein Konto ist optional, wird aber empfohlen — ohne eines wird deine Sammlung nur in diesem Browser gespeichert und geht dauerhaft verloren, wenn du die Browserdaten löschst.',
+      acct_tab_signin: 'Anmelden', acct_tab_create: 'Konto erstellen',
+      acct_lbl_email: 'E-Mail', acct_lbl_password: 'Passwort',
+      acct_pw_hint: 'Mindestens 8 Zeichen',
+      acct_btn_signin: 'Anmelden', acct_btn_create: 'Konto erstellen',
+      acct_checking: 'Cloud wird geprüft…', acct_checking_op: 'Prüfen…', acct_syncing: 'Synchronisieren…',
+      acct_no_backup: 'Noch kein Cloud-Backup — klicke auf „Mit Cloud synchronisieren", um eines zu erstellen.',
+      acct_last_synced: 'Zuletzt synchronisiert:', acct_status_err: 'Synchronisierungsstatus konnte nicht geprüft werden.',
+      acct_sync: '↑ Mit Cloud synchronisieren', acct_restore_btn: '↓ Aus Cloud wiederherstellen', acct_signout: 'Abmelden',
+      sync_to_cloud: 'Mit Cloud synchronisieren', restore_from_cloud: 'Aus Cloud wiederherstellen',
+      tip_sync_cloud: 'Lädt deine Sammlung in dein Konto hoch, damit sie auf jedem Gerät wiederhergestellt werden kann. Erfordert Anmeldung. Das vorherige Cloud-Backup wird überschrieben.',
+      tip_restore_cloud: '⚠️ Lädt dein letztes Cloud-Backup herunter und ersetzt deine aktuelle lokale Sammlung. Exportiere zuerst ein lokales Backup, wenn du es behalten möchtest.',
+      conflict_title: 'Aus Cloud wiederherstellen?',
+      conflict_warn: 'Deine lokale Sammlung wird ersetzt. Exportiere zuerst eine Sicherungskopie, wenn du sie behalten möchtest.',
+      conflict_restore_btn: 'Wiederherstellen',
     },
     fr: {
       lbl_items: 'Articles', lbl_total_paid: 'Total payé', lbl_est_value: 'Val. est.', lbl_return: 'Rendement',
@@ -3125,6 +3252,8 @@
       fld_specific1: 'Détail 1', fld_specific2: 'Détail 2',
       tip_language: 'Définit la langue d\'affichage de l\'application.',
       tip_appearance: 'Bascule entre les thèmes clair et sombre. Votre choix est enregistré automatiquement.',
+      lbl_presentation: 'Mode présentation', btn_presentation: 'Lancer le diaporama',
+      tip_presentation: "Joue un diaporama plein écran de votre collection. Cliquez n'importe où ou appuyez sur Échap pour quitter.",
       tip_photo_format: 'Définit le ratio d\'aspect des cartes image pour correspondre à vos pièces — par ex. photos 8×10, fiches ou cartes à collectionner.',
       tip_image_fit: 'Contrôle l\'affichage des photos lorsque l\'image importée ne correspond pas au format sélectionné.',
       tip_info_links: 'Choisissez le site vers lequel pointent les noms des signataires et les titres de films/séries dans la vue tableau et le détail de l\'article.',
@@ -3143,6 +3272,22 @@
       tip_local_currency: 'La devise utilisée pour saisir les montants Payé et Val. est. sur vos articles.',
       tip_display_currency: 'La devise affichée dans la galerie. Si elle diffère de votre devise locale, les valeurs sont converties automatiquement.',
       tip_exchange_rate: 'Affiche le taux de change actuel entre votre devise locale et la devise d\'affichage. Les taux sont mis en cache pendant 1 heure.',
+      acct_title: 'Compte',
+      acct_warning: 'Un compte est facultatif, mais recommandé — sans compte, votre collection n\'est stockée que dans ce navigateur et sera définitivement perdue si vous effacez vos données de navigation.',
+      acct_tab_signin: 'Se connecter', acct_tab_create: 'Créer un compte',
+      acct_lbl_email: 'E-mail', acct_lbl_password: 'Mot de passe',
+      acct_pw_hint: '8 caractères minimum',
+      acct_btn_signin: 'Se connecter', acct_btn_create: 'Créer un compte',
+      acct_checking: 'Vérification du cloud…', acct_checking_op: 'Vérification…', acct_syncing: 'Synchronisation…',
+      acct_no_backup: 'Aucune sauvegarde cloud — cliquez sur « Synchroniser » pour en créer une.',
+      acct_last_synced: 'Dernière sync :', acct_status_err: 'Impossible de vérifier le statut de synchronisation.',
+      acct_sync: '↑ Synchroniser avec le cloud', acct_restore_btn: '↓ Restaurer depuis le cloud', acct_signout: 'Se déconnecter',
+      sync_to_cloud: 'Synchroniser avec le cloud', restore_from_cloud: 'Restaurer depuis le cloud',
+      tip_sync_cloud: 'Téléverse votre collection vers votre compte pour la restaurer sur n\'importe quel appareil. Nécessite une connexion. La sauvegarde cloud précédente sera écrasée.',
+      tip_restore_cloud: '⚠️ Télécharge votre dernière sauvegarde cloud et remplace votre collection locale actuelle. Exportez d\'abord une sauvegarde locale si vous souhaitez la conserver.',
+      conflict_title: 'Restaurer depuis le cloud ?',
+      conflict_warn: 'Votre collection locale sera remplacée. Exportez d\'abord une sauvegarde si vous souhaitez la conserver.',
+      conflict_restore_btn: 'Restaurer',
     },
   };
 
@@ -3652,6 +3797,7 @@
   }
 
   function persist() {
+    localStorage.setItem('ag_last_modified', Date.now());
     // Fallback path: no IndexedDB → original behavior (photos inline).
     if (idbBroken || !window.indexedDB) {
       try { localStorage.setItem(KEY, JSON.stringify(items)); }
@@ -5026,10 +5172,12 @@
     if (savedSort) { const el = document.getElementById('sortSelect'); if (el) el.value = savedSort; }
 
     await load();   // metadata from localStorage + photos from IndexedDB
+    applyI18n();   // re-run to catch overlays parsed after the script block
 
     const savedView = localStorage.getItem('ag_view') || 'grid';
     setView(savedView);  // first render, now that items are ready
     fetchExchangeRate(); // re-renders once the rate is ready (uses cache if fresh)
+    sbInit().catch(() => {}); // restore persisted auth session and update header
     checkShareURL();
   })();
   window.addEventListener('hashchange', checkShareURL);
@@ -5251,12 +5399,372 @@
 
     window.print();
   }
+
+  /* ── Supabase / Account ── */
+  const SB_URL = 'https://wmaxvywvlomsqyswentv.supabase.co';
+  const SB_KEY = 'sb_publishable_vjQEPBXuDp46KT9pzbvViQ_vmdgxoNb';
+  let _sbClient = null;
+  let _sbSdkPromise = null;
+
+  function sbLoadSdk() {
+    if (_sbSdkPromise) return _sbSdkPromise;
+    _sbSdkPromise = new Promise((resolve, reject) => {
+      if (window.supabase) { resolve(); return; }
+      const s = document.createElement('script');
+      s.src = 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2';
+      s.onload  = resolve;
+      s.onerror = () => { _sbSdkPromise = null; reject(new Error('SDK load failed')); };
+      document.head.appendChild(s);
+    });
+    return _sbSdkPromise;
+  }
+
+  async function sbInit() {
+    if (_sbClient) return _sbClient;
+    await sbLoadSdk();
+    _sbClient = window.supabase.createClient(SB_URL, SB_KEY);
+    _sbClient.auth.onAuthStateChange((_event, session) => {
+      sbUpdateHeader(session?.user ?? null);
+    });
+    return _sbClient;
+  }
+
+  function sbUpdateHeader(user) {
+    const btn  = document.getElementById('accountBtn');
+    const icon = document.getElementById('acctIcon');
+    const init = document.getElementById('acctInitial');
+    if (!btn) return;
+    if (user) {
+      btn.classList.add('sb-authed');
+      icon.style.display = 'none';
+      init.style.display = '';
+      init.textContent = (user.email || '?')[0].toUpperCase();
+    } else {
+      btn.classList.remove('sb-authed');
+      icon.style.display = '';
+      init.style.display = 'none';
+    }
+    ['settingsSyncBtn','settingsRestoreBtn'].forEach(id => {
+      const el = document.getElementById(id);
+      if (el) el.disabled = !user;
+    });
+  }
+
+  function sbPanel(id) {
+    ['sbLoading','sbOut','sbIn'].forEach(p =>
+      document.getElementById(p).style.display = p === id ? '' : 'none'
+    );
+  }
+
+  function sbUpdateModal(user) {
+    if (user) {
+      document.getElementById('sbEmail').textContent = user.email;
+      sbPanel('sbIn');
+      sbLoadSyncStatus(user.id);
+    } else {
+      sbPanel('sbOut');
+    }
+  }
+
+  async function openAccount() {
+    open('accountOverlay');
+    sbPanel('sbLoading');
+    try {
+      const sb = await sbInit();
+      const { data: { user } } = await sb.auth.getUser();
+      sbUpdateModal(user);
+    } catch {
+      document.getElementById('sbLoading').textContent =
+        'Could not connect — check your internet connection.';
+    }
+  }
+
+  function closeAccount() { close('accountOverlay'); }
+
+  function sbTab(which) {
+    const isIn = which === 'in';
+    document.getElementById('sbTabIn').classList.toggle('active',  isIn);
+    document.getElementById('sbTabUp').classList.toggle('active', !isIn);
+    document.getElementById('sbFormIn').style.display = isIn ? '' : 'none';
+    document.getElementById('sbFormUp').style.display = isIn ? 'none' : '';
+    document.getElementById('sbMsgIn').style.display = 'none';
+    document.getElementById('sbMsgUp').style.display = 'none';
+  }
+
+  function sbMsg(id, text, type) {
+    const el = document.getElementById(id);
+    el.textContent = text;
+    el.className = 'auth-msg ' + type;
+    el.style.display = '';
+  }
+
+  async function sbSignIn(e) {
+    e.preventDefault();
+    const email = document.getElementById('sbEmailIn').value.trim();
+    const pass  = document.getElementById('sbPassIn').value;
+    const btn   = document.getElementById('sbBtnIn');
+    document.getElementById('sbMsgIn').style.display = 'none';
+    btn.disabled = true; btn.textContent = 'Signing in…';
+    try {
+      const { error } = await _sbClient.auth.signInWithPassword({ email, password: pass });
+      if (error) throw error;
+      document.getElementById('sbPassIn').value = '';
+      const { data: { user } } = await _sbClient.auth.getUser();
+      sbUpdateModal(user);
+    } catch (err) {
+      sbMsg('sbMsgIn', err.message || 'Sign in failed.', 'err');
+    } finally {
+      btn.disabled = false; btn.textContent = 'Sign in';
+    }
+  }
+
+  async function sbSignUp(e) {
+    e.preventDefault();
+    const email = document.getElementById('sbEmailUp').value.trim();
+    const pass  = document.getElementById('sbPassUp').value;
+    const btn   = document.getElementById('sbBtnUp');
+    document.getElementById('sbMsgUp').style.display = 'none';
+    btn.disabled = true; btn.textContent = 'Creating account…';
+    try {
+      const { error } = await _sbClient.auth.signUp({ email, password: pass });
+      if (error) throw error;
+      document.getElementById('sbPassUp').value = '';
+      sbMsg('sbMsgUp', 'Check your email for a confirmation link, then sign in.', 'ok');
+    } catch (err) {
+      sbMsg('sbMsgUp', err.message || 'Sign up failed.', 'err');
+    } finally {
+      btn.disabled = false; btn.textContent = 'Create account';
+    }
+  }
+
+  async function sbSignOut() {
+    if (!_sbClient) return;
+    await _sbClient.auth.signOut();
+    sbUpdateModal(null);
+  }
+
+  function sbFormatDate(d) {
+    if (!d || isNaN(d)) return 'unknown date';
+    return d.toLocaleDateString(undefined, { month: 'short', day: 'numeric', year: 'numeric' })
+         + ' at ' + d.toLocaleTimeString(undefined, { hour: 'numeric', minute: '2-digit' });
+  }
+
+  function sbSetSyncHint(text) {
+    const el = document.getElementById('sbSyncHint');
+    if (el) el.textContent = text;
+  }
+
+  async function sbLoadSyncStatus(uid) {
+    sbSetSyncHint(t('acct_checking'));
+    try {
+      const { data, error } = await _sbClient
+        .from('collection_meta')
+        .select('last_modified, item_count')
+        .eq('user_id', uid)
+        .single();
+      if (error || !data) {
+        sbSetSyncHint(t('acct_no_backup'));
+      } else {
+        const n = data.item_count;
+        sbSetSyncHint(`${t('acct_last_synced')} ${sbFormatDate(new Date(data.last_modified))} · ${n} item${n !== 1 ? 's' : ''}`);
+      }
+    } catch {
+      sbSetSyncHint(t('acct_status_err'));
+    }
+  }
+
+  async function sbPush() {
+    const btn = document.getElementById('sbPushBtn');
+    const { data: { user } } = await _sbClient.auth.getUser();
+    if (!user) return;
+    btn.disabled = true; btn.textContent = t('acct_syncing');
+    try {
+      const payload = {
+        currency: localStorage.getItem('ag_currency') || 'USD',
+        settings: collectSettings(),
+        items,
+      };
+      const blob = new Blob([JSON.stringify(payload)], { type: 'application/json' });
+      const { error: upErr } = await _sbClient.storage
+        .from('collections')
+        .upload(`${user.id}/collection.json`, blob, { contentType: 'application/json', upsert: true });
+      if (upErr) throw upErr;
+      const { error: metaErr } = await _sbClient
+        .from('collection_meta')
+        .upsert({ user_id: user.id, last_modified: new Date().toISOString(), item_count: items.length, app_version: '1' });
+      if (metaErr) throw metaErr;
+      const n = items.length;
+      sbSetSyncHint(`${t('acct_last_synced')} ${sbFormatDate(new Date())} · ${n} item${n !== 1 ? 's' : ''}`);
+      markClean();
+      toast('Collection synced to cloud');
+    } catch (err) {
+      toast('⚠️ Sync failed — ' + (err.message || 'check your connection'));
+    } finally {
+      btn.disabled = false; btn.textContent = t('acct_sync');
+    }
+  }
+
+  let _sbRestoreCtx = null;
+
+  async function sbPull() {
+    const btn = document.getElementById('sbPullBtn');
+    const { data: { user } } = await _sbClient.auth.getUser();
+    if (!user) return;
+    btn.disabled = true; btn.textContent = t('acct_checking_op');
+    try {
+      const { data: meta, error } = await _sbClient
+        .from('collection_meta')
+        .select('last_modified, item_count')
+        .eq('user_id', user.id)
+        .single();
+      if (error || !meta) { toast('No cloud backup found — sync first to create one'); return; }
+      const cloudDate = new Date(meta.last_modified);
+      const localTs   = parseInt(localStorage.getItem('ag_last_modified') || '0', 10);
+      const localDate = localTs ? new Date(localTs) : null;
+      _sbRestoreCtx = { userId: user.id };
+      const cn = meta.item_count; const ln = items.length;
+      document.getElementById('sbConflictCloud').textContent = `☁ Cloud: ${cn} item${cn !== 1 ? 's' : ''}`;
+      document.getElementById('sbConflictCloudDate').textContent = `Saved ${sbFormatDate(cloudDate)}`;
+      document.getElementById('sbConflictLocal').textContent = `💾 Local: ${ln} item${ln !== 1 ? 's' : ''}`;
+      document.getElementById('sbConflictLocalDate').textContent = localDate ? `Last changed ${sbFormatDate(localDate)}` : '';
+      open('sbConflictOverlay');
+    } catch (err) {
+      toast('⚠️ Could not check cloud — ' + (err.message || 'check your connection'));
+    } finally {
+      btn.disabled = false; btn.textContent = t('acct_restore_btn');
+    }
+  }
+
+  function closeConflict() { close('sbConflictOverlay'); }
+
+  async function sbConfirmRestore() {
+    closeConflict();
+    if (!_sbRestoreCtx) return;
+    const { userId } = _sbRestoreCtx;
+    _sbRestoreCtx = null;
+    const btn = document.getElementById('sbPullBtn');
+    btn.disabled = true; btn.textContent = 'Restoring…';
+    try {
+      const { data: blob, error } = await _sbClient.storage
+        .from('collections')
+        .download(`${userId}/collection.json`);
+      if (error) throw error;
+      const parsed  = JSON.parse(await blob.text());
+      const data     = Array.isArray(parsed) ? parsed : parsed.items;
+      const currency = Array.isArray(parsed) ? null   : parsed.currency;
+      if (!Array.isArray(data)) throw new Error('Invalid backup format');
+      items = data.map(migrateItem);
+      persist();
+      markDirty();
+      if (currency) setLocalCurrency(currency);
+      if (parsed.settings) applySettings(parsed.settings);
+      render();
+      close('accountOverlay');
+      toast(`Restored ${items.length} item${items.length !== 1 ? 's' : ''} from cloud`);
+    } catch (err) {
+      toast('⚠️ Restore failed — ' + (err.message || 'check your connection'));
+    } finally {
+      btn.disabled = false; btn.textContent = t('acct_restore_btn');
+    }
+  }
 </script>
 
 <div id="printView"></div>
 <footer class="site-footer">
   <a href="index.html">Home</a> · <a href="dashboard.html">Dashboard</a> · <a href="blog/">Blog</a>
 </footer>
+<!-- ── Restore conflict dialog ── -->
+<div class="overlay" id="sbConflictOverlay" style="z-index:300" onclick="if(event.target===this)closeConflict()">
+  <div class="modal" style="max-width:380px">
+    <div class="modal-head">
+      <span class="modal-title" data-i18n="conflict_title">Restore from cloud?</span>
+      <button class="btn-x" onclick="closeConflict()">✕</button>
+    </div>
+    <div class="modal-body">
+      <p style="font-size:13px;margin-bottom:14px;color:var(--sub)" data-i18n="conflict_warn">Your local collection will be replaced. Export a backup first if you want to keep it.</p>
+      <div style="background:var(--bg);border-radius:8px;padding:12px 14px;margin-bottom:18px">
+        <div style="margin-bottom:8px">
+          <div id="sbConflictCloud" style="font-size:13px;font-weight:600"></div>
+          <div id="sbConflictCloudDate" style="font-size:12px;color:var(--sub)"></div>
+        </div>
+        <div>
+          <div id="sbConflictLocal" style="font-size:13px"></div>
+          <div id="sbConflictLocalDate" style="font-size:12px;color:var(--sub)"></div>
+        </div>
+      </div>
+      <div style="display:flex;gap:8px">
+        <button class="btn-secondary" onclick="closeConflict()" style="flex:1;height:36px" data-i18n="cancel">Cancel</button>
+        <button class="btn-add" onclick="sbConfirmRestore()" style="flex:1;justify-content:center;height:36px" data-i18n="conflict_restore_btn">Restore</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ── Account / Auth Modal ── -->
+<div class="overlay" id="accountOverlay" onclick="overlayClick(event,'accountOverlay')">
+  <div class="modal" style="max-width:380px">
+    <div class="modal-head">
+      <span class="modal-title" data-i18n="acct_title">Account</span>
+      <button class="btn-x" onclick="closeAccount()">✕</button>
+    </div>
+    <div class="modal-body" id="accountBody">
+
+      <p style="font-size:12px;color:var(--sub);margin-bottom:16px;line-height:1.5" data-i18n="acct_warning">An account is optional, but recommended — without one your collection is stored only in this browser and will be permanently lost if you clear your browser data.</p>
+
+      <!-- Loading -->
+      <div id="sbLoading" style="text-align:center;padding:32px 0;color:var(--sub);font-size:14px">Loading…</div>
+
+      <!-- Signed out -->
+      <div id="sbOut" style="display:none">
+        <div class="auth-tabs">
+          <button class="auth-tab active" id="sbTabIn" onclick="sbTab('in')" data-i18n="acct_tab_signin">Sign in</button>
+          <button class="auth-tab"        id="sbTabUp" onclick="sbTab('up')" data-i18n="acct_tab_create">Create account</button>
+        </div>
+
+        <form id="sbFormIn" onsubmit="sbSignIn(event)">
+          <div class="fg">
+            <label class="flabel" data-i18n="acct_lbl_email">Email</label>
+            <input class="finput" type="email" id="sbEmailIn" autocomplete="email" required>
+          </div>
+          <div class="fg">
+            <label class="flabel" data-i18n="acct_lbl_password">Password</label>
+            <input class="finput" type="password" id="sbPassIn" autocomplete="current-password" required>
+          </div>
+          <div id="sbMsgIn" class="auth-msg err" style="display:none"></div>
+          <button class="btn-add" type="submit" id="sbBtnIn" style="width:100%;justify-content:center;height:38px" data-i18n="acct_btn_signin">Sign in</button>
+        </form>
+
+        <form id="sbFormUp" onsubmit="sbSignUp(event)" style="display:none">
+          <div class="fg">
+            <label class="flabel" data-i18n="acct_lbl_email">Email</label>
+            <input class="finput" type="email" id="sbEmailUp" autocomplete="email" required>
+          </div>
+          <div class="fg">
+            <label class="flabel" data-i18n="acct_lbl_password">Password</label>
+            <input class="finput" type="password" id="sbPassUp" autocomplete="new-password" required minlength="8">
+            <div class="fhint" data-i18n="acct_pw_hint">Minimum 8 characters</div>
+          </div>
+          <div id="sbMsgUp" class="auth-msg err" style="display:none"></div>
+          <button class="btn-add" type="submit" id="sbBtnUp" style="width:100%;justify-content:center;height:38px" data-i18n="acct_btn_create">Create account</button>
+        </form>
+      </div>
+
+      <!-- Signed in -->
+      <div id="sbIn" style="display:none">
+        <p class="auth-email" id="sbEmail"></p>
+        <p class="auth-hint" id="sbSyncHint"></p>
+        <div style="display:flex;gap:8px;margin-bottom:16px">
+          <button class="btn-add" id="sbPushBtn" onclick="sbPush()" style="flex:1;justify-content:center;height:36px;font-size:13px" data-i18n="acct_sync">↑ Sync to cloud</button>
+          <button class="btn-secondary" id="sbPullBtn" onclick="sbPull()" style="flex:1;height:36px;font-size:13px" data-i18n="acct_restore_btn">↓ Restore from cloud</button>
+        </div>
+        <hr style="border:none;border-top:1px solid var(--border);margin:0 0 14px">
+        <button class="btn-secondary" onclick="sbSignOut()" style="width:100%;height:34px;font-size:13px" data-i18n="acct_signout">Sign out</button>
+      </div>
+
+    </div>
+  </div>
+</div>
+
 <div id="batchDropOverlay">
   <div class="batch-drop-box">
     <div class="batch-drop-icon">🖼️</div>
