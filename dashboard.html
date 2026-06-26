@@ -45,6 +45,8 @@
       font-family: var(--font);
       min-height: 100vh;
       -webkit-font-smoothing: antialiased;
+      display: flex;
+      flex-direction: column;
     }
 
     /* ── Header ── */
@@ -1424,6 +1426,10 @@
       .pv-roi-pos { color: #2a9d6a; }
       .pv-roi-neg { color: #d94f4f; }
     }
+
+    .site-footer { background: var(--surface); border-top: 1px solid var(--border); padding: 24px; text-align: center; font-size: 13px; color: var(--sub); margin-top: auto; }
+    .site-footer a { color: var(--gold); text-decoration: none; }
+    .site-footer a:hover { text-decoration: underline; }
   </style>
 </head>
 <body>
@@ -5118,6 +5124,9 @@
 </script>
 
 <div id="printView"></div>
+<footer class="site-footer">
+  <a href="index.html">Home</a> · <a href="dashboard.html">Dashboard</a> · <a href="blog/">Blog</a>
+</footer>
 <div id="batchDropOverlay">
   <div class="batch-drop-box">
     <div class="batch-drop-icon">🖼️</div>

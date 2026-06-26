@@ -2,6 +2,8 @@
 
 A single-file, no-backend browser app for managing an autograph and memorabilia collection. All data is stored locally in the browser — nothing is ever sent to a server.
 
+> **Note:** This README documents `dashboard.html` (the app) only. It does not cover `index.html` (the marketing page) or the `/blog/` section.
+
 ---
 
 ## Table of Contents
@@ -23,10 +25,11 @@ A single-file, no-backend browser app for managing an autograph and memorabilia 
 15. [Sharing a Collection](#sharing-a-collection)
 16. [View Mode](#view-mode)
 17. [Light & Dark Mode](#light--dark-mode)
-18. [Mobile Behavior](#mobile-behavior)
-19. [Data Storage](#data-storage)
-20. [Item Schema](#item-schema)
-21. [Technical Notes](#technical-notes)
+18. [Footer](#footer)
+19. [Mobile Behavior](#mobile-behavior)
+20. [Data Storage](#data-storage)
+21. [Item Schema](#item-schema)
+22. [Technical Notes](#technical-notes)
 
 ---
 
@@ -971,6 +974,12 @@ Click **Batch Import Photos** in the Settings Modal (⚙️ → Data), or drag o
 **Drag-and-drop:**
 
 Dragging image files over the browser window (when the Add/Edit form is not open) triggers a full-screen drop overlay: a dark backdrop with a dashed gold box reading "Drop photos to import / One stub item will be created per image." Dropping the files runs the same import flow. Non-image files in the drop are silently ignored; if none of the dropped files are images, a toast error is shown.
+
+---
+
+## Footer
+
+A footer is fixed to the bottom of the page and contains three navigation links: **Home** (the marketing page), **Dashboard** (the app), and **Blog**. It appears on all pages of the site, including the dashboard, the marketing page, and all blog pages.
 
 ---
 
