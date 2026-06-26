@@ -481,12 +481,13 @@ A dropdown to set the display language for the entire app. Currently supported:
 | **English** *(default)* | English |
 | **Deutsch** | German |
 | **Español** | Spanish (neutral — suitable for all Spanish-speaking regions) |
+| **Français** | French |
 | **繁體中文** | Traditional Chinese (Taiwan) |
 
 **Language priority:**
 
 1. If the user has previously changed the language in Settings, that choice is stored in `localStorage` (`ag_lang`) and used on every visit.
-2. If no preference is saved, the app checks the browser's language preference (`navigator.languages`). If the browser language matches a supported language, it is used automatically. Any `de-*` locale (e.g. `de-DE`, `de-AT`, `de-CH`) maps to German; any `es-*` locale (e.g. `es-MX`, `es-AR`, `es-ES`) maps to the neutral Spanish translation.
+2. If no preference is saved, the app checks the browser's language preference (`navigator.languages`). If the browser language matches a supported language, it is used automatically. Any `de-*` locale (e.g. `de-DE`, `de-AT`, `de-CH`) maps to German; any `es-*` locale (e.g. `es-MX`, `es-AR`, `es-ES`) maps to the neutral Spanish translation; any `fr-*` locale (e.g. `fr-FR`, `fr-CA`, `fr-BE`) maps to French.
 3. If the browser language is not supported, the app falls back to English.
 
 This priority means first-time visitors and shared-link viewers always see the app in their own browser language (if supported), without any setting from the original creator overriding it. Shared collections never carry language preferences that would force a language on the viewer.
@@ -681,7 +682,7 @@ This is a free, public API that requires no authentication.
 | Loaded | "1 $USD = 31.6335 NT$TWD" with a timestamp ("Updated just now" / "Updated Xm ago") |
 | Error | "Could not fetch rate — check your connection" |
 
-A **Refresh** button allows manually re-fetching the rate at any time (bypasses the 1-hour cache). All status strings and the Refresh button label are fully translated (English, Spanish, German, and Traditional Chinese).
+A **Refresh** button allows manually re-fetching the rate at any time (bypasses the 1-hour cache). All status strings and the Refresh button label are fully translated (English, Spanish, French, German, and Traditional Chinese).
 
 **Behavior when currencies match:** If local and display currencies are set to the same value, no exchange rate is fetched, and `exchangeRate` is set to `1` internally. All displayed values are identical to stored values.
 
@@ -1019,7 +1020,7 @@ autographed.app uses a **hybrid storage model**: lightweight item metadata and p
 | `ag_privacy` | String | Saved privacy mode: `"off"` or `"on"` |
 | `ag_sort` | String | Saved sort mode (e.g. `"date-desc"`, `"custom"`) |
 | `ag_custom_order` | JSON string | Array of item IDs representing the user-defined custom sort sequence |
-| `ag_lang` | String | Saved language preference (e.g. `"en"`, `"de"`, `"es"`, `"zh-TW"`). Only present when the user has manually selected a language — absence means auto-detect from browser. |
+| `ag_lang` | String | Saved language preference (e.g. `"en"`, `"de"`, `"es"`, `"fr"`, `"zh-TW"`). Only present when the user has manually selected a language — absence means auto-detect from browser. |
 | `ag_grid_image` | String | Grid card image visibility: `"1"` (visible) or `"0"` (hidden). Absent = visible. |
 | `ag_grid_signer` | String | Grid card signer name visibility: `"1"` or `"0"`. Absent = visible. |
 | `ag_grid_detail1` | String | Grid card Detail 1 field visibility: `"1"` or `"0"`. Absent = visible. |
